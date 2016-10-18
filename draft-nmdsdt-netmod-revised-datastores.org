@@ -125,6 +125,10 @@ Some observations:
   for inactive data receive the content of the <running> datastore
   with the inactive data removed.  Validation always happens on the
   <running> datastore with inactive data removed.
+- Some implementations have proprietary mechanisms that allow clients
+  to define configuration templates in <running/>.  These templates
+  are expanded automatically by the system, and the resulting
+  configuration is applied.
 - Some operators have reported that it is essential for them to be
   able to retrieve the configuration that has actually been
   successfully applied, which may be a subset or a superset of the
@@ -146,15 +150,15 @@ model in order reflect the experience gained with the original model.
                    | (ct, rw)  |
                    +-----------+
                          |
-                        (A)       // e.g., removal of 'inactive'
-                         |        // nodes
+                         |        // e.g., removal of 'inactive'
+                         |        // nodes, expansion of templates
                          v
                    +------------+
                    | <intended> | // subject to validation
                    | (ct, ro)   |
                    +------------+
                          |
-                        (B)       // e.g., missing resources or
+                         |        // e.g., missing resources or
                          |        // delays
                          v
                    +-----------+
@@ -162,7 +166,7 @@ model in order reflect the experience gained with the original model.
                    | (ct, ro)  |    |      protocols
                    +-----------+    +--- control-plane datastores
                          |
-                        (C)         +--- auto-discovery
+                         |          +--- auto-discovery
                          |    +-----+--- control-plane protocols
                          |    |     +--- control-plane datastores
                          v    v
@@ -186,17 +190,13 @@ model described here.
 
 ** The <intended> datastore
 
-[Editor's note: should we keep this or remove it?  It has the risk
-that people object to this "change" of running.  E.g., what happens w/
-7950 that says that "running" is subject to validation?  If we remove
-it, a future document that defines inactive will have to somehow
-update this architecture.]
-
 The original <running> configuration datastore has been split into the
 <running> configuration datastore and the <intended> configuration
 datastore.  The <intended> configuration datastore contains the
-configuration that is intended to be applied to the device.  On a
-traditional NETCONF implementation, <running> and <intended> are
+configuration that is intended to be applied to the device, and is
+subject to validation of semantical constraints.
+
+On a traditional NETCONF implementation, <running> and <intended> are
 always the same.  However, implementations that support inactive
 configuration usually expose <running> to clients that understand
 inactive configuration and they expose <intended> to clients that do
@@ -220,15 +220,33 @@ are defined:
   +-- origin
       +-- static
       +-- dynamic
-          +-- dhcp
+          [ +-- dhcp ]
+          [ +-- slaac ]
       +-- default
-      +-- system-controlled
+      +-- system
 
-Conceptually, the <applied> datastore consists of the subset of
-<operational-state> datastore where the "origin" values are derived
-from or equal to "static" or "dynamic".
+Conceptually, the <applied> datastore contains the subset of the
+instances in the <operational-state> datastore where the "origin"
+values are derived from or equal to "static" or "dynamic".
 
-[Editor's note: Is system-controlled data included here or not?]
+*** Missing Resources
+
+Sometimes some parts of <intended> configuration refer to resources
+that are not present and hence parts of the <intended> configuration
+cannot be applied.  A typical example is an interface configuration
+that refers to an interface that is not currently present.  In such a
+situation, the interface configuration remains in <intended> but the
+interface configuration will not appear in <applied>.
+
+*** System-controlled Resources
+
+Sometimes resources are controlled by the device and such system
+controlled resources appear in (and disappear from) the
+<operational-state> dynamically.  If a system controlled resource has
+matching configuration in <intended> when it appears, the system will
+try to apply the configuration, which causes the configuration to
+appear in <applied> eventually (if application of the configuration
+was successful).
 
 ** The <operational-state> datastore
 
@@ -238,28 +256,6 @@ the operational state only had config false nodes.  The reason for
 incorporating config true nodes here is to be able to expose all
 operational settings without having to replicate definitions in the
 data models.
-
-* Discussion
-
-** Missing Resources
-
-Sometimes some parts of <intended> configuration refer to resources
-that are not present and hence parts of the <intended> configuration
-cannot be applied.  A typical example is an interface configuration
-that refers to an interface that is not currently present.  In such a
-situation, the interface configuration remains in <intended> but the
-interface configuration will not appear in <applied> and
-<operational-state>.
-
-** System-controlled Resources
-
-Sometimes resources are controlled by the device and such system
-controlled resources appear in (and disappear from) the
-<operational-state> dynamically.  If a system controlled resource has
-matching configuration in <intended> when it appears, the system will
-try to apply the configuration, which causes the configuration to
-appear in <applied> eventually (if application of the configuration
-was successful).
 
 * Implications
 
@@ -277,9 +273,6 @@ was successful).
   work but it would be a confusing name.)
 - The <get/> operation will be deprecated since it returns data from
   two datastores that may overlap in the revised datastore model.
-- Invoking <get-config/> on <running> will return <intended> for
-  backwards compatibility.  [XXX: How to deal with <edit-config/> for
-  old and new clients with inactive nodes? XXX]
 
 *** Migration Path
 
@@ -297,7 +290,7 @@ tree.
 
 A server that does not implement the <operational-state> datastore can
 implement a module of the new design, but with limited functionality.
-Specifically, it is may not possible to retrieve all operationally
+Specifically, it may not be possible to retrieve all operationally
 used instances (e.g., dynamically configured or system-controlled).
 The same limitation applies to a client that does not implement the
 <operational-state> datastore, but talks to a server that implements
@@ -328,16 +321,18 @@ it.
   together in one tree, data models were often forced to branch at the
   top-level into a config true branch and a structurally similar
   config-false branch that replicated some of the config true nodes
-  and added state nodes.  With the revised datastore model, this is not
+  and added state nodes.  With the revised datastore model this is not
   needed anymore since the different datastores handle the different
-  lifetimes of data objects and together with the deprecation of the
-  <get/> operation it is not possible to write simpler models.
+  lifetimes of data objects.  Introducing this model together with the
+  deprecation of the <get/> operation makes it possible to write
+  simpler models.
 - There may be some differences in the value set of some nodes that
   are used for both configuration and state.  At this point of time,
   these are considered to be rare cases that can be dealt with using
   different nodes for the configured and state values.
-- It is important to design data models with clear semantics that
-  works well for both configuration and operational state.
+- It is important to design data models with clear semantics
+  that work equally well for instantiation in a configuration
+  datastore and instantiation in the operational state datastore.
 
 * Data Model Design Guidelines
 

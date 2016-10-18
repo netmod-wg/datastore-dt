@@ -67,7 +67,7 @@ module ietf-yang-architecture {
        or dynamic datastores (e.g., DHCP or SLAAC).";
   }
 
-  identity system-controlled {
+  identity system {
     base origin;
     description
       "Denotes data created by the system independently of what
