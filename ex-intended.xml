@@ -1,0 +1,25 @@
+<data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+<system xmlns="urn:example:system">
+
+  <hostname>foo</hostname>
+
+  <interface>
+    <name>eth0</name>
+    <auto-negotiate-speed/>
+    <address>
+      <ip>2001:db8::10</ip>
+      <prefix-length>32</prefix-length>
+    </address>
+  </interface>
+
+  <interface>
+    <name>eth1</name>
+    <auto-negotiate-speed/>
+    <address>
+      <ip>2001:db8::20</ip>
+      <prefix-length>32</prefix-length>
+    </address>
+  </interface>
+
+</system>
+</data>

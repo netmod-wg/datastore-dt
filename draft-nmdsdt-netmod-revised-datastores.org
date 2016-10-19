@@ -22,6 +22,13 @@ protocols expose all these conceptual datastores.  Furthermore, the
 architecture does not detail how data is encoded by network management
 protocols.
 
+* Terminology
+
+The following terms are used in this docuement:
+
+- dynamic configuration: data modeled as being configuration (config
+  true in YANG), 
+
 * Background
 
 NETCONF ^RFC6241^ provides the following definitions:
@@ -112,13 +119,12 @@ Some observations:
 - Operational state has not been defined as a datastore although there
   were proposals in the past to introduce an operational state
   datastore.
-- The NETCONF <get/> operation returns the content of the <running/>
+- The NETCONF <get/> operation returns the content of the <running>
   configuration datastore together with the operational state.  It is
   therefore necessary that config false data is in a different branch
-  than the config true data.  This is in particular relevant if
-  operational state data can have a different lifetime compared to
-  configuration data or if configuration data is not immediately or
-  successfully applied.
+  than the config true data if the operational state data can have a
+  different lifetime compared to configuration data or if
+  configuration data is not immediately or successfully applied.
 - Several implementations have proprietary mechanisms that allow
   clients to store inactive data in the <running> datastore; this
   inactive data is only exposed to clients that indicate that they
@@ -127,7 +133,7 @@ Some observations:
   with the inactive data removed.  Validation always happens on the
   <running> datastore with inactive data removed.
 - Some implementations have proprietary mechanisms that allow clients
-  to define configuration templates in <running/>.  These templates
+  to define configuration templates in <running>.  These templates
   are expanded automatically by the system, and the resulting
   configuration is applied.
 - Some operators have reported that it is essential for them to be
@@ -261,6 +267,9 @@ incorporating config true nodes here is to be able to expose all
 operational settings without having to replicate definitions in the
 data models.
 
+In the <operational-state> datastore, semantical constraints defined
+in the data model are not applied.
+
 * Implications
 
 ** Implications on NETCONF
@@ -323,7 +332,7 @@ it.
 ** Implications on Data Models
 
 - Since the NETCONF <get/> operation returns the content of the
-  <running/> configuration datastore and the operational state
+  <running> configuration datastore and the operational state
   together in one tree, data models were often forced to branch at the
   top-level into a config true branch and a structurally similar
   config-false branch that replicated some of the config true nodes
@@ -385,11 +394,38 @@ the discussions that led to this document:
 - Ladislav Lhotka, CZ.NIC, <lhotka@nic.cz>
 - Thomas Nadeau, Brocade Networks, <tnadeau@lucidvision.com>
 - Anees Shaikh, Google, <aashaikh@google.com>
-- Rob Shakir, Jive Communications, <rjs@rob.sh>
+- Rob Shakir, Google, <robjs@google.com>
 
 Juergen Schoenwaelder was partly funded by Flamingo, a Network of
 Excellence project (ICT-318488) supported by the European Commission
 under its Seventh Framework Programme.
+
+*! start-appendix
+
+* Example Data
+
+In this example, the following fictional module is used:
+
+!! include-figure example-system.yang
+
+The operator has configured the hostname and two interfaces, so the
+contents of <intended> is:
+
+!! include-figure ex-intended.load
+
+The system has detected that the hardware for one of the configured
+interfaces ("eth1") is not yet present, so the configuration for that
+interface is not applied.  Further, the system has received a hostname
+and an additional IP address for "eth0" over DHCP.  This is reflected
+in <applied>:
+
+!! include-figure ex-applied.load
+
+In <operational-state>, all data from <applied> is present, in
+addition to defaults, a loopback interface automatically added by the
+system, and the result of the "speed" auto-negotiation:
+
+!! include-figure ex-oper.load
 
 {{document:
     name ;

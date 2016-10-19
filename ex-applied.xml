@@ -1,0 +1,22 @@
+<data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+<system
+    xmlns="urn:example:system"
+    xmlns:arch="urn:ietf:params:xml:ns:yang:ietf-yang-architecture">
+
+  <hostname arch:origin="arch:dynamic">bar</hostname>
+
+  <interface arch:origin="arch:static">
+    <name>eth0</name>
+    <auto-negotiate-speed/>
+    <address>
+      <ip>2001:db8::10</ip>
+      <prefix-length>32</prefix-length>
+    </address>
+    <address arch:origin="arch:dynamic">
+      <ip>2001:db8::1:100</ip>
+      <prefix-length>32</prefix-length>
+    </address>
+  </interface>
+
+</system>
+</data>

@@ -9,6 +9,8 @@ pyang ?= pyang
 
 draft := $(basename $(lastword $(sort $(wildcard draft-*.xml)) $(sort $(wildcard draft-*.md)) $(sort $(wildcard draft-*.org)) ))
 
+examples = $(wildcard ex-*.xml)
+load=$(patsubst ex-%.xml,ex-%.load,$(examples))
 trees =
 
 ifeq (,$(draft))
@@ -26,7 +28,11 @@ next_ver ?= $(shell printf "%.2d" $$((1$(current_ver)-99)))
 endif
 next := $(draft)-$(next_ver)
 
-yang := $(wildcard *.yang)
+std-yang := $(wildcard ietf*.yang)
+
+ex-yang := $(wildcard ex*.yang)
+
+yang := $(std-yang) $(ex-yang)
 
 .PHONY: latest submit clean validate
 
@@ -38,7 +44,8 @@ idnits: $(next).txt
 	$(idnits) $<
 
 clean:
-	-rm -f $(draft).txt back.xml
+	-rm -f $(draft).txt back.xml $(load)
+	-rm -f *.dsrl *.rng *.sch
 	-rm -f $(next).txt
 	-rm -f $(draft)-[0-9][0-9].xml
 ifeq (.md,$(draft_type))
@@ -48,8 +55,27 @@ ifeq (.org,$(draft_type))
 	-rm -f $(draft).xml
 endif
 
-validate:
-	pyang --ietf $(yang)
+%.load: %.xml
+	 cat $< | awk -f fix-load-xml.awk > $@
+.INTERMEDIATE: $(load)
+
+example-system.oper.yang: example-system.yang
+	grep -v must $< > $@
+.INTERMEDIATE: example-system.oper.yang
+
+validate: validate-std-yang validate-ex-yang validate-ex-xml
+
+validate-std-yang:
+	pyang --ietf $(std-yang)
+
+validate-ex-yang:
+	pyang --canonical $(ex-yang)
+
+validate-ex-xml: ietf-yang-architecture.yang example-system.yang \
+	example-system.oper.yang
+	yang2dsdl -j -t data -v ex-intended.xml $< example-system.yang
+	yang2dsdl -j -t data -v ex-applied.xml $< example-system.yang
+	yang2dsdl -j -t data -v ex-oper.xml $< example-system.oper.yang
 
 back.xml: back.xml.src
 	./mk-back $< > $@
@@ -57,7 +83,7 @@ back.xml: back.xml.src
 $(next).xml: $(draft).xml
 	sed -e"s/$(basename $<)-latest/$(basename $@)/" $< > $@
 
-$(draft).xml: back.xml $(trees) $(examples) $(yang)
+$(draft).xml: back.xml $(trees) $(load) $(yang)
 
 .INTERMEDIATE: $(draft).xml
 
