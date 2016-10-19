@@ -84,12 +84,13 @@ currently used by NETCONF ^RFC6241^:
                    +-----------+
                          |
                          v
-               +---------------------+
-               | <operational-state> |<--- control plane
-               |      (cf, ro)       |
-               +---------------------+
+                  operational state  <--- control plane
+                      (cf, ro)
 
-ct = config true; cf = config false; rw = read-write; ro = read-only
+  ct = config true; cf = config false
+  rw = read-write; ro = read-only
+  boxes denote datastores
+
 #+END_EXAMPLE
 
 Note that read-only (ro) and read-write (rw) is to be understood at a
@@ -175,7 +176,10 @@ model in order reflect the experience gained with the original model.
                | (ct + cf, ro)       |
                +---------------------+
 
-ct = config true; cf = config false; rw = read-write; ro = read-only
+  ct = config true; cf = config false
+  rw = read-write; ro = read-only
+  boxes denote datastores
+
 #+END_EXAMPLE
 
 The model foresees control-plane datastores that are by definition not
@@ -269,8 +273,10 @@ data models.
   datastores, the <get-config/> operation may be used to retrieve data
   stored in these new datastores.
 - A new operation should be added to retrieve the operational state
-  data store (e.g., <get-state/>).  (In principle <get-config/> could
-  work but it would be a confusing name.)
+  data store (e.g., <get-state/>).  An alternative is to define a new
+  operation to retrieve data from any datastore (e.g., <get-datastore>).
+  (In principle <get-config/> could work but it would be a confusing
+  name.)
 - The <get/> operation will be deprecated since it returns data from
   two datastores that may overlap in the revised datastore model.
 
