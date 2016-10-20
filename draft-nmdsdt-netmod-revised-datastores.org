@@ -81,12 +81,13 @@ stored in another datastore.  Section 4.4 of this document then
 concludes that at the time of the writing, modeling state as a
 separate data tree is the recommended approach.
 
-Implementation experience and requests from operators indicate that
-the datastore model initially designed for NETCONF and refined by
-YANG needs to be extended.  In particular, the notion of intended
-configuration and applied configuration has developed.  Furthermore,
-separating operational state data from configuration data in a
-separate branch has been found operationally complicated.  The
+Implementation experience and requests from operators
+^I-D.ietf-netmod-opstate-reqs^, ^I-D.openconfig-netmod-opstate^
+indicate that the datastore model initially designed for NETCONF and
+refined by YANG needs to be extended.  In particular, the notion of
+intended configuration and applied configuration has developed.
+Furthermore, separating operational state data from configuration data
+in a separate branch has been found operationally complicated.  The
 relationship between the branches is not machine readable and filter
 expressions operating on configuration data and on related operational
 state data are different.
@@ -292,6 +293,10 @@ the operational state only had config false nodes.  The reason for
 incorporating config true nodes here is to be able to expose all
 operational settings without having to replicate definitions in the
 data models.
+
+The <operational-state> datastore consists of the data actually used
+by the system.  This data is marked with the "origin" metadata
+annotation.
 
 In the <operational-state> datastore, semantic constraints defined
 in the data model are not applied.  See ^issues^.
