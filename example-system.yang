@@ -19,24 +19,25 @@ module example-system {
         type string;
       }
 
-      leaf mtu {
-        type uint32;
-        default 1500;
-      }
-
-      leaf auto-negotiate-speed {
-        type empty;
+      container auto-negotiation {
+        leaf enabled {
+          type boolean;
+          default true;
+        }
+        leaf speed {
+          type uint32;
+          units mbps;
+          description
+            "The advertised speed, in mbps.";
+        }
       }
 
       leaf speed {
         type uint32;
         units mbps;
-        must 'not(../auto-negotiate-speed)';
-      }
-
-      leaf in-pkts {
-        type uint64;
         config false;
+        description
+          "The speed of the interface, in mbps.";
       }
 
       list address {

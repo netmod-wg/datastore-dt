@@ -5,7 +5,9 @@
 
   <interface>
     <name>eth0</name>
-    <auto-negotiate-speed/>
+    <auto-negotiation>
+      <speed>1000</speed>
+    </auto-negotiation>
     <address>
       <ip>2001:db8::10</ip>
       <prefix-length>32</prefix-length>
@@ -14,7 +16,6 @@
 
   <interface>
     <name>eth1</name>
-    <auto-negotiate-speed/>
     <address>
       <ip>2001:db8::20</ip>
       <prefix-length>32</prefix-length>

@@ -24,10 +24,27 @@ protocols.
 
 * Terminology
 
-The following terms are used in this docuement:
+This document defines the following terms:
 
-- dynamic configuration: data modeled as being configuration (config
-  true in YANG), 
+- configuration data: Data that determines how a device behaves.
+  Configuration data can originate from different sources.
+- static configuration data: Configuration data that is eventually
+  persistent and used to get a device from its initial default state
+  into its desired operational state.
+- dynamic configuration data: Configuration data that is obtained
+  dynamically during the operation of a device through interaction
+  with other systems and usually not persistent.
+- system configuration data: Configuration data that is supplied by
+  the device itself but not learned via interaction with other
+  systems.
+- default configuration data: Configuration data that is not
+  explicitly provided but for which a defined default value exists.
+- default value: A value of a data node that is used when no value has
+  been explicitly assigned.
+- simple default value: A default value for a data node that is
+  statically defined, i.e., a constant.
+- complex default value: A default value for a data object that is derived
+  algorithmically out of the context in which the data object exists.
 
 * Background
 
@@ -204,14 +221,22 @@ The original <running> configuration datastore has been split into the
 <running> configuration datastore and the <intended> configuration
 datastore.  The <intended> configuration datastore contains the
 configuration that is intended to be applied to the device, and is
-subject to validation of semantical constraints.
+subject to validation of semantic constraints.
 
 On a traditional NETCONF implementation, <running> and <intended> are
-always the same.  However, implementations that support inactive
-configuration usually expose <running> to clients that understand
-inactive configuration and they expose <intended> to clients that do
-not understand inactive configuration.  The introduction of an
-<intended> datastore makes this difference explicit.
+always the same.
+
+Currently there are no standard mechanisms defined that affect
+<intended> so that it would have different contents than <running>,
+but this architecture allows for such mechanisms to be defined.
+
+One example of such a mechanism is support for marking nodes as
+inactive in <running>.  Inactive nodes are not copied to <intended>,
+and are thus not taken into account when validating the
+configuration.
+
+Another example is support for templates.  Templates are expanded
+when copied into <intended>, and the result is validated.
 
 ** The <applied> datastore
 
@@ -230,10 +255,11 @@ are defined:
   +-- origin
       +-- static
       +-- dynamic
-          [ +-- dhcp ]
-          [ +-- slaac ]
       +-- default
       +-- system
+
+These identities can be further refined, e.g., there might be an
+identity "dhcp" derived from "dynamic".
 
 Conceptually, the <applied> datastore contains the subset of the
 instances in the <operational-state> datastore where the "origin"
@@ -267,8 +293,8 @@ incorporating config true nodes here is to be able to expose all
 operational settings without having to replicate definitions in the
 data models.
 
-In the <operational-state> datastore, semantical constraints defined
-in the data model are not applied.
+In the <operational-state> datastore, semantic constraints defined
+in the data model are not applied.  See ^issues^.
 
 * Implications
 
@@ -320,7 +346,6 @@ it.
   deprecated.
 - A new query parameter is needed to indicate that data from
   <operational-state> is requested.
-- Open issue: should it be possible to ask for <applied>?
 
 ** Implications on YANG
 
@@ -386,8 +411,8 @@ problems of the original datastore model.  The following people were
 authors to these Internet-Drafts or otherwise actively involved in
 the discussions that led to this document:
 
-- Andy Biermann, YumaWorks, <andy@yumaworks.com>
 - Lou Berger, LabN Consulting, L.L.C., <lberger@labn.net>
+- Andy Bierman, YumaWorks, <andy@yumaworks.com>
 - Marcus Hines, Google, <hines@google.com>
 - Christian Hopps, Deutsche Telekom, <chopps@chopps.org>
 - Acee Lindem, Cisco Systems, <acee@cisco.com>
@@ -408,14 +433,14 @@ In this example, the following fictional module is used:
 
 !! include-figure example-system.yang
 
-The operator has configured the hostname and two interfaces, so the
+The operator has configured the host name and two interfaces, so the
 contents of <intended> is:
 
 !! include-figure ex-intended.load
 
 The system has detected that the hardware for one of the configured
 interfaces ("eth1") is not yet present, so the configuration for that
-interface is not applied.  Further, the system has received a hostname
+interface is not applied.  Further, the system has received a host name
 and an additional IP address for "eth0" over DHCP.  This is reflected
 in <applied>:
 
@@ -426,6 +451,15 @@ addition to defaults, a loopback interface automatically added by the
 system, and the result of the "speed" auto-negotiation:
 
 !! include-figure ex-oper.load
+
+* Open Issues @issues@
+
+- Do we need another DS <active> inbetween <running> and <intended>?
+- How do we handle semantical constraints in <operational-state>?  Are
+  they just ignored?  Do we need a new YANG statement to define if a
+  "must" constraints applies to the <operational-state>?
+- Should it be possible to ask for <applied> in RESTCONF?
+
 
 {{document:
     name ;

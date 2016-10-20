@@ -78,7 +78,8 @@ module ietf-yang-architecture {
     base origin;
     description
       "Denotes data that does not have an explicitly configured
-       value, but has a default value in use.";
+       value, but has a default value in use.  Covers both simple
+       defaults and complex defaults.";
   }
 
   /*

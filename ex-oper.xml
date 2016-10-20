@@ -7,10 +7,11 @@
 
   <interface arch:origin="arch:static">
     <name>eth0</name>
-    <mtu arch:origin="arch:default">1500</mtu>
-    <auto-negotiate-speed/>
-    <speed arch:origin="arch:system">100</speed>
-    <in-pkts>42</in-pkts>
+    <auto-negotiation>
+      <enabled arch:origin="arch:default">true</enabled>
+      <speed>1000</speed>
+    </auto-negotiation>
+    <speed>100</speed>
     <address>
       <ip>2001:db8::10</ip>
       <prefix-length>32</prefix-length>
@@ -23,8 +24,6 @@
 
   <interface arch:origin="arch:system">
     <name>lo0</name>
-    <mtu>65536</mtu>
-    <in-pkts>4711</in-pkts>
     <address>
       <ip>::1</ip>
       <prefix-length>128</prefix-length>
