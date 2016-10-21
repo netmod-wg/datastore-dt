@@ -35,8 +35,7 @@ This document defines the following terms:
   dynamically during the operation of a device through interaction
   with other systems and usually not persistent.
 - system configuration data: Configuration data that is supplied by
-  the device itself but not learned via interaction with other
-  systems.
+  the device itself.
 - default configuration data: Configuration data that is not
   explicitly provided but for which a defined default value exists.
 - default value: A value of a data node that is used when no value has
@@ -294,9 +293,11 @@ incorporating config true nodes here is to be able to expose all
 operational settings without having to replicate definitions in the
 data models.
 
-The <operational-state> datastore consists of the data actually used
-by the system.  This data is marked with the "origin" metadata
-annotation.
+The <operational-state> datastore contains all configura data actually
+used by the system, i.e., all applied configuration, system
+configuration and default configuration.  This data is marked with the
+"origin" metadata annotation.  In addition, the <operational-state>
+datastore also contains state data.
 
 In the <operational-state> datastore, semantic constraints defined
 in the data model are not applied.  See ^issues^.
