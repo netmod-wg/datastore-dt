@@ -22,29 +22,6 @@ protocols expose all these conceptual datastores.  Furthermore, the
 architecture does not detail how data is encoded by network management
 protocols.
 
-* Terminology
-
-This document defines the following terms:
-
-- configuration data: Data that determines how a device behaves.
-  Configuration data can originate from different sources.
-- static configuration data: Configuration data that is eventually
-  persistent and used to get a device from its initial default state
-  into its desired operational state.
-- dynamic configuration data: Configuration data that is obtained
-  dynamically during the operation of a device through interaction
-  with other systems and usually not persistent.
-- system configuration data: Configuration data that is supplied by
-  the device itself.
-- default configuration data: Configuration data that is not
-  explicitly provided but for which a defined default value exists.
-- default value: A value of a data node that is used when no value has
-  been explicitly assigned.
-- simple default value: A default value for a data node that is
-  statically defined, i.e., a constant.
-- complex default value: A default value for a data object that is derived
-  algorithmically out of the context in which the data object exists.
-
 * Background
 
 NETCONF ^RFC6241^ provides the following definitions:
@@ -90,6 +67,25 @@ in a separate branch has been found operationally complicated.  The
 relationship between the branches is not machine readable and filter
 expressions operating on configuration data and on related operational
 state data are different.
+
+* Terminology
+
+This document defines the following terms:
+
+- configuration data: Data that determines how a device behaves.
+  Configuration data can originate from different sources.
+- static configuration data: Configuration data that is eventually
+  persistent and used to get a device from its initial default state
+  into its desired operational state.
+- dynamic configuration data: Configuration data that is obtained
+  dynamically during the operation of a device through interaction
+  with other systems and usually not persistent.
+- system configuration data: Configuration data that is supplied by
+  the device itself.
+- data-model-defined configuration data: Configuration data that is not
+  explicitly provided but for which a value defined in the data model
+  is used.  In YANG 1.1, such data can be defined with the "default"
+  statement or in "description" statements.
 
 * Original Model of Datastores
 
@@ -255,7 +251,7 @@ are defined:
   +-- origin
       +-- static
       +-- dynamic
-      +-- default
+      +-- data-model
       +-- system
 
 These identities can be further refined, e.g., there might be an
@@ -295,7 +291,7 @@ data models.
 
 The <operational-state> datastore contains all configura data actually
 used by the system, i.e., all applied configuration, system
-configuration and default configuration.  This data is marked with the
+configuration and data-model-defined configuration.  This data is marked with the
 "origin" metadata annotation.  In addition, the <operational-state>
 datastore also contains state data.
 
@@ -453,8 +449,8 @@ in <applied>:
 !! include-figure ex-applied.load
 
 In <operational-state>, all data from <applied> is present, in
-addition to defaults, a loopback interface automatically added by the
-system, and the result of the "speed" auto-negotiation:
+addition to a default value, a loopback interface automatically added
+by the system, and the result of the "speed" auto-negotiation:
 
 !! include-figure ex-oper.load
 
@@ -465,6 +461,7 @@ system, and the result of the "speed" auto-negotiation:
   they just ignored?  Do we need a new YANG statement to define if a
   "must" constraints applies to the <operational-state>?
 - Should it be possible to ask for <applied> in RESTCONF?
+- Better name for "static configutation"?
 
 
 {{document:

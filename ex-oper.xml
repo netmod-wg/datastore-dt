@@ -8,7 +8,7 @@
   <interface arch:origin="arch:static">
     <name>eth0</name>
     <auto-negotiation>
-      <enabled arch:origin="arch:default">true</enabled>
+      <enabled arch:origin="arch:data-model">true</enabled>
       <speed>1000</speed>
     </auto-negotiation>
     <speed>100</speed>

@@ -64,7 +64,7 @@ module ietf-yang-architecture {
     base origin;
     description
       "Denotes data from dynamic configuration protocols
-       or dynamic datastores (e.g., DHCP or SLAAC).";
+       or dynamic datastores (e.g., DHCP).";
   }
 
   identity system {
@@ -74,7 +74,7 @@ module ietf-yang-architecture {
        has been configured.";
   }
 
-  identity default {
+  identity data-model {
     base origin;
     description
       "Denotes data that does not have an explicitly configured
