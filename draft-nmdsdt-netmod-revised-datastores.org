@@ -62,11 +62,12 @@ Implementation experience and requests from operators
 indicate that the datastore model initially designed for NETCONF and
 refined by YANG needs to be extended.  In particular, the notion of
 intended configuration and applied configuration has developed.
+
 Furthermore, separating operational state data from configuration data
-in a separate branch has been found operationally complicated.  The
-relationship between the branches is not machine readable and filter
-expressions operating on configuration data and on related operational
-state data are different.
+in a separate branch in the data model has been found operationally
+complicated.  The relationship between the branches is not machine
+readable and filter expressions operating on configuration data and on
+related operational state data are different.
 
 * Terminology
 
@@ -144,12 +145,12 @@ Some observations:
   inactive data is only exposed to clients that indicate that they
   support the concept of inactive data; clients not indicating support
   for inactive data receive the content of the <running> datastore
-  with the inactive data removed.  Validation always happens on the
-  <running> datastore with inactive data removed.
+  with the inactive data removed.  Inactive data is conceptually
+  removed during validation.
 - Some implementations have proprietary mechanisms that allow clients
   to define configuration templates in <running>.  These templates
   are expanded automatically by the system, and the resulting
-  configuration is applied.
+  configuration is applied internally.
 - Some operators have reported that it is essential for them to be
   able to retrieve the configuration that has actually been
   successfully applied, which may be a subset or a superset of the
@@ -214,11 +215,11 @@ model described here.
 
 ** The <intended> datastore
 
-The original <running> configuration datastore has been split into the
-<running> configuration datastore and the <intended> configuration
-datastore.  The <intended> configuration datastore contains the
-configuration that is intended to be applied to the device, and is
-subject to validation of semantic constraints.
+The <intended> datastore is a read-only datastore that consists of
+config true nodes.  It is tightly coupled to <running>.  When data is
+written to <running>, the data that is to be validated is also
+conceptually written to <intended>.  Validation is performed on the
+contents of <intended>.
 
 On a traditional NETCONF implementation, <running> and <intended> are
 always the same.
@@ -284,11 +285,11 @@ was successful).
 ** The <operational-state> datastore
 
 The <operational-state> datastore is a read-only datastore that
-consists of config true and config false nodes.  In the original model
-the operational state only had config false nodes.  The reason for
-incorporating config true nodes here is to be able to expose all
-operational settings without having to replicate definitions in the
-data models.
+consists of config true and config false nodes.  In the original
+NETCONF model the operational state only had config false nodes.  The
+reason for incorporating config true nodes here is to be able to
+expose all operational settings without having to replicate
+definitions in the data models.
 
 The <operational-state> datastore contains all configura data actually
 used by the system, i.e., all applied configuration, system
@@ -312,9 +313,9 @@ in the data model are not applied.  See ^issues^.
   stored in these new datastores.
 - A new operation should be added to retrieve the operational state
   data store (e.g., <get-state/>).  An alternative is to define a new
-  operation to retrieve data from any datastore (e.g., <get-datastore>).
-  (In principle <get-config/> could work but it would be a confusing
-  name.)
+  operation to retrieve data from any datastore (e.g., <get-data> with
+  the name of the datastore as a parameter).  In principle
+  <get-config/> could work but it would be a confusing name.
 - The <get/> operation will be deprecated since it returns data from
   two datastores that may overlap in the revised datastore model.
 
