@@ -73,13 +73,14 @@ state data are different.
 This document defines the following terms:
 
 - configuration data: Data that determines how a device behaves.
-  Configuration data can originate from different sources.
+  Configuration data can originate from different sources.  In YANG
+  1.1, configuration data is the "config true" nodes.
 - static configuration data: Configuration data that is eventually
   persistent and used to get a device from its initial default state
   into its desired operational state.
 - dynamic configuration data: Configuration data that is obtained
   dynamically during the operation of a device through interaction
-  with other systems and usually not persistent.
+  with other systems and not persistent.
 - system configuration data: Configuration data that is supplied by
   the device itself.
 - data-model-defined configuration data: Configuration data that is not
