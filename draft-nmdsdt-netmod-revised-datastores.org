@@ -464,6 +464,7 @@ by the system, and the result of the "speed" auto-negotiation:
   "must" constraints applies to the <operational-state>?
 - Should it be possible to ask for <applied> in RESTCONF?
 - Better name for "static configuration"?
+- Better name for "intended"?
 
 
 {{document:
