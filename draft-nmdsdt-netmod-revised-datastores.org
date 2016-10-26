@@ -259,7 +259,7 @@ are defined:
 These identities can be further refined, e.g., there might be an
 identity "dhcp" derived from "dynamic".
 
-Conceptually, the <applied> datastore contains the subset of the
+The <applied> datastore contains the subset of the
 instances in the <operational-state> datastore where the "origin"
 values are derived from or equal to "static" or "dynamic".
 
@@ -364,7 +364,7 @@ it.
   <running> configuration datastore and the operational state
   together in one tree, data models were often forced to branch at the
   top-level into a config true branch and a structurally similar
-  config-false branch that replicated some of the config true nodes
+  config false branch that replicated some of the config true nodes
   and added state nodes.  With the revised datastore model this is not
   needed anymore since the different datastores handle the different
   lifetimes of data objects.  Introducing this model together with the
@@ -376,7 +376,7 @@ it.
   different nodes for the configured and state values.
 - It is important to design data models with clear semantics
   that work equally well for instantiation in a configuration
-  datastore and instantiation in the operational state datastore.
+  datastore and instantiation in the <operational-state> datastore.
 
 * Data Model Design Guidelines
 
@@ -406,14 +406,14 @@ on the Internet.
 
 * Acknowledgments
 
-This document grew out of many discussions that took place
-since 2010.  Several Internet-Drafts (^I-D.wilton-netmod-opstate-yang^,
-^I-D.bjorklund-netmod-operational^, ^I-D.wilton-netmod-opstate-yang^,
-^I-D.ietf-netmod-opstate-reqs^, ^I-D.kwatsen-netmod-opstate^,
-^I-D.openconfig-netmod-opstate^) and ^RFC6244^ touched on some of the
-problems of the original datastore model.  The following people were
-authors to these Internet-Drafts or otherwise actively involved in
-the discussions that led to this document:
+This document grew out of many discussions that took place since 2010.
+Several Internet-Drafts (^I-D.bjorklund-netmod-operational^,
+^I-D.wilton-netmod-opstate-yang^, ^I-D.ietf-netmod-opstate-reqs^,
+^I-D.kwatsen-netmod-opstate^, ^I-D.openconfig-netmod-opstate^) and
+^RFC6244^ touched on some of the problems of the original datastore
+model.  The following people were authors to these Internet-Drafts or
+otherwise actively involved in the discussions that led to this
+document:
 
 - Lou Berger, LabN Consulting, L.L.C., <lberger@labn.net>
 - Andy Bierman, YumaWorks, <andy@yumaworks.com>
@@ -463,7 +463,7 @@ by the system, and the result of the "speed" auto-negotiation:
   they just ignored?  Do we need a new YANG statement to define if a
   "must" constraints applies to the <operational-state>?
 - Should it be possible to ask for <applied> in RESTCONF?
-- Better name for "static configutation"?
+- Better name for "static configuration"?
 
 
 {{document:
