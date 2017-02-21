@@ -22,52 +22,6 @@ protocols expose all these conceptual datastores.  Furthermore, the
 architecture does not detail how data is encoded by network management
 protocols.
 
-* Background
-
-NETCONF ^RFC6241^ provides the following definitions:
-
-- datastore: A conceptual place to store and access information.  A
-  datastore might be implemented, for example, using files, a
-  database, flash memory locations, or combinations thereof.
-- configuration datastore: The datastore holding the complete set of
-  configuration data that is required to get a device from its initial
-  default state into a desired operational state.
-
-YANG 1.1 ^RFC7950^ provides the following
-refinements when NETCONF is used with YANG (which is the usual case
-but note that NETCONF was defined before YANG did exist):
-
-- datastore: When modeled with YANG, a datastore is realized as an
-  instantiated data tree.
-- configuration datastore: When modeled with YANG, a configuration
-  datastore is realized as an instantiated data tree with
-  configuration data.
-
-RFC 6244 defined operational state data as follows:
-
-- Operational state data is a set of data that has been obtained by
-  the system at runtime and influences the system's behavior similar
-  to configuration data.  In contrast to configuration data,
-  operational state is transient and modified by interactions with
-  internal components or other systems via specialized protocols.
-
-Section 4.3.3 of RFC 6244 discusses operational state and among other
-things mentions the option to consider operational state as being
-stored in another datastore.  Section 4.4 of this document then
-concludes that at the time of the writing, modeling state as a
-separate data tree is the recommended approach.
-
-Implementation experience and requests from operators
-^I-D.ietf-netmod-opstate-reqs^, ^I-D.openconfig-netmod-opstate^
-indicate that the datastore model initially designed for NETCONF and
-refined by YANG needs to be extended.  In particular, the notion of
-intended configuration and applied configuration has developed.
-
-Furthermore, separating operational state data from configuration data
-in a separate branch in the data model has been found operationally
-complicated.  The relationship between the branches is not machine
-readable and filter expressions operating on configuration data and on
-related operational state data are different.
 
 * Terminology
 
@@ -89,74 +43,7 @@ This document defines the following terms:
   is used.  In YANG 1.1, such data can be defined with the "default"
   statement or in "description" statements.
 
-* Original Model of Datastores
-
-The following drawing shows the original model of datastores as it is
-currently used by NETCONF ^RFC6241^:
-
-#+BEGIN_EXAMPLE
-  +-------------+                 +-----------+
-  | <candidate> |                 | <startup> |
-  |  (ct, rw)   |<---+       +--->| (ct, rw)  |
-  +-------------+    |       |    +-----------+
-         |           |       |           |
-         |         +-----------+         |
-         +-------->| <running> |<--------+
-                   | (ct, rw)  |
-                   +-----------+
-                         |
-                         v
-                  operational state  <--- control plane
-                      (cf, ro)
-
-  ct = config true; cf = config false
-  rw = read-write; ro = read-only
-  boxes denote datastores
-
-#+END_EXAMPLE
-
-Note that read-only (ro) and read-write (rw) is to be understood at a
-conceptual level.  In NETCONF, for example, support for the <candidate>
-and <startup> datastores is optional and the <running> datastore does
-not have to be writable.  Furthermore, the <startup> datastore can only
-be modified by copying <running> to <startup> in the standardized
-NETCONF datastore editing model.  The RESTCONF protocol does not expose
-these differences and instead provides only a writable unified
-datastore, which hides whether edits are done through a <candidate>
-datastore or by directly modifying the <running> datastore or via some
-other implementation specific mechanism.  RESTCONF also hides how
-configuration is made persistent.  Note that implementations may also
-have additional datastores that can propagate changes to the <running>
-datastore.  NETCONF explicitly mentions so called named datastores.
-
-Some observations:
-
-- Operational state has not been defined as a datastore although there
-  were proposals in the past to introduce an operational state
-  datastore.
-- The NETCONF <get/> operation returns the content of the <running>
-  configuration datastore together with the operational state.  It is
-  therefore necessary that config false data is in a different branch
-  than the config true data if the operational state data can have a
-  different lifetime compared to configuration data or if
-  configuration data is not immediately or successfully applied.
-- Several implementations have proprietary mechanisms that allow
-  clients to store inactive data in the <running> datastore; this
-  inactive data is only exposed to clients that indicate that they
-  support the concept of inactive data; clients not indicating support
-  for inactive data receive the content of the <running> datastore
-  with the inactive data removed.  Inactive data is conceptually
-  removed during validation.
-- Some implementations have proprietary mechanisms that allow clients
-  to define configuration templates in <running>.  These templates
-  are expanded automatically by the system, and the resulting
-  configuration is applied internally.
-- Some operators have reported that it is essential for them to be
-  able to retrieve the configuration that has actually been
-  successfully applied, which may be a subset or a superset of the
-  <running> configuration.
-
-* Revised Model of Datastores
+* Revised Model of Datastores @datastore-model@
 
 Below is a new conceptual model of datastores extending the original
 model in order reflect the experience gained with the original model.
@@ -300,95 +187,67 @@ datastore also contains state data.
 In the <operational-state> datastore, semantic constraints defined
 in the data model are not applied.  See ^issues^.
 
-* Implications
 
-** Implications on NETCONF
+* Guidelines for Defining Control-Plane Datastores
 
-- A mechanism is needed to announce support for <intended>,
-  <applied>, and <operational-state>.
-- Support for <intended>, <applied>, and <operational-state>
-  should be optional to implement.
-- For systems supporting <intended> or <applied> configuration
-  datastores, the <get-config/> operation may be used to retrieve data
-  stored in these new datastores.
-- A new operation should be added to retrieve the operational state
-  data store (e.g., <get-state/>).  An alternative is to define a new
-  operation to retrieve data from any datastore (e.g., <get-data> with
-  the name of the datastore as a parameter).  In principle
-  <get-config/> could work but it would be a confusing name.
-- The <get/> operation will be deprecated since it returns data from
-  two datastores that may overlap in the revised datastore model.
+The following provides guidelines for control-plane datastore
+designers.
 
-*** Migration Path
+** Define the control-plane datastore's name.
 
-A common approach in current data models is to have two separate trees
-"/foo" and "/foo-state", where the former contains config true nodes,
-and the latter config false nodes.  A data model that is designed for
-the revised architectural framework presented in this document will
-have a single tree "/foo" with a combination of config true and config
-false nodes.
+All datastores, including control-plane datastores, MUST have
+a globally unique name.  To ensure this, all datastores MUST
+register their names with IANA, along with the RFC number that
+defined it.
 
-A server that implements the <operational-state> datastore can
-implement a module of the old design.  In this case, some instances
-are probably reported both in the "/foo" tree and in the "/foo-state"
-tree.
+Open Issues:
+  - identityref or enum
+  - name of registry?
+  - add section to IANA Considerations to create registry...
 
-A server that does not implement the <operational-state> datastore can
-implement a module of the new design, but with limited functionality.
-Specifically, it may not be possible to retrieve all operationally
-used instances (e.g., dynamically configured or system-controlled).
-The same limitation applies to a client that does not implement the
-<operational-state> datastore, but talks to a server that implements
-it.
 
-** Implications on RESTCONF
+** Define which YANG modules can be used in the datastore.
 
-- The {+restconf}/data resource represents the combined configuration
-  and state data resources that can be accessed by a client.  This is
-  effectively bundling <running> together with <operational-state>,
-  much like the <get/> operation of NETCONF.  This design should be
-  deprecated.
-- A new query parameter is needed to indicate that data from
-  <operational-state> is requested.
+Not all YANG modules may be used in all datastores.  Some datastores may 
+constrain which data models can be used in them.  Please see the "Implications
+to YANG Library" section for details.
 
-** Implications on YANG
+** Define which subset of YANG-modelled data applies.
 
-- Some clarifications may be needed if this revised model is
-  adopted.  YANG currently describes validation in terms of the
-  <running> configuration datastore while it really happens on the
-  <intended> configuration datastore.
+ By default, the data in a control-plane datastore is modeled
+ by all YANG statements in the available YANG modules.
+ However, it is possible to specify criteria YANG statements
+ must satisfy in order to be present in a control-plane
+ datastore.  For instance, maybe only config true nodes are
+ present, or config false nodes that also have a specific
+ YANG extension (e.g., ephemeral true).
 
-** Implications on Data Models
+** Define how control-plane data is actualized.
 
-- Since the NETCONF <get/> operation returns the content of the
-  <running> configuration datastore and the operational state
-  together in one tree, data models were often forced to branch at the
-  top-level into a config true branch and a structurally similar
-  config false branch that replicated some of the config true nodes
-  and added state nodes.  With the revised datastore model this is not
-  needed anymore since the different datastores handle the different
-  lifetimes of data objects.  Introducing this model together with the
-  deprecation of the <get/> operation makes it possible to write
-  simpler models.
-- There may be some differences in the value set of some nodes that
-  are used for both configuration and state.  At this point of time,
-  these are considered to be rare cases that can be dealt with using
-  different nodes for the configured and state values.
-- It is important to design data models with clear semantics
-  that work equally well for instantiation in a configuration
-  datastore and instantiation in the <operational-state> datastore.
+ The diagram in ^datastore-model^ depicts 'control-plane' datastores
+ feeding into the <applied> and <operational-state> datastores.
+ How this interaction occurs must be defined by the control-
+ plane datastore.  In some cases, it may occur implicitly, as
+ soon as the data is put into the control-plane datastore while,
+ in other cases, an explicit action may be required to trigger
+ the application of the control-plane datastore's data.
 
-* Data Model Design Guidelines
+** Define which protocols can be used.
 
-** Auto-configured or Auto-negotiated Values
+By default, it is assumed that both the NETCONF and RESTCONF
+protocol can be used to interact with a control-plane datastore.
+However, it may be that only a specific protocol can be used
+(e.g., forces) or that a subset of all protocol operations or
+capabilities are available (e.g., no locking, no xpath-based
+filtering).
 
-Sometimes configuration leafs support special values that instruct the
-system to automatically configure a value.  An example is an MTU that
-is configured to 'auto' to let the system determine a suitable MTU
-value.  Another example is Ethernet auto-negotiation of link speed.  In
-such a situation, it is recommended to model this as two separate
-leafs, one config true leaf for the input to the auto-negotiation
-process, and one config false leaf for the output from the process.
+** Extend the 'origin' attribute
+
+This RFC defines an attribute call "origin" that is used to identify
+from which datastore operational state data came from.  Using an
+"identity" statment, the "dynamic" identity SHOULD be extended with
+the name of the new control-plane datastore.
+
 
 * Data Model @module@
 
@@ -469,12 +328,222 @@ by the system, and the result of the "speed" auto-negotiation:
 + Better name for "intended"?
 
 
+* Design Considerations
+
+** Background
+
+NETCONF ^RFC6241^ provides the following definitions:
+
+- datastore: A conceptual place to store and access information.  A
+  datastore might be implemented, for example, using files, a
+  database, flash memory locations, or combinations thereof.
+- configuration datastore: The datastore holding the complete set of
+  configuration data that is required to get a device from its initial
+  default state into a desired operational state.
+
+YANG 1.1 ^RFC7950^ provides the following
+refinements when NETCONF is used with YANG (which is the usual case
+but note that NETCONF was defined before YANG did exist):
+
+- datastore: When modeled with YANG, a datastore is realized as an
+  instantiated data tree.
+- configuration datastore: When modeled with YANG, a configuration
+  datastore is realized as an instantiated data tree with
+  configuration data.
+
+RFC 6244 defined operational state data as follows:
+
+- Operational state data is a set of data that has been obtained by
+  the system at runtime and influences the system's behavior similar
+  to configuration data.  In contrast to configuration data,
+  operational state is transient and modified by interactions with
+  internal components or other systems via specialized protocols.
+
+Section 4.3.3 of RFC 6244 discusses operational state and among other
+things mentions the option to consider operational state as being
+stored in another datastore.  Section 4.4 of this document then
+concludes that at the time of the writing, modeling state as a
+separate data tree is the recommended approach.
+
+Implementation experience and requests from operators
+^I-D.ietf-netmod-opstate-reqs^, ^I-D.openconfig-netmod-opstate^
+indicate that the datastore model initially designed for NETCONF and
+refined by YANG needs to be extended.  In particular, the notion of
+intended configuration and applied configuration has developed.
+
+Furthermore, separating operational state data from configuration data
+in a separate branch in the data model has been found operationally
+complicated.  The relationship between the branches is not machine
+readable and filter expressions operating on configuration data and on
+related operational state data are different.
+
+
+** Original Model of Datastores
+
+The following drawing shows the original model of datastores as it is
+currently used by NETCONF ^RFC6241^:
+
+#+BEGIN_EXAMPLE
+  +-------------+                 +-----------+
+  | <candidate> |                 | <startup> |
+  |  (ct, rw)   |<---+       +--->| (ct, rw)  |
+  +-------------+    |       |    +-----------+
+         |           |       |           |
+         |         +-----------+         |
+         +-------->| <running> |<--------+
+                   | (ct, rw)  |
+                   +-----------+
+                         |
+                         v
+                  operational state  <--- control plane
+                      (cf, ro)
+
+  ct = config true; cf = config false
+  rw = read-write; ro = read-only
+  boxes denote datastores
+
+#+END_EXAMPLE
+
+Note that read-only (ro) and read-write (rw) is to be understood at a
+conceptual level.  In NETCONF, for example, support for the <candidate>
+and <startup> datastores is optional and the <running> datastore does
+not have to be writable.  Furthermore, the <startup> datastore can only
+be modified by copying <running> to <startup> in the standardized
+NETCONF datastore editing model.  The RESTCONF protocol does not expose
+these differences and instead provides only a writable unified
+datastore, which hides whether edits are done through a <candidate>
+datastore or by directly modifying the <running> datastore or via some
+other implementation specific mechanism.  RESTCONF also hides how
+configuration is made persistent.  Note that implementations may also
+have additional datastores that can propagate changes to the <running>
+datastore.  NETCONF explicitly mentions so called named datastores.
+
+Some observations:
+
+- Operational state has not been defined as a datastore although there
+  were proposals in the past to introduce an operational state
+  datastore.
+- The NETCONF <get/> operation returns the content of the <running>
+  configuration datastore together with the operational state.  It is
+  therefore necessary that config false data is in a different branch
+  than the config true data if the operational state data can have a
+  different lifetime compared to configuration data or if
+  configuration data is not immediately or successfully applied.
+- Several implementations have proprietary mechanisms that allow
+  clients to store inactive data in the <running> datastore; this
+  inactive data is only exposed to clients that indicate that they
+  support the concept of inactive data; clients not indicating support
+  for inactive data receive the content of the <running> datastore
+  with the inactive data removed.  Inactive data is conceptually
+  removed during validation.
+- Some implementations have proprietary mechanisms that allow clients
+  to define configuration templates in <running>.  These templates
+  are expanded automatically by the system, and the resulting
+  configuration is applied internally.
+- Some operators have reported that it is essential for them to be
+  able to retrieve the configuration that has actually been
+  successfully applied, which may be a subset or a superset of the
+  <running> configuration.
+
+
+
+* Implications on NETCONF
+
+- A mechanism is needed to announce support for <intended>,
+  <applied>, and <operational-state>.
+- Support for <intended>, <applied>, and <operational-state>
+  should be optional to implement.
+- For systems supporting <intended> or <applied> configuration
+  datastores, the <get-config/> operation may be used to retrieve data
+  stored in these new datastores.
+- A new operation should be added to retrieve the operational state
+  data store (e.g., <get-state/>).  An alternative is to define a new
+  operation to retrieve data from any datastore (e.g., <get-data> with
+  the name of the datastore as a parameter).  In principle
+  <get-config/> could work but it would be a confusing name.
+- The <get/> operation will be deprecated since it returns data from
+  two datastores that may overlap in the revised datastore model.
+
+** Migration Path
+
+A common approach in current data models is to have two separate trees
+"/foo" and "/foo-state", where the former contains config true nodes,
+and the latter config false nodes.  A data model that is designed for
+the revised architectural framework presented in this document will
+have a single tree "/foo" with a combination of config true and config
+false nodes.
+
+A server that implements the <operational-state> datastore can
+implement a module of the old design.  In this case, some instances
+are probably reported both in the "/foo" tree and in the "/foo-state"
+tree.
+
+A server that does not implement the <operational-state> datastore can
+implement a module of the new design, but with limited functionality.
+Specifically, it may not be possible to retrieve all operationally
+used instances (e.g., dynamically configured or system-controlled).
+The same limitation applies to a client that does not implement the
+<operational-state> datastore, but talks to a server that implements
+it.
+
+* Implications on RESTCONF
+
+- The {+restconf}/data resource represents the combined configuration
+  and state data resources that can be accessed by a client.  This is
+  effectively bundling <running> together with <operational-state>,
+  much like the <get/> operation of NETCONF.  This design should be
+  deprecated.
+- A new query parameter is needed to indicate that data from
+  <operational-state> is requested.
+
+* Implications on YANG
+
+- Some clarifications may be needed if this revised model is
+  adopted.  YANG currently describes validation in terms of the
+  <running> configuration datastore while it really happens on the
+  <intended> configuration datastore.
+
+* Implications on Data Models
+
+- Since the NETCONF <get/> operation returns the content of the
+  <running> configuration datastore and the operational state
+  together in one tree, data models were often forced to branch at the
+  top-level into a config true branch and a structurally similar
+  config false branch that replicated some of the config true nodes
+  and added state nodes.  With the revised datastore model this is not
+  needed anymore since the different datastores handle the different
+  lifetimes of data objects.  Introducing this model together with the
+  deprecation of the <get/> operation makes it possible to write
+  simpler models.
+- There may be some differences in the value set of some nodes that
+  are used for both configuration and state.  At this point of time,
+  these are considered to be rare cases that can be dealt with using
+  different nodes for the configured and state values.
+- It is important to design data models with clear semantics
+  that work equally well for instantiation in a configuration
+  datastore and instantiation in the <operational-state> datastore.
+
+* Data Model Design Guidelines
+
+** Auto-configured or Auto-negotiated Values
+
+Sometimes configuration leafs support special values that instruct the
+system to automatically configure a value.  An example is an MTU that
+is configured to 'auto' to let the system determine a suitable MTU
+value.  Another example is Ethernet auto-negotiation of link speed.  In
+such a situation, it is recommended to model this as two separate
+leafs, one config true leaf for the input to the auto-negotiation
+process, and one config false leaf for the output from the process.
+
+
+
+
 {{document:
     name ;
     ipr trust200902;
     category std;
     references back.xml;
-    title "A Revised Conceptual Model for YANG Datastores";
+    title "YANG Datastore Architecture";
     contributor "editor:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
     contributor "author:Juergen Schoenwaelder:Jacobs University:j.schoenwaelder@jacobs-university.de";
     contributor "author:Phil Shafer:Juniper:phil@juniper.net";
