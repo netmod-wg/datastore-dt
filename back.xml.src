@@ -6,9 +6,11 @@
 
   ietf-ref:RFC7952
 
+  ietf-ref:RFC7895
+
   ietf-ref:RFC7950
 
-  ietf-ref:I-D.ietf-netconf-restconf
+  ietf-ref:RFC8040
 
 </references>
 
