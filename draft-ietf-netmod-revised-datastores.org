@@ -27,10 +27,7 @@ protocols.
 This document defines the following terms:
 
 - configuration data: Data that determines how a device behaves.
-  Configuration data can originate from different sources.  In YANG
-  1.1, configuration data is the "config true" nodes. [DISCUSS: The
-  last statement (a) is not needed and (b) may go too far as it rules
-  out config false; ephemeral true.]
+  Configuration data can originate from different sources.
 - static configuration data: Configuration data that is eventually
   persistent and used to get a device from its initial default state
   into its desired operational state.
@@ -41,16 +38,10 @@ This document defines the following terms:
   the device itself.
 - data-model-defined configuration data: Configuration data that is not
   explicitly provided but for which a value defined in the data model
-  is used.  In YANG 1.1, such data can be defined with the "default"
-  statement or in "description" statements. [DISCUSS: I would again
-  prefer to remove YANG 1.1 specifics from the definition.] [DISCUSS:
-  The data-model identity distinguishes 'simple' and 'complex' defaults
-  but there is no definition what this means. Do we need the distinction?
-  If so, there should be a definition.]
+  is used.
 - applied configuration data: Configuration data that is currently
-  used by a device. Applied configuration data is derived from the
-  static configuration data, dynamic configuration data, system
-  configuration data, and data-model-defined configuration data.
+  used by a device. Applied configuration data consists of static
+  configuration data and dynamic configuration data.
 - state data: The additional data on a system that is not
   configuration data such as read-only status information and
   collected statistics. State data is transient and modified by
@@ -62,8 +53,8 @@ This document defines the following terms:
   data that is required to get a device from its initial default state
   into a desired operational state.
 - running configuration datastore: A configuration datastore holding
-  the complete configuration currently active on the device.  The
-  running configuration datastore always exists. It may include
+  the complete static configuration currently active on the device.
+  The running configuration datastore always exists. It may include
   inactive configuration or template configuration that require
   further expansion.
 - intended configuration datastore: A configuration datastore holding
@@ -100,17 +91,15 @@ used and thus defined here as well:
 - remote procedure call: An operation that can be invoked by a client
   on a server.
 
-[DISCUSS: Do we need to discuss somewhere how remote procedure calls
-and notifications/actions tie into datastores? RFC 7950 shows as an
-example a ping action tied to an interface. Does this refer to an
-interface defined in a configuration datastore? Or an interface
-defined in the operational state datastore? Or the applied
-configuration datastore? Similarly, RFC 7950 shows an example of a
-link-failure notification; this likely applies implicitly to the
-operational state datastore. The netconf-config-change notification
-does explicitly identify a datastore. I think we generally need to
-have remote procedure calls and notifications about which datastores
-they apply to and I do not know how things would work for actions.]
+Relationship to YANG 1.1 ^RFC7950^:
+
+- Configuration data maps to all schema nodes marked "config true".
+- Data-model-defined configuration data maps to schema nodes with an
+  explict default statement or an explanation in the decription
+  statement how a default value is determined.
+- A datastore maps to an instantiated YANG data tree.
+- A configuration datastore maps to an instantiated YANG data tree
+  consisting of configuration data nodes and interior data nodes.
 
 * Background
 
@@ -601,7 +590,7 @@ entail.
    to the operational state datastore, indicating that the origin
    meta-data should be included in the reply.
 
- - 'wtih-defaults' is supported on all configuration datastores, but
+ - 'with-defaults' is supported on all configuration datastores, but
    is not supported on the operational state datastore path, because
    it has different default handling semantics.
 
@@ -751,6 +740,19 @@ resource.
   adopted.  YANG currently describes validation in terms of the
   <running> configuration datastore while it really happens on the
   <intended> configuration datastore.
+
+- [DISCUSS: We need to discuss somewhere how remote procedure calls
+  and notifications/actions tie into datastores RFC 7950 shows as an
+  example a ping action tied to an interface. Does this refer to an
+  interface defined in a configuration datastore? Or an interface
+  defined in the operational state datastore? Or the applied
+  configuration datastore? Similarly, RFC 7950 shows an example of a
+  link-failure notification; this likely applies implicitly to the
+  operational state datastore. The netconf-config-change notification
+  does explicitly identify a datastore. I think we generally need to
+  have remote procedure calls and notifications be explicit about which
+  datastores they apply to and perhaps change the default xpath context
+  from running plus state to the operational state datastore.]
 
 * Implications on YANG library @yang-lib-impl@
 

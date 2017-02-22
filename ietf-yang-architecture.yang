@@ -79,7 +79,8 @@ module ietf-yang-architecture {
     description
       "Denotes data that does not have an explicitly configured
        value, but has a default value in use.  Covers both simple
-       defaults and complex defaults.";
+       defaults and defaults defined via an explanation in a
+       decription statement.";
   }
 
   /*
