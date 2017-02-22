@@ -295,7 +295,7 @@ configuration.
 Another example is support for templates.  Templates are expanded
 when copied into <intended>, and the result is validated.
 
-** The <applied> datastore
+** The <applied> datastore @applied-ds@
 
 The <applied> datastore is a read-only datastore that consists of
 config true nodes.  It contains the currently active configuration on
@@ -305,7 +305,8 @@ control-plane datastores.
 
 As data flows into the <applied> and <operational-state> datastores,
 it is conceptually marked with a metadata annotation (^RFC7952^) that
-indicates its origin.  The "origin" metadata annotation is defined in
+indicates its origin.  [DISCUSS: the following should be moved into
+its own section] The "origin" metadata annotation is defined in
 ^module^.  The values are YANG identities.  The following identities
 are defined:
 
@@ -359,7 +360,7 @@ datastore also contains state data.
 In the <operational-state> datastore, semantic constraints defined
 in the data model are not applied.  See ^issues^.
 
-* Guidelines for Defining Control-Plane Datastores
+* Guidelines for Defining Control-Plane Datastores @cp-ds-guidelines@:$
 
 The following provides guidelines for control-plane datastore
 designers.
@@ -371,10 +372,9 @@ a globally unique name.  To ensure this, all datastores MUST
 register their names with IANA, along with the RFC number that
 defined it.
 
-Open Issues:
-- identityref or enum
-- name of registry?
-- add section to IANA Considerations to create registry...
+[DISCUSS: how do they register their name?  identityref, enum, module name?
+- if not module name, then we'll need to add an IANA Considerations section]
+
 
 ** Define which YANG modules can be used in the datastore.
 
@@ -410,12 +410,19 @@ However, it may be that only a specific protocol can be used
 capabilities are available (e.g., no locking, no xpath-based
 filtering).
 
-** Extend the 'origin' attribute
+** Define a module
 
-This RFC defines an attribute call "origin" that is used to identify
-from which datastore operational state data came from.  Using an
-"identity" statment, the "dynamic" identity SHOULD be extended with
-the name of the new control-plane datastore.
+Each control-plane datastore definition MUST define a YANG module
+that can be used to 1) identify servers that support the datastore,
+and 2) define an 'origin' identity that can be used for data that
+originates from the datastore.
+
+IETF modules MUST be called "ietf-ds-<datastore-name>".
+
+All modules MUST import "ietf-yang-architecture" in order to obtain
+the base origin identity used (e.g., 'dynamic' for control-plane
+datastores).
+
 
 * Data Model @module@
 
@@ -424,6 +431,10 @@ the name of the new control-plane datastore.
 * IANA Considerations
 
 TBD
+
+- register module "ietf-yang-archiecture"
+- register ns "urn:ietf:params:xml:ns:yang:ietf-yang-architecture"
+- create a new registry for datastore names? (^cp-ds-guidelines^)
 
 * Security Considerations
 
@@ -795,6 +806,39 @@ such a situation, it is recommended to model this as two separate
 leafs, one config true leaf for the input to the auto-negotiation
 process, and one config false leaf for the output from the process.
 
+
+* Ephemeral Control-Plane Datastore 
+
+  The section defines an example control-plane datastore using
+  the guidelines in ^cp-ds-guidelines^.  While this example is
+  very terse, it is expected that it would be a standalone RFC
+  when fully expanded as an RFC.
+
+  This example defines a control-plane datastore called :ephemeral,
+  which is loosely modelled after the work done in the I2RS working
+  group.
+
+  1. Name            : ephemeral  (register with IANA)
+  2. YANG modules    : all (default)
+  3. YANG statements : config false + ephemeral true
+  4. How applied     : automatic
+  5. Protocols       : NC/RC (default)
+  6. YANG Module     : (see below)
+
+    module ietf-ds-ephemeral {
+      namespace "urn:ietf:params:xml:ns:yang:ietf-ds-ephemeral";
+      prefix e;
+      import ietf-yang-architecture {
+        prefix arch;
+      }
+      identity ephemeral {
+        base arch:dynamic;
+        description
+          "Denotes data from the ephemeral control-plane datastore.";
+      }
+    }
+
+  [DISCUSS: this needs to be a valid module example now, right?]
 
 
 
