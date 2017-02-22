@@ -547,13 +547,203 @@ it.
 
 * Implications on RESTCONF
 
-- The {+restconf}/data resource represents the combined configuration
-  and state data resources that can be accessed by a client.  This is
-  effectively bundling <running> together with <operational-state>,
-  much like the <get/> operation of NETCONF.  This design should be
-  deprecated.
-- A new query parameter is needed to indicate that data from
-  <operational-state> is requested.
+This section describes the authors' thoughts on how RESTCONF could be
+updated to support the datastore architecture described in this draft.
+It has been incorporated as an appendix of this document to facilate
+easier review, but the expectation is that this work will be owned and
+standized via the NETCONF working group.
+
+** Introduction
+
+RESTCONF ^RFC8040^ defines a protocol based on HTTP for configuring
+data defined in YANG version 1 or 1.1, using a conceptual datastore
+that is compatible with a server that implements NETCONF 1.1 compliant
+datastores.
+
+The combined conceptual datastore defined in RESTCONF is incompatible
+with the new datastore architecture defined in this document. There
+are two possible ways that RESTCONF could be extended to support the
+new architecture: Either as new optional capabilities extending the
+existing RESTCONF RFC, or as an new version of RESTCONF.
+
+Many of the required additions are common to both approaches, and are
+described below.  A following section then describes the benefits of
+defining a new RESTCONF version, and the additional changes that would
+entail.
+
+** Overview of additions to RESTCONF
+
+- A new path {+restconf}/datastore/<datastore-name>/data/
+  to provide a YANG datatree for each datastore that is exposed via
+  RESTCONF.
+
+- Implementations can choose which datastores they expose, but MUST at
+  least expose both the <running> and <operational> datastores.  They
+  MAY expose additional datastores, such as <intended> or <applied>.
+  TODO - Document how supported datastores are advertised.
+
+- The same HTTP Methods supported on {+restconf}/data/ are also
+  supported on {+restconf}/datastore/<datastore-name>/data/ but
+  suitably constrained depending on whether the datastore can be
+  written to by the client, or is read-only.
+
+- The same query parameters supported on {+restconf}/data/ are also
+  support on {+restconf}/datastore/<datastore-name>/data/ except for
+  the following query parameters:
+
+ - 'content' - is not supported on any of the new datastore paths.
+
+ - 'meta-data' - is a new optional query parameter that only applies
+   to the operational state datastore, and filters the returned data
+   based on the meta-data annotation.
+
+ - 'with-meta-data' - is a new optional query parameter that applies
+   to the operational state datastore, indicating that the origin
+   meta-data should be included in the reply.
+
+ - 'wtih-defaults' is supported on all configuration datastores, but
+   is not supported on the operational state datastore path, because
+   it has different default handling semantics.
+
+- The handling of defaults (include the with-defaults query parameter)
+  for the new configuration datastores is the same as the existing
+  conceptual datastore, but doesn't apply for the operational state
+  datastore that defines new semantics.
+
+*** HTTP Methods
+
+All configuration datastores support all HTTP Methods.
+
+The <operational-state> datastore only supports the following HTTP methods:
+OPTIONS, HEAD, GET, and POST to invoke an RFC operation.
+
+*** Query parameters
+
+The 'content' query parameter is not supported by RESTCONF v2 because
+its functionality has been obsoletely by the revised datastores
+architecture.
+
+The 'meta-data' query parameter allows the returned data to be
+restricted by its associated origin meta-data. It takes a single
+parameter containing a simple logic filter expression (i.e. and, or,
+not, bracketing) of origin meta-data tags.  The response is restricted
+to those nodes with origin meta-data that match, or is derived from
+origin meta-data that matches, the filter.  Note that regardless of
+these origin meta-data, ancestor nodes (if any) and list key leafs (if
+any) are also returned.
+
+The 'with-meta-data' query parameter can only be used on requests to
+<operational>, and ensures that origin meta-data annotations are
+included in the response, encoded according to YANG Metadata
+^RFC7952^.  If this query parameter is not specified, then origin
+metadata information is not included in the response.
+
+A new capability is defined to indicate whether a device supports
+filtering on, or annotating responses with, the origin meta data.
+DISCUSS: Presume that one capability is sufficient because if a device
+can filter on the origin metadata then it should also be able to
+annotate.
+
+*** Operational State Datastore Defaults Handling
+
+DISCUSS: Should the description in 4.3 also be updated to explain the
+"default" handling semantics in the operational state datastore.
+
+The normal semantics for the <operational-state> datastore are that
+all values that match the default specified in the schema are included
+in response to requests on the operational state datastore. This is
+equivalent to the 'report-all' mode of the with-defaults handling.
+
+The 'meta-data' query parameter can be used to exclude nodes with a
+origin meta-data matching 'data-model', that would exclude (only
+config true?) nodes that match the default value specified in the
+schema.
+
+If the server cannot return a value for any reason (e.g. the server
+cannot determine the value, or the value that would be returned is
+outside the allowed leaf value range) then the server can choose to
+not return any value for a particular leaf, which MUST be interpreted
+by the client as the value of that leaf not being known, rather than
+implicitly having the default value.
+
+Issue: RESTCONF v1 changes the default handling semantics if a GET
+request is made against a path that hasn't been explicitly configured.
+This doesn't seem to make so much sense in the revised datastores
+architecture.
+
+
+** Overview of RESTCONF version 2
+
+This section describes RESTCONF version 2, by explaining the
+differences to RESTCONF version 1.  Where not explicitly specified,
+the behaviour of RESTCONF version 2 is the same as for RESTCONF
+version 1 ^RFC8040^.
+
+*** Benefits of defining a new RESTCONF version
+
+Defining a new version of RESTCONF (as opposed to extending RESTCONF
+version 1) has several benefits:
+
+- It exposes datastores, and models designed for the revised datastore
+  architecture, in a clean and consistent way.
+
+- It allows the parts of RESTCONF that don't work well with the
+  revised datastore architecture to be omitted from RESTCONF v2.
+
+- It makes it easier for clients and servers to know what reasonable
+  common baseline functionality to expect, rather than a collection of
+  capabilities that may not be implemented in a consistent fashion.
+
+- It can gracefully coexist with RESTCONF v1.  A server could implement both
+  versions.  Existing YANG models exposing split config/state trees
+  could be exposed via RESTCONF v1, whereas combined config/state YANG models
+  could be exposed via RESTCONF v2, providing a viable server upgrade path.
+
+*** Proposed changes for RESTCONF v2
+
+The differences between RESTCONF version 2 (RESTCONF v2) and RESTCONF
+version 1 (RESTCONF v1) ^RFC8040^ can be summarized as:
+
+- RESTCONF v2 defines a new root resource (referred to as
+{+restconf2}, and a separate link relation in the
+/.well-known/host-meta resource.
+
+- RESTCONF v2 removes support for the {+restconf}/data path supported
+  in RESTCONF v1.
+
+- RESTCONF v2 removes support for the content query parameter, since
+  it no longer useful in the revised datastore architecture.
+
+- RESTCONF v2 can publish a separate version of YANG library from a
+  RESTCONF v1 implementation running on the same device, allowing
+  different versions of RESTCONF to support a different set of YANG
+  modules.
+
+*** Possible Migration Path using RESTCONF v2
+
+A common approach in current data models is to have two separate trees
+"/foo" and "/foo-state", where the former contains config true nodes,
+and the latter config false nodes.  A data model that is designed for
+the revised architectural framework presented in this document will
+have a single tree "/foo" with a combination of config true and config
+false nodes.
+
+If for backwards compatbility reasons, a server intends to support both
+split config/state trees, and the combined config/state trees proposed
+in this architecture, then this can be achieved by having the device
+support both RESTCONF v1 and RESTCONF v2 at the same time:
+
+ - The RESTCONF v1 implementation could support YANG module revisions
+   with split config/state trees.
+
+ - The RESTCONF v2 implementation could support different YANG
+   modules, or YANG module revisions, with combined config/state
+   trees.
+
+Clients can then decide on which type of models to use by choosing
+whether to use the RESTCONF v1 root resource or the RESTCONF v2 root
+resource.
+
 
 * Implications on YANG
 
