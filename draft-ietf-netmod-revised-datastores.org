@@ -28,7 +28,9 @@ This document defines the following terms:
 
 - configuration data: Data that determines how a device behaves.
   Configuration data can originate from different sources.  In YANG
-  1.1, configuration data is the "config true" nodes.
+  1.1, configuration data is the "config true" nodes. [DISCUSS: The
+  last statement (a) is not needed and (b) may go too far as it rules
+  out config false; ephemeral true.]
 - static configuration data: Configuration data that is eventually
   persistent and used to get a device from its initial default state
   into its desired operational state.
@@ -40,7 +42,75 @@ This document defines the following terms:
 - data-model-defined configuration data: Configuration data that is not
   explicitly provided but for which a value defined in the data model
   is used.  In YANG 1.1, such data can be defined with the "default"
-  statement or in "description" statements.
+  statement or in "description" statements. [DISCUSS: I would again
+  prefer to remove YANG 1.1 specifics from the definition.] [DISCUSS:
+  The data-model identity distinguishes 'simple' and 'complex' defaults
+  but there is no definition what this means. Do we need the distinction?
+  If so, there should be a definition.]
+- applied configuration data: Configuration data that is currently
+  used by a device. Applied configuration data is derived from the
+  static configuration data, dynamic configuration data, system
+  configuration data, and data-model-defined configuration data.
+- state data: The additional data on a system that is not
+  configuration data such as read-only status information and
+  collected statistics. State data is transient and modified by
+  interactions with internal components or other systems.
+- datastore: A conceptual place to store and access information.  A
+  datastore might be implemented, for example, using files, a
+  database, flash memory locations, or combinations thereof.
+- configuration datastore: A datastore holding static configuration
+  data that is required to get a device from its initial default state
+  into a desired operational state.
+- running configuration datastore: A configuration datastore holding
+  the complete configuration currently active on the device.  The
+  running configuration datastore always exists. It may include
+  inactive configuration or template configuration that require
+  further expansion.
+- intended configuration datastore: A configuration datastore holding
+  the complete configuration currently active on the device. It does
+  not include inactive configuration and it does include the expansion
+  of any templates.
+- candidate configuration datastore: A configuration datastore that
+  can be manipulated without impacting the device's running
+  configuration datastore and that can be committed to the running
+  configuration datastore. Only present on devices that support and
+  expose candidate configuration datastores.
+- startup configuration datastore: The configuration datastore holding
+  the configuration loaded by the device into the running
+  configuration datastore when it boots. Only present on devices that
+  separate the startup configuration datastore from the running
+  configuration datastore.
+- control-plane datastore: A datastore holding dynamic configuration
+  data.
+- applied configuration datastore: A datastore holding the currently
+  active applied configuration data.
+- operational state datastore: A datastore holding the currently
+  active applied configuration data as well as the device's state
+  data.
+
+The following additional terms are not datastore specific but commonly
+used and thus defined here as well:
+
+- client: An entity that can access YANG-defined data on a server,
+  over some network management protocol.
+- server: An entity that provides access to YANG-defined data to a
+  client, over some network management protocol.
+- notification: A server-initiated message indicating that a certain
+  event has been recognized by the server.
+- remote procedure call: An operation that can be invoked by a client
+  on a server.
+
+[DISCUSS: Do we need to discuss somewhere how remote procedure calls
+and notifications/actions tie into datastores? RFC 7950 shows as an
+example a ping action tied to an interface. Does this refer to an
+interface defined in a configuration datastore? Or an interface
+defined in the operational state datastore? Or the applied
+configuration datastore? Similarly, RFC 7950 shows an example of a
+link-failure notification; this likely applies implicitly to the
+operational state datastore. The netconf-config-change notification
+does explicitly identify a datastore. I think we generally need to
+have remote procedure calls and notifications about which datastores
+they apply to and I do not know how things would work for actions.]
 
 * Background
 
