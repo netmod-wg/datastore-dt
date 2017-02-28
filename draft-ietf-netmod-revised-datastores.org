@@ -360,7 +360,7 @@ datastore also contains state data.
 In the <operational-state> datastore, semantic constraints defined
 in the data model are not applied.  See ^issues^.
 
-* Guidelines for Defining Control-Plane Datastores @cp-ds-guidelines@:$
+* Guidelines for Defining Control-Plane Datastores @cp-ds-guidelines@
 
 The following provides guidelines for control-plane datastore
 designers.
