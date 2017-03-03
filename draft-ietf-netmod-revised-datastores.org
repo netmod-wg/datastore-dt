@@ -776,27 +776,85 @@ created.
 
 * Implications on Data Models
 
-- Since the NETCONF <get/> operation returns the content of the
-  <running> configuration datastore and the operational state together
-  in one tree, data models were often forced to branch at the
-  top-level into a config true branch and a structurally similar
-  config false branch that replicated some of the config true nodes
-  and added state nodes.  With the datastore model described here this
-  is not needed anymore since the different datastores handle the
-  different lifetimes of data objects.  Introducing this model
-  together with the deprecation of the <get/> operation makes it
-  possible to write simpler models.
-- There may be some differences in the value set of some nodes that
-  are used for both configuration and state.  At this point of time,
-  these are considered to be rare cases that can be dealt with using
-  different nodes for the configured and state values.
-- It is important to design data models with clear semantics
-  that work equally well for instantiation in a configuration
-  datastore and instantiation in the <operational-state> datastore.
+Since the NETCONF <get/> operation returns the content of the
+<running> configuration datastore and the operational state together
+in one tree, data models were often forced to branch at the top-level
+into a config true branch and a structurally similar config false
+branch that replicated some of the config true nodes and added state
+nodes.  With the datastore model described here this is not needed
+anymore since the different datastores handle the different lifetimes
+of data objects.  Introducing this model together with the deprecation
+of the <get/> operation makes it possible to write simpler models.
 
-* Data Model Design Guidelines
+** Proposed migration of existing YANG Data Models
 
-** Auto-configured or Auto-negotiated Values
+For standards based YANG data modules that have already been
+published, or are in active development, that are using split config
+and state trees, it is planned that these modules are updated with new
+revisions containing the following changes:
+
+- The top level module description is updated to indicate that the
+  module conforms to the revised datastore architecture with a
+  combined config and state tree, and that the existing state tree
+  nodes are deprecated, to be obsoleted over time.
+
+- All status 'current' data nodes under the existing 'state' trees are
+  copied to the equivalent place under the 'config' tree:
+
+  - If a node with the same name and type already exists under the
+    equivalent path in the config tree then the nodes are merged and
+    the description updated.
+
+  - If a node with the same name but different type exists under the
+    equivalent path in the config tree, then the module authors must
+    choose the appropriate mechanism to combine the config and state
+    nodes in a backwards compatible way based on the data model design
+    guidelines below.  This may require the state node to be added to
+    the config tree with a modified name.  This scenario is expected
+    to be relatively uncommon.
+
+  - If no node with the same name and path already exists under the
+    config tree then the state node schema is copied verbatim into the
+    config tree.
+
+  - As the state nodes are copied into the config trees, any
+    leafrefs that reference other nodes in the state tree are adjusted
+    to reference the equivalent path in the config tree.
+
+  - All status 'current' nodes under the existing 'state' trees are
+    marked as 'status' deprecated.
+
+- Augmentations are similarly handled to data nodes as described
+  above.
+
+- Tooling, e.g. based on pyang, could be provided to aid with some of
+  the initial stages of revising existing modules, reducing the work
+  required on module authors.
+
+** Standardization of new YANG Data Models:
+
+New standards based YANG data modules should be designed to conform
+with the revised datastore architecture, following the design
+guidelines described below, and only need to provide combined
+config/state trees.
+
+** Design Guidelines
+
+It is important to design data models with clear semantics that work
+equally well for instantiation in a configuration datastore and
+instantiation in the <operational-state> datastore.
+
+[DISCUSS, are we missing further design guidelines that should be
+pointed out here?]
+
+*** Nodes with different config/state value sets
+
+There may be some differences in the value set of some nodes that are
+used for both configuration and state.  At this point of time, these
+are considered to be rare cases that can be dealt with using different
+nodes for the configured and state values.
+
+*** Auto-configured or Auto-negotiated Values
 
 Sometimes configuration leafs support special values that instruct the
 system to automatically configure a value.  An example is an MTU that
