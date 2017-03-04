@@ -905,7 +905,7 @@ process, and one config false leaf for the output from the process.
     ipr trust200902;
     category std;
     references back.xml;
-    title "YANG Datastore Architecture";
+    title "YANG Datastores";
     contributor "editor:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
     contributor "author:Juergen Schoenwaelder:Jacobs University:j.schoenwaelder@jacobs-university.de";
     contributor "author:Phil Shafer:Juniper:phil@juniper.net";
