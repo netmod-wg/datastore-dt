@@ -593,13 +593,12 @@ entail.
 
  - 'content' - is not supported on any of the new datastore paths.
 
- - 'meta-data' - is a new optional query parameter that only applies
-   to the operational state datastore, and filters the returned data
-   based on the meta-data annotation.
+ - 'meta-data' - is a new optional query parameter that filters the
+   returned data based on the meta-data annotation.
 
- - 'with-meta-data' - is a new optional query parameter that applies
-   to the operational state datastore, indicating that the origin
-   meta-data should be included in the reply.
+ - 'with-meta-data' - is a new optional query parameter that
+   indicating that the meta-data annotations should be included in the
+   reply.
 
  - 'with-defaults' is supported on all configuration datastores, but
    is not supported on the operational state datastore path, because
@@ -619,25 +618,28 @@ OPTIONS, HEAD, GET, and POST to invoke an RFC operation.
 
 *** Query parameters
 
-The 'content' query parameter is not supported by RESTCONF v2 because
-its functionality has been obsoletely by the revised datastores
-architecture.
+The 'content' query parameter is not supported by any of the new
+datastores because its functionality has been obsoletely by the
+revised datastores architecture.
 
-The 'meta-data' query parameter allows the returned data to be
-restricted by its associated origin meta-data. It takes a single
-parameter containing a simple logic filter expression (i.e. and, or,
-not, bracketing) of origin meta-data tags.  The response is restricted
-to those nodes with origin meta-data that match, or is derived from
-origin meta-data that matches, the filter.  Note that regardless of
-these origin meta-data, ancestor nodes (if any) and list key leafs (if
-any) are also returned.
+[DISCUSS, actually, is there any harm in leaving the 'content' query parameter as is?]
 
-The 'with-meta-data' query parameter can only be used on requests to
-<operational>, and ensures that origin meta-data annotations are
-included in the response, encoded according to YANG Metadata
-^RFC7952^.  If this query parameter is not specified, then origin
-metadata information is not included in the response.
+^RFC7952^ specifies how a YANG data tree can be annotated with generic
+meta-data inforation, that is used by this document to annotate data
+nodes with origin information indicating the mechanism by which the
+operational value came into effect.
 
+RESTCONF could be extended with an optional generic mechanism to allow
+the filtering of nodes returned in a query based on meta-data
+annotations associated with the data node.
+
+RESTCONF could also be extended with an optional generic mechanism to
+choose whether metadata annotations should be included in the
+response, potentially filtering to a subset of annotations.  E.g. only
+include @origin metadata annotations, and not any others that may be
+in use.
+
+Both of the generic mechanisms could be controlled by a new capability.
 A new capability is defined to indicate whether a device supports
 filtering on, or annotating responses with, the origin meta data.
 DISCUSS: Presume that one capability is sufficient because if a device
@@ -645,9 +647,6 @@ can filter on the origin metadata then it should also be able to
 annotate.
 
 *** Operational State Datastore Defaults Handling
-
-DISCUSS: Should the description in 4.3 also be updated to explain the
-"default" handling semantics in the operational state datastore.
 
 The normal semantics for the <operational-state> datastore are that
 all values that match the default specified in the schema are included
@@ -665,12 +664,6 @@ outside the allowed leaf value range) then the server can choose to
 not return any value for a particular leaf, which MUST be interpreted
 by the client as the value of that leaf not being known, rather than
 implicitly having the default value.
-
-Issue: RESTCONF v1 changes the default handling semantics if a GET
-request is made against a path that hasn't been explicitly configured.
-This doesn't seem to make so much sense in the revised datastores
-architecture.
-
 
 ** Overview of RESTCONF version 2
 
@@ -788,10 +781,10 @@ of the <get/> operation makes it possible to write simpler models.
 
 ** Proposed migration of existing YANG Data Models
 
-For standards based YANG data modules that have already been
-published, or are in active development, that are using split config
-and state trees, it is planned that these modules are updated with new
-revisions containing the following changes:
+For standards based YANG modules that have already been published, or
+are in active development, that are using split config and state
+trees, it is planned that these modules are updated with new revisions
+containing the following changes:
 
 - The top level module description is updated to indicate that the
   module conforms to the revised datastore architecture with a
@@ -833,7 +826,7 @@ revisions containing the following changes:
 
 ** Standardization of new YANG Data Models:
 
-New standards based YANG data modules should be designed to conform
+New standards based YANG modules should be designed to conform
 with the revised datastore architecture, following the design
 guidelines described below, and only need to provide combined
 config/state trees.
