@@ -973,10 +973,6 @@ containing the following changes:
 - Augmentations are similarly handled to data nodes as described
   above.
 
-- Tooling, e.g. based on pyang, could be provided to aid with some of
-  the initial stages of revising existing modules, reducing the work
-  required on module authors.
-
 ** Standardization of new YANG Data Models:
 
 New standards based YANG modules should be designed to conform
