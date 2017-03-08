@@ -934,10 +934,10 @@ of the <get/> operation makes it possible to write simpler models.
 
 ** Proposed migration of existing YANG Data Models
 
-For standards based YANG modules that have already been published, or
-are in active development, that are using split config and state
-trees, it is planned that these modules are updated with new revisions
-containing the following changes:
+For standards based YANG modules that have already been published,
+that are using split config and state trees, it is planned that these
+modules are updated with new revisions containing the following
+changes:
 
 - The top level module description is updated to indicate that the
   module conforms to the revised datastore architecture with a
@@ -975,10 +975,10 @@ containing the following changes:
 
 ** Standardization of new YANG Data Models:
 
-New standards based YANG modules should be designed to conform
-with the revised datastore architecture, following the design
-guidelines described below, and only need to provide combined
-config/state trees.
+New standards based YANG modules, or those in active development,
+should be designed to conform to the revised datastore architecture,
+following the design guidelines described below, and only need to
+provide combined config/state trees.
 
 ** Design Guidelines
 
