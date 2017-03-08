@@ -20,6 +20,8 @@
 
   ietf-ref:RFC6244
 
+  ietf-ref:I-D.ietf-netmod-rfc6087bis
+
   ietf-ref:I-D.ietf-netmod-opstate-reqs
 
   ietf-ref:I-D.bjorklund-netmod-operational
