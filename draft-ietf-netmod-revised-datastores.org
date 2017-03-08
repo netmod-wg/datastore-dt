@@ -602,10 +602,10 @@ of the <get/> operation makes it possible to write simpler models.
 
 ** Proposed migration of existing YANG Data Models
 
-For standards based YANG modules that have already been published, or
-are in active development, that are using split config and state
-trees, it is planned that these modules are updated with new revisions
-containing the following changes:
+For standards based YANG modules that have already been published,
+that are using split config and state trees, it is planned that these
+modules are updated with new revisions containing the following
+changes:
 
 - The top level module description is updated to indicate that the
   module conforms to the revised datastore architecture with a
@@ -643,10 +643,11 @@ containing the following changes:
 
 ** Standardization of new YANG Data Models:
 
-New standards based YANG modules should be designed to conform
-with the revised datastore architecture, following the design
-guidelines described below, and only need to provide combined
-config/state trees.
+New standards based YANG modules, or those in active development,
+should be designed to conform to the revised datastore architecture,
+following the design guidelines described below, and only need to
+provide combined config/state trees.
+
 
 
 * Implications onto Other Drafts
@@ -657,6 +658,7 @@ drafts may be updated to support the datastore architecture described
 to facilitate easier review, but the expectation is that this work will be
 moved into another document as soon as the appropriate working group
 decides to take on the work.
+
 
 
 ** Implications on YANG
@@ -699,6 +701,7 @@ be owned and standized via the NETCONF working group.
 [TBD (mbj)] FIXME
 
 
+
 ** Implications to YANG Guidelines 
 
 Note: This section describes the authors' thoughts on how Guidelines for
@@ -728,6 +731,8 @@ value.  Another example is Ethernet auto-negotiation of link speed.  In
 such a situation, it is recommended to model this as two separate
 leafs, one config true leaf for the input to the auto-negotiation
 process, and one config false leaf for the output from the process.
+
+
 
 ** Implications on NETCONF
 
@@ -925,6 +930,8 @@ support the deprecated <get> operation:
  - New YANG modules, conforming to the datastores architecture, would
    work exactly as expected.
 
+
+
 ** Implications on RESTCONF
 
 This section describes the authors' thoughts on how RESTCONF ^RFC8040^ could be
@@ -1116,6 +1123,7 @@ support both RESTCONF v1 and RESTCONF v2 at the same time:
 Clients can then decide on which type of models to use by choosing
 whether to use the RESTCONF v1 root resource or the RESTCONF v2 root
 resource.
+
 
 
 
