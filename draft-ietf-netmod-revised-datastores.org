@@ -504,7 +504,7 @@ by the system, and the result of the "speed" auto-negotiation:
 
 * Implications on NETCONF
 
-This section describes the authors' thoughts on how NETCONF could be
+Note: This section describes the authors' thoughts on how NETCONF ^RFC6241^ could be
 updated to support the datastore architecture described in this draft.
 It has been incorporated as an appendix of this document to facilitate
 easier review, but the expectation is that this work will be owned and
@@ -700,7 +700,7 @@ support the deprecated <get> operation:
 
 * Implications on RESTCONF
 
-This section describes the authors' thoughts on how RESTCONF could be
+This section describes the authors' thoughts on how RESTCONF ^RFC8040^ could be
 updated to support the datastore architecture described in this draft.
 It has been incorporated as an appendix of this document to facilitate
 easier review, but the expectation is that this work will be owned and
@@ -893,6 +893,13 @@ resource.
 
 * Implications on YANG
 
+Note: This section describes the authors' thoughts on how YANG ^RFC7950^
+could be updated to support the datastore architecture described in this
+draft.  It has been incorporated as an appendix of this document to 
+facilitate easier review, but the expectation is that this work will be
+moved into another document as soon as the NETMOD WG decides to take on
+the work.
+
 - Some clarifications may be needed if this datastore model is
   adopted.  YANG currently describes validation in terms of the
   <running> configuration datastore while it really happens on the
@@ -911,16 +918,27 @@ resource.
   datastores they apply to and perhaps change the default xpath context
   from running plus state to the operational state datastore.]
 
+
+
 * Implications on YANG library @yang-lib-impl@
 
-NOTE: This appendix provides initial text regarding how the YANG
-module "ietf-yang-library" ^RFC7895^ might be updated.  If accepted by
-the WG, the intention is that a separate rfc7895bis document is
-created.
+Note: This section describes the authors' thoughts on how YANG Library
+^RFC7895^ could be updated to support the datastore architecture described
+in this draft.  It has been incorporated as an appendix of this document
+to facilitate easier review, but the expectation is that this work will
+be owned and standized via the NETCONF working group.
 
-[TBD (mbj)]
+[TBD (mbj)] FIXME
+
+
 
 * Implications on Data Models
+
+Note: This section describes the authors' thoughts on how data models
+could be updated to support the datastore architecture described in this
+draft.  It has been incorporated as an appendix of this document to
+facilitate easier review, but the expectation is that this work will
+be owned and standized via the NETCONF working group.
 
 Since the NETCONF <get/> operation returns the content of the
 <running> configuration datastore and the operational state together
@@ -980,7 +998,10 @@ should be designed to conform to the revised datastore architecture,
 following the design guidelines described below, and only need to
 provide combined config/state trees.
 
-** Design Guidelines
+** Design Guidelines 
+
+[DISCUSS: should this section be moved into another Appendix Section
+"Implications to YANG Guidelines ^I-D.ietf-netmod-rfc6087bis^" ?]
 
 It is important to design data models with clear semantics that work
 equally well for instantiation in a configuration datastore and
@@ -1047,10 +1068,10 @@ process, and one config false leaf for the output from the process.
     ipr trust200902;
     category std;
     references back.xml;
-    title "YANG Datastores";
-    contributor "editor:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
+    title "Network Management Datastore Architecture";
+    contributor "author:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
     contributor "author:Juergen Schoenwaelder:Jacobs University:j.schoenwaelder@jacobs-university.de";
-    contributor "author:Phil Shafer:Juniper:phil@juniper.net";
-    contributor "author:Kent Watsen:Juniper:kwatsen@juniper.net";
-    contributor "author:Rob Wilton:Cisco:rwilton@cisco.com";
+    contributor "author:Phil Shafer:Juniper Networks:phil@juniper.net";
+    contributor "author:Kent Watsen:Juniper Networks:kwatsen@juniper.net";
+    contributor "author:Rob Wilton:Cisco Systems:rwilton@cisco.com";
 }}
