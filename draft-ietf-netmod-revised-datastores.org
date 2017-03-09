@@ -372,7 +372,6 @@ a globally unique name.  To ensure this, all datastores MUST
 register their names with IANA, along with the RFC number
 that defined it, using the registry defined in ^ds-name-reg^.
 
-
 ** Define which YANG modules can be used in the datastore.
 
 Not all YANG modules may be used in all datastores.  Some datastores may
@@ -416,19 +415,24 @@ filtering, etc.).
 
 Each control-plane datastore definition MUST define a YANG module
 that can be used to 1) identify servers that support the datastore,
-and 2) define an 'origin' identity that can be used for data that
-originates from the datastore.
+2) define a 'datastore' identity that can be used to identity the
+datastore in protocol operations, and 3) define an 'origin' 
+identity that can be used for data that originates from the
+datastore.
 
 IETF modules MUST be called "ietf-ds-<datastore-name>".
 
-All modules MUST import "ietf-yang-architecture" in order to obtain
+All modules MUST import "ietf-datastores" in order to obtain
 the base origin identity used (e.g., 'dynamic' for control-plane
 datastores).
+
+An example of these guidelines in use is provided in 
+^ephemeral-ds-example^.
 
 
 * Data Model @module@
 
-!! include-figure ietf-yang-architecture.yang extract-to="ietf-yang-architecture@2016-10-13.yang"
+!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2016-10-13.yang"
 
 * IANA Considerations @iana-con@
 
@@ -470,7 +474,7 @@ All datastore names in the registry MUST be unique.
 This document registers one URI in the IETF XML registry ^RFC3688^.  Following
 the format in ^RFC3688^, the following registration is requested:
 
-   URI: urn:ietf:params:xml:ns:yang:ietf-yang-architecture
+   URI: urn:ietf:params:xml:ns:yang:ietf-datastores
    Registrant Contact: The NETMOD WG of the IETF.
    XML: N/A, the requested URI is an XML namespace.
 
@@ -481,8 +485,8 @@ This document registers one YANG module in the YANG Module Names registry
 ^RFC6020^.  Following the format in ^RFC6020^, the the following registration
 is requested:
 
-   name:         ietf-yang-architecture
-   namespace:    urn:ietf:params:xml:ns:yang:ietf-yang-architecture
+   name:         ietf-datastores
+   namespace:    urn:ietf:params:xml:ns:yang:ietf-datastores
    prefix:       ds
    reference:    RFC XXXX
 
@@ -555,7 +559,7 @@ by the system, and the result of the "speed" auto-negotiation:
 + Better name for "intended"?
 
 
-* Ephemeral Control-Plane Datastore Example
+* Ephemeral Control-Plane Datastore Example @ephemeral-ds-example@
 
   The section defines documentation for an example control-plane
   datastore using the guidelines provided in ^cp-ds-guidelines^.
@@ -576,11 +580,21 @@ by the system, and the result of the "speed" auto-negotiation:
     module ietf-ds-ephemeral {
       namespace "urn:ietf:params:xml:ns:yang:ietf-ds-ephemeral";
       prefix e;
-      import ietf-yang-architecture {
-        prefix arch;
+
+      import ietf-datastores {
+        prefix ds;
       }
+
+      // add datastore identity
       identity ephemeral {
-        base arch:dynamic;
+        base ds:datastore;
+        description
+          "The 'ephemeral' datastore.";
+      }
+
+      // add origin identity
+      identity ephemeral {
+        base ds:dynamic;
         description
           "Denotes data from the ephemeral control-plane datastore.";
       }
@@ -650,7 +664,7 @@ provide combined config/state trees.
 
 
 
-* Implications onto Other Drafts
+* Implications on other Drafts
 
 The sections below describe the authors' thoughts on how various other
 drafts may be updated to support the datastore architecture described

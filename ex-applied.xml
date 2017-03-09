@@ -1,7 +1,7 @@
 <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
 <system
     xmlns="urn:example:system"
-    xmlns:arch="urn:ietf:params:xml:ns:yang:ietf-yang-architecture">
+    xmlns:arch="urn:ietf:params:xml:ns:yang:ietf-datastores">
 
   <hostname arch:origin="arch:dynamic">bar</hostname>
 

@@ -1,6 +1,6 @@
-module ietf-yang-architecture {
-  namespace "urn:ietf:params:xml:ns:yang:ietf-yang-architecture";
-  prefix arch;
+module ietf-datastores {
+  namespace "urn:ietf:params:xml:ns:yang:ietf-datastores";
+  prefix ds;
 
   import ietf-yang-metadata {
     prefix md;
@@ -14,8 +14,11 @@ module ietf-yang-architecture {
 
      WG List:  <mailto:netmod@ietf.org>
 
-     Editor:   Martin Bjorklund
-               <mailto:mbj@tail-f.com>";
+     Author:   Martin Bjorklund
+               <mailto:mbj@tail-f.com>
+
+     Author:   Kent Watsen
+               <mailto:kwatsen@juniper.net>";
 
   description
     "This YANG module defines an 'origin' metadata annotation,
@@ -23,6 +26,10 @@ module ietf-yang-architecture {
      metadata annotation is used to mark data in the applied
      and operational state datastores with information on where
      the data originated.
+
+     This YANG module also defines a set of identities for
+     datastores.  These identities can be used to identify
+     datastores in protocol operations.
 
      Copyright (c) 2016 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
@@ -48,6 +55,47 @@ module ietf-yang-architecture {
   /*
    * Identities
    */
+
+  identity datastore {
+    description
+     "Abstract base identity for the datastore identity.";
+  }
+
+  identity candidate {
+    base datastore;
+    description
+     "The 'candidate' datastore.";
+  }
+
+  identity running {
+    base datastore;
+    description
+     "The 'running' datastore.";
+  }
+
+  identity startup {
+    base datastore;
+    description
+     "The 'startup' datastore.";
+  }
+
+  identity intended {
+    base datastore;
+    description
+     "The 'intended' datastore.";
+  }
+
+  identity applied {
+    base datastore;
+    description
+     "The 'applied' datastore.";
+  }
+
+  identity operational-state {
+    base datastore;
+    description
+     "The 'operational-state' datastore.";
+  }
 
   identity origin {
     description
