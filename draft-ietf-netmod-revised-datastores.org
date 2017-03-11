@@ -894,7 +894,7 @@ changes:
 - Augmentations are similarly handled to data nodes as described
   above.
 
-** Standardization of new YANG Data Models:
+** Standardization of new YANG Data Models
 
 New standards based YANG modules, or those in active development,
 should be designed to conform to the revised datastore architecture,
@@ -1182,12 +1182,12 @@ The combined conceptual datastore defined in RESTCONF is incompatible
 with the new datastore architecture defined in this document. There
 are two possible ways that RESTCONF could be extended to support the
 new architecture: Either as new optional capabilities extending the
-existing RESTCONF RFC, or as an new version of RESTCONF.
+existing RESTCONF RFC, or possibly as an new version of RESTCONF.
 
 Many of the required additions are common to both approaches, and are
-described below.  A following section then describes the benefits of
-defining a new RESTCONF version, and the additional changes that would
-entail.
+described below.  A following section then describes the potential
+benefits of defining a new RESTCONF version, and the additional
+changes that might entail.
 
 *** Overview of additions to RESTCONF
 
@@ -1239,9 +1239,6 @@ The 'content' query parameter is not supported by any of the new
 datastores because its functionality has been obsoletely by the
 revised datastores architecture.
 
-[DISCUSS, actually, is there any harm in leaving the 'content' query parameter as is?]
-- we agreed to leave the 'content' param in for now.
-
 ^RFC7952^ specifies how a YANG data tree can be annotated with generic
 metadata information, that is used by this document to annotate data
 nodes with origin information indicating the mechanism by which the
@@ -1280,54 +1277,53 @@ not return any value for a particular leaf, which MUST be interpreted
 by the client as the value of that leaf not being known, rather than
 implicitly having the default value.
 
-*** Overview of RESTCONF version 2
+*** Overview of a possible new RESTCONF version
 
-This section describes RESTCONF version 2, by explaining the
-differences to RESTCONF version 1.  Where not explicitly specified,
-the behavior of RESTCONF version 2 is the same as for RESTCONF
-version 1 ^RFC8040^.
+This section describes a notional new RESTCONF version, by explaining
+the differences to RESTCONF version 1.  Where not explicitly
+specified, the behavior of a new RESTCONF version is the same as for
+RESTCONF version 1 ^RFC8040^.
 
-**** Benefits of defining a new RESTCONF version
+**** Potential benefits of defining a new RESTCONF version
 
 Defining a new version of RESTCONF (as opposed to extending RESTCONF
-version 1) has several benefits:
+version 1) has several potential benefits:
 
-- It exposes datastores, and models designed for the revised datastore
-  architecture, in a clean and consistent way.
+- It could expose datastores, and models designed for the revised
+  datastore architecture, in a clean and consistent way.
 
-- It allows the parts of RESTCONF that do not work well with the
-  revised datastore architecture to be omitted from RESTCONF v2.
+- It would allow the parts of RESTCONF that do not work well with the
+  revised datastore architecture to be omitted from the new RESTCONF
+  version.
 
-- It makes it easier for clients and servers to know what reasonable
-  common baseline functionality to expect, rather than a collection of
-  capabilities that may not be implemented in a consistent fashion.
+- It would make it easier for clients and servers to know what
+  reasonable common baseline functionality to expect, rather than a
+  collection of capabilities that may not be implemented in a
+  consistent fashion.
 
-- It can gracefully coexist with RESTCONF v1.  A server could implement both
-  versions.  Existing YANG models exposing split config/state trees
-  could be exposed via RESTCONF v1, whereas combined config/state YANG models
-  could be exposed via RESTCONF v2, providing a viable server upgrade path.
+- It could gracefully coexist with RESTCONF v1.  A server could
+  implement both versions.  Existing YANG models exposing split
+  config/state trees could be exposed via RESTCONF v1, whereas
+  combined config/state YANG models could be exposed via a new
+  RESTCONF version, providing a viable server upgrade path.
 
-**** Proposed changes for RESTCONF v2
+**** Possible changes for a new RESTCONF version
 
-The differences between RESTCONF version 2 (RESTCONF v2) and RESTCONF
+The differences between a notional new RESTCONF version and RESTCONF
 version 1 (RESTCONF v1) ^RFC8040^ can be summarized as:
 
-- RESTCONF v2 defines a new root resource (referred to as
-  {+restconf2}, and a separate link relation in the
-  /.well-known/host-meta resource.
+- A new RESTCONF version would define a new root resource, and a
+  separate link relation in the /.well-known/host-meta resource.
 
-- RESTCONF v2 removes support for the {+restconf}/data path supported
-  in RESTCONF v1.
+- A new RESTCONF version could remove support for the
+  {+restconf}/data path supported in RESTCONF v1.
 
-- RESTCONF v2 removes support for the content query parameter, since
-  it no longer useful in the revised datastore architecture.
+- A new RESTCONF version could publish a separate version of YANG
+  library from a RESTCONF v1 implementation running on the same
+  device, allowing different versions of RESTCONF to support a
+  different set of YANG modules.
 
-- RESTCONF v2 can publish a separate version of YANG library from a
-  RESTCONF v1 implementation running on the same device, allowing
-  different versions of RESTCONF to support a different set of YANG
-  modules.
-
-**** Possible Migration Path using RESTCONF v2
+**** Possible Migration Path using a new RESTCONF version
 
 A common approach in current data models is to have two separate trees
 "/foo" and "/foo-state", where the former contains config true nodes,
@@ -1338,22 +1334,19 @@ false nodes.
 
 If for backwards compatability reasons, a server intends to support both
 split config/state trees, and the combined config/state trees proposed
-in this architecture, then this can be achieved by having the device
-support both RESTCONF v1 and RESTCONF v2 at the same time:
+in this architecture, then this could be achieved by having the device
+support both RESTCONF v1 and the new RESTCONF version at the same time:
 
 - The RESTCONF v1 implementation could support existing YANG module
   revisions defined with split config/state trees.
 
-- The RESTCONF v2 implementation could support different YANG
-  modules, or YANG module revisions, with combined config/state
+- The implementation of the new RESTCONF version could support different
+  YANG modules, or YANG module revisions, with combined config/state
   trees.
 
 Clients can then decide on which type of models to use by choosing
-whether to use the RESTCONF v1 root resource or the RESTCONF v2 root
-resource.
-
-
-
+whether to use the RESTCONF v1 root resource or the root resource
+associated with the new RESTCONF version.
 
 
 
