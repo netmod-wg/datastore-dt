@@ -354,6 +354,14 @@ interface that is not currently present.  In such a situation, the
 interface configuration remains in <intended> but the interface
 configuration will not appear in <operational>.
 
+Note that configuration validity cannot depend on the current state of
+such resources, since that would imply the removing a resource might
+render the configuration invalid.  This is unacceptable, especially
+given that rebooting such a device would fail to boot due to an
+invalid configuration.  Instead we allow configuration for missing
+resources to exist in <running> and <intended>, but it will not appear
+in <operational>.
+
 *** System-controlled Resources
 
 Sometimes resources are controlled by the device and such system
@@ -363,6 +371,10 @@ configuration in <intended> when it appears, the system will
 try to apply the configuration, which causes the configuration to
 appear in <operational> eventually (if application of the
 configuration was successful).
+
+? I can't really follow this section; not sure if it's really talking
+about missing resources or system-controlled data.  Seems to be both,
+sort of.
 
 *** Origin Metadata Annotation
 
@@ -752,14 +764,6 @@ device without requiring a reboot or interfering with normal
 operation.  These FRUs are typically interface cards, and the devices
 support "pre-configuration" of these interfaces, something called
 "ephemeral interfaces".
-
-Configuration validity cannot depend on the current state of FRUs,
-since that would imply the removing a FRU might render the
-configuration invalid.  This is unacceptable, especially given that
-rebooting such a device would fail to boot due to an invalid
-configuration.  So we allow configuration for missing FRUs to exist in
-<running> and <intended>, but since the missing FRU is not operational
-data, it will not appear in <operational>.
 
 If a client creates an interface "et-0/0/0" but the interface does not
 physically exist at this point, then the <intended> datastore might
