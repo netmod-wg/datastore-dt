@@ -95,3 +95,8 @@ $(draft).xml: back.xml $(trees) $(load) $(yang)
 
 %.tree: %.yang
 	$(pyang) -f tree --tree-line-length 68 $< > $@
+
+RFC2629XSLT = xsltproc --path ../bin ../bin/rfc2629-yang.xslt
+%.html: %.xml
+	@echo "Generating $@ ..."
+	@${RFC2629XSLT}  $< > $@ || (rm $@ ; false)
