@@ -1,4 +1,5 @@
 module ietf-datastores {
+  yang-version 1.1;
   namespace "urn:ietf:params:xml:ns:yang:ietf-datastores";
   prefix ds;
 
@@ -31,7 +32,7 @@ module ietf-datastores {
      datastores.  These identities can be used to identify
      datastores in protocol operations.
 
-     Copyright (c) 2016 IETF Trust and the persons identified as
+     Copyright (c) 2017 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
 
      Redistribution and use in source and binary forms, with or
@@ -45,15 +46,16 @@ module ietf-datastores {
      (http://www.rfc-editor.org/info/rfcxxxx); see the RFC itself
      for full legal notices.";
 
-  revision 2016-10-13 {
+  revision 2017-03-11 {
     description
       "Initial revision.";
     reference
-      "RFC XXXX: A Revised Conceptual Model for YANG Datastores";
+      "RFC XXXX: Network Management Datastore Architecture";
   }
 
-
-  // Datastore Identities
+  /*
+   * Datastore Identities
+   */
 
   identity datastore {
     description
@@ -90,8 +92,9 @@ module ietf-datastores {
      "The 'operational-state' datastore.";
   }
 
-
-  // Origin Identities
+  /*
+   * Origin Identities
+   */
 
   identity origin {
     description
@@ -127,8 +130,9 @@ module ietf-datastores {
        description statement.";
   }
 
-
-  // Metadata annotations
+  /*
+   * Metadata annotations
+   */
 
   md:annotation origin {
     type identityref {

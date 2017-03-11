@@ -1,0 +1,23 @@
+module example-ds-ephemeral {
+  yang-version 1.1;
+  namespace "urn:example:ds-ephemeral";
+  prefix eph;
+
+  import ietf-datastores {
+    prefix ds;
+  }
+
+  // add datastore identity
+  identity ds-ephemeral {
+    base ds:datastore;
+    description
+      "The 'ephemeral' datastore.";
+  }
+
+  // add origin identity
+  identity or-ephemeral {
+    base ds:dynamic;
+    description
+      "Denotes data from the ephemeral dynamic datastore.";
+  }
+}

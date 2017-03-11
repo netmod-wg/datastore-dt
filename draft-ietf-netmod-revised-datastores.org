@@ -24,6 +24,11 @@ protocols.
 
 * Terminology
 
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in BCP
+14, ^RFC2119^.
+
 This document defines the following terms:
 
 - configuration data: Data that determines how a device behaves.
@@ -77,8 +82,6 @@ This document defines the following terms:
   present on devices that support the "startup" YANG feature.
 - dynamic datastore: A datastore holding dynamic configuration
   data.
-- applied configuration datastore: A datastore holding the currently
-  active applied configuration data.
 - operational state datastore: A datastore holding the currently
   active applied configuration data as well as the device's state
   data.
@@ -384,7 +387,7 @@ origin.  The "origin" metadata annotation is defined in ^yang-module^.
 The values are YANG identities.  The following identities are defined:
 
   +-- origin
-      +-- intended
+      +-- static
       +-- dynamic
       +-- data-model
       +-- operational
@@ -392,7 +395,7 @@ The values are YANG identities.  The following identities are defined:
 These identities can be further refined, e.g., there might be an
 identity "dhcp" derived from "dynamic".
 
-The "intended" origin represents data provided by the <intended>
+The "static" origin represents data provided by the <intended>
 datastore.  The "dynamic" origin represents data provided by a dynamic
 datastore.  The "data-model" origin represents data values specified
 in the data model, using either the "default" statement or the
@@ -484,14 +487,12 @@ identity as its base.  This identity is necessary so that data
 originating from the datastore can be identified as such via
 the 'origin' metadata attribute define in ^yang-module^.
 
-An example of these guidelines in use is provided in 
+An example of these guidelines in use is provided in
 ^ephemeral-ds-example^.
-
 
 * YANG Module @yang-module@
 
-!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2016-10-13.yang"
-
+!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-03-11.yang"
 
 * IANA Considerations @iana-con@
 
@@ -514,7 +515,6 @@ is requested:
    namespace:    urn:ietf:params:xml:ns:yang:ietf-datastores
    prefix:       ds
    reference:    RFC XXXX
-
 
 * Security Considerations @sec-con@
 
@@ -577,47 +577,48 @@ in <operational>:
 
 !! include-figure ex-oper.load
 
-
 ** BGP Example
 
 Consider the following piece of a ersatz BGP module:
 
     container bgp {
+      leaf local-as {
+        type uint32;
+      }
+      leaf peer-as {
+        type uint32;
+      }
+      list peer {
+        key name;
+        leaf name {
+          type ipaddress;
+        }
         leaf local-as {
-            type uint32;
+          type uint32;
+          description
+            ".... Defaults to ../local-as";
         }
         leaf peer-as {
-            type uint32;
+          type uint32;
+          description
+             "... Defaults to ../peer-as";
         }
-        list peer {
-            key name;
-            leaf name {
-                type ipaddress;
-            }
-            leaf local-as {
-                type uint32;
-		description ".... Defaults to ../local-as";
-            }
-            leaf peer-as {
-                type uint32;
-		description "... Defaults to ../peer-as";
-            }
-	    leaf local-port {
-                type inet:port;
-            }
-	    leaf remote-port {
-                type inet:port;
-                default 179;
-            }
-            leaf state {
-                config false;
-                type enumeration {
-                    enum init;
-                    enum established;
-                    enum closing;
-                }
-            }
+        leaf local-port {
+          type inet:port;
         }
+        leaf remote-port {
+          type inet:port;
+          default 179;
+        }
+        leaf state {
+          config false;
+          type enumeration {
+            enum init;
+            enum established;
+            enum closing;
+          }
+        }
+      }
     }
 
 In this example model, both bgp/peer/local-as and bgp/peer/peer-as
@@ -687,15 +688,15 @@ regardless of the origin.  If the system has chosen the values, the
 connection is established, one or both of the nodes may not appear,
 since the system may not yet have their values.
 
-  <bgp origin="orgn:intended" xmlns="urn:example:bgp">
-    <local-as origin="orgn:intended">64642</local-as>
-    <peer-as origin="orgn:intended">65000</peer-as>
-    <peer origin="orgn:intended">
-      <name origin="orgn:intended">10.1.2.3</name>
-      <local-as origin="orgn:data-model">64642</local-as>
-      <peer-as origin="orgn:data-model">65000</peer-as>
-      <local-port origin="orgn:operational">60794</local-port>
-      <remote-port origin="orgn:data-model">179</remote-port>
+  <bgp origin="ds:static" xmlns="urn:example:bgp">
+    <local-as origin="ds:static">64642</local-as>
+    <peer-as origin="ds:static">65000</peer-as>
+    <peer origin="ds:static">
+      <name origin="ds:static">10.1.2.3</name>
+      <local-as origin="ds:data-model">64642</local-as>
+      <peer-as origin="ds:data-model">65000</peer-as>
+      <local-port origin="ds:operational">60794</local-port>
+      <remote-port origin="ds:data-model">179</remote-port>
     </peer>
   </bgp>
 
@@ -719,15 +720,15 @@ current data values will continue to be visible in the <operational>
 datastore, with the "origin" attribute set to indicate the
 origin of the original data.
 
-  <bgp origin="orgn:intended">
-    <local-as origin="orgn:intended">64642</local-as>
-    <peer-as origin="orgn:intended">65000</peer-as>
-    <peer origin="orgn:intended">
-      <name origin="orgn:intended">10.1.2.3</name>
-      <local-as origin="orgn:data-model">64642</local-as>
-      <peer-as origin="orgn:data-model">65000</peer-as>
-      <local-port origin="orgn:intended">60794</local-port>
-      <remote-port origin="orgn:intended">179</remote-port>
+  <bgp origin="ds:static">
+    <local-as origin="ds:static">64642</local-as>
+    <peer-as origin="ds:static">65000</peer-as>
+    <peer origin="ds:static">
+      <name origin="ds:static">10.1.2.3</name>
+      <local-as origin="ds:data-model">64642</local-as>
+      <peer-as origin="ds:data-model">65000</peer-as>
+      <local-port origin="ds:static">60794</local-port>
+      <remote-port origin="ds:static">179</remote-port>
     </peer>
   </bgp>
 
@@ -738,43 +739,42 @@ peer's data is removed from the <operational> datastore.
 
 In this section, we'll use this simple interface data model:
 
-    container interfaces {
-        list interface {
-            key name;
-            leaf name {
-                type string;
-            }
-            leaf description {
-                type string;
-            }
-            leaf mtu {
-                type uint;
-            }
-            leaf ipv4-address {
-                type yang:ipv4-prefix;
-            }
-        }
+  container interfaces {
+    list interface {
+      key name;
+      leaf name {
+        type string;
+      }
+      leaf description {
+        type string;
+      }
+      leaf mtu {
+        type uint;
+      }
+      leaf ipv4-address {
+        type inet:ipv4-address;
+      }
     }
+  }
 
-*** Ephemeral Interfaces
+*** Pre-provisioned Interfaces
 
 One common issue in networking devices is the support of Field
 Replaceable Units (FRUs) that can be inserted and removed from the
 device without requiring a reboot or interfering with normal
 operation.  These FRUs are typically interface cards, and the devices
-support "pre-configuration" of these interfaces, something called
-"ephemeral interfaces".
+support pre-provisioning of these interfaces.
 
 If a client creates an interface "et-0/0/0" but the interface does not
 physically exist at this point, then the <intended> datastore might
 contain the following:
 
-    <interfaces>
-      <interface>
-        <name>et-0/0/0</name>
-        <description>Test interface</description>
-      </interface>
-    </interfaces>
+  <interfaces>
+    <interface>
+      <name>et-0/0/0</name>
+      <description>Test interface</description>
+    </interface>
+  </interfaces>
 
 Since the interface does not exist, this data does not appear in the
 <operational> datastore.
@@ -784,14 +784,13 @@ detect it and process the associated configuration.  The <operational>
 will contain the data from <intended>, as well as the "config false"
 nodes, such as the current value of the interface's MTU.
 
-    <interfaces origin="orgn:intended">
-      <interface origin="orgn:intended">
-        <name origin="orgn:intended">et-0/0/0</name>
-        <description origin="orgn:intended"
-                     >Test interface</description>
-        <mtu origin="orgn:operational">1500</mtu>
-      </interface>
-    </interfaces>
+  <interfaces origin="ds:static">
+    <interface origin="ds:static">
+      <name origin="ds:static">et-0/0/0</name>
+      <description origin="ds:static">Test interface</description>
+      <mtu origin="ds:operational">1500</mtu>
+    </interface>
+  </interfaces>
 
 If the FRU is removed, the interface data is removed from the
 <operational> datastore.
@@ -799,33 +798,31 @@ If the FRU is removed, the interface data is removed from the
 *** System-provided Interface
 
 Imagine if the system provides a loopback interface (named "lo0") with
-a default ipv4-prefix of "127.0.0.1/32".  The system will only provide
+a default ipv4-address of "127.0.0.1".  The system will only provide
 configuration for this interface if the is no data for it in <intended>.
 
 When no configuration for "lo0" appears in <intended>, then
 <operational> will show the system-provided data:
 
-    <interfaces origin="orgn:intended">
-      <interface origin="orgn:operational">
-        <name origin="orgn:operational">lo0</name>
-        <ipv4-address origin="orgn:operational"
-                      >127.0.0.1/32</ipv4-address>
-      </interface>
-    </interfaces>
+  <interfaces origin="ds:static">
+    <interface origin="ds:operational">
+      <name origin="ds:operational">lo0</name>
+      <ipv4-address origin="ds:system">127.0.0.1</ipv4-address>
+    </interface>
+  </interfaces>
 
 When configuration for "lo0" does appear in <intended>, then
 <operational> will show that data with the origin set to "intended".
 If the "ipv4-address" is not provided, then the system-provided value
 will appear as follows:
 
-    <interfaces origin="orgn:intended">
-      <interface origin="orgn:intended">
-        <name origin="orgn:intended">lo0</name>
-        <description origin="orgn:intended">loopback</description>
-        <ipv4-address origin="orgn:operational"
-                      >127.0.0.1/32</ipv4-address>
-      </interface>
-    </interfaces>
+  <interfaces origin="ds:static">
+    <interface origin="ds:static">
+      <name origin="ds:static">lo0</name>
+      <description origin="ds:static">loopback</description>
+      <ipv4-address origin="system">127.0.0.1</ipv4-address>
+    </interface>
+  </interfaces>
 
 * Open Issues @issues@
 
@@ -838,39 +835,18 @@ datastore using the guidelines provided in ^guidelines^.
 While this example is very terse, it is expected to be that a
 standalone RFC would be needed when fully expanded.
 
-This example defines a dynamic datastore called :ephemeral,
+This example defines a dynamic datastore called "ephemeral",
 which is loosely modeled after the work done in the I2RS working
 group.
 
-  1. Name            : ephemeral  (register with IANA)
+  1. Name            : ephemeral
   2. YANG modules    : all (default)
   3. YANG statements : config false + ephemeral true
   4. How applied     : automatic
   5. Protocols       : NC/RC (default)
   6. YANG Module     : (see below)
 
-  module ietf-ds-ephemeral {
-    namespace "urn:ietf:params:xml:ns:yang:ietf-ds-ephemeral";
-    prefix e;
-
-    import ietf-datastores {
-      prefix ds;
-    }
-
-    // add datastore identity
-    identity ds-ephemeral {
-      base ds:datastore;
-      description
-        "The 'ephemeral' datastore.";
-    }
-
-    // add origin identity
-    identity or-ephemeral {
-      base ds:dynamic;
-      description
-        "Denotes data from the ephemeral dynamic datastore.";
-    }
-  }
+!! include-figure example-ds-ephemeral.yang
 
 * Implications on Data Models
 
@@ -895,14 +871,11 @@ changes:
   module conforms to the revised datastore architecture with a
   combined config and state tree, and that the existing state tree
   nodes are deprecated, to be obsoleted over time.
-
 - All status 'current' data nodes under the existing 'state' trees are
   copied to the equivalent place under the 'config' tree:
-
 -- If a node with the same name and type already exists under the
    equivalent path in the config tree then the nodes are merged and
    the description updated.
-
 -- If a node with the same name but different type exists under the
    equivalent path in the config tree, then the module authors must
    choose the appropriate mechanism to combine the config and state
@@ -910,18 +883,14 @@ changes:
    guidelines below.  This may require the state node to be added to
    the config tree with a modified name.  This scenario is expected
    to be relatively uncommon.
-
 -- If no node with the same name and path already exists under the
    config tree then the state node schema is copied verbatim into the
    config tree.
-
 -- As the state nodes are copied into the config trees, any
    leafrefs that reference other nodes in the state tree are adjusted
    to reference the equivalent path in the config tree.
-
 -- All status 'current' nodes under the existing 'state' trees are
    marked as 'status' deprecated.
-
 - Augmentations are similarly handled to data nodes as described
   above.
 
@@ -932,11 +901,11 @@ should be designed to conform to the revised datastore architecture,
 following the design guidelines described below, and only need to
 provide combined config/state trees.
 
-* Implications on other Drafts
+* Implications on other Documents
 
 The sections below describe the authors' thoughts on how various other
-drafts may be updated to support the datastore architecture described
-in this draft.  They have been incorporated as an appendix of this
+documents may be updated to support the datastore architecture described
+in this document.  They have been incorporated as an appendix of this
 document to facilitate easier review, but the expectation is that this
 work will be moved into another document as soon as the appropriate
 working group decides to take on the work.
@@ -945,7 +914,7 @@ working group decides to take on the work.
 
 Note: This section describes the authors' thoughts on how YANG ^RFC7950^
 could be updated to support the datastore architecture described in this
-draft.  It has been incorporated here as a temporary measure to 
+document.  It has been incorporated here as a temporary measure to
 facilitate easier review, but the expectation is that this work will be
 moved into another document as soon as the NETMOD WG decides to take on
 the work.
@@ -954,7 +923,6 @@ the work.
   adopted.  YANG currently describes validation in terms of the
   <running> configuration datastore while it really happens on the
   <intended> configuration datastore.
-
 - [DISCUSS: We need to discuss somewhere how remote procedure calls
   and notifications/actions tie into datastores RFC 7950 shows as an
   example a ping action tied to an interface. Does this refer to an
@@ -972,20 +940,28 @@ the work.
 
 Note: This section describes the authors' thoughts on how YANG Library
 ^RFC7895^ could be updated to support the datastore architecture described
-in this draft.  It has been incorporated here as a temporary measure
+in this document.  It has been incorporated here as a temporary measure
 to facilitate easier review, but the expectation is that this work will
 be owned and standardized via the NETCONF working group.
 
-[TBD (mbj)] FIXME
+With the introduction of multiple datastores, it is important that a
+server can advertise to clients which modules are supported in the
+different datastores implemented by the server.  In order to do this,
+we propose that the "ietf-yang-module" (^RFC7895^) is revised, with
+the following addition to the "module" list in the "module-list"
+grouping:
 
-** Implications to YANG Guidelines 
+ // TBD
 
-Note: This section describes the authors' thoughts on how Guidelines for
-Authors and Reviewers of YANG Data Model Documents ^I-D.ietf-netmod-rfc6087bis^
-could be updated to support the datastore architecture described in this draft.
-It has been incorporated here as a temporary measure to facilitate easier
-review, but the expectation is that this work will be owned and standardized via
-the NETCONF working group.
+** Implications to YANG Guidelines
+
+Note: This section describes the authors' thoughts on how Guidelines
+for Authors and Reviewers of YANG Data Model Documents
+^I-D.ietf-netmod-rfc6087bis^ could be updated to support the datastore
+architecture described in this document.  It has been incorporated
+here as a temporary measure to facilitate easier review, but the
+expectation is that this work will be owned and standardized via the
+NETCONF working group.
 
 It is important to design data models with clear semantics that work
 equally well for instantiation in a configuration datastore and
@@ -1010,11 +986,12 @@ process, and one config false leaf for the output from the process.
 
 ** Implications on NETCONF
 
-Note: This section describes the authors' thoughts on how NETCONF ^RFC6241^ could be
-updated to support the datastore architecture described in this draft.
-It has been incorporated here as a temporary measure to facilitate
-easier review, but the expectation is that this work will be owned and
-standardized via the NETCONF working group.
+Note: This section describes the authors' thoughts on how NETCONF
+^RFC6241^ could be updated to support the datastore architecture
+described in this document.  It has been incorporated here as a
+temporary measure to facilitate easier review, but the expectation is
+that this work will be owned and standardized via the NETCONF working
+group.
 
 *** Introduction
 
@@ -1047,30 +1024,24 @@ entail.
   they expose, but MUST at least expose both the <running> and
   <operational> datastores.  They MAY expose additional datastores,
   such as <intended>, <candidate>, etc.
-
 - A new <get-data> operation is introduced that allows the client
   to return the contents of a datastore.  For configuration
   datastores, this operation returns the same data that would be
   returned by the existing <get-config> operation.
-
 - A new "metadata-filter" capability allows a device to indicate that
   it supports queries using YANG metadata as a <filter> element.
   E.g. <filter type=metadata/> in <get> and <get-config> requests.
-
 - DISCUSS, does the capability need to be able to differentiate between
   different types of YANG metadata?  [Move to Open Issue, perhaps add
   to new <get-data> operation?]
-
 - A new "with-metadata" capability allows a device to indicate that it
   supports the capability of including YANG metadata annotations in
   the responses to <get> and <get-config> requests.  This is achieved
   in a similar way to with-defaults ^RFC6243^, by introducing a
   <with-metadata> XML element to <get> and <get-config> requests.
-
 - DISCUSS, does the capability, and XML element, need to be able to
   differentiate between different types of YANG metadata annotations?
   [should be controlled by a feature statement]
-
 - The handling of defaults for the new configuration datastores is as
   described in with-defaults ^RFC6243^, but that does not apply for
   the operational state datastore that defines new semantics.
@@ -1108,17 +1079,14 @@ version 1.1) has several benefits:
 - It allows for removal of the existing <get> RPC operation, that
   returns content from both the running configuration datastore
   combined with all config false leaves.
-
 - It could allow the existing <get-config> operation to also be
   removed, replaced by the more generic <get-data> that is named
   appropriately to also apply to the operational datastore.
-
 - It makes it easier for clients and servers to know what reasonable
   common baseline functionality to expect, rather than a collection of
   capabilities that may not be implemented in a consistent fashion.
   In particular, clients will able to assume support for the
   <operational> datastore.
-
 - It can gracefully coexist with NETCONF v1.  A server could implement
   both versions.  Existing YANG models exposing split config/state
   trees could be exposed via NETCONF v1.1, whereas combined
@@ -1134,10 +1102,8 @@ as:
   "urn:ietf:params:netconf:base:2.0".  A service may advertise older
   NETCONF versions as well, to allow a client to choose which version
   to use.
-
 - NETCONF v2 removes support for the existing <get> operation, that is
   replaced by the <get-data> on the operational datastore.
-
 - NETCONF v2 can publish a separate version of YANG library from a
   NETCONF v1.1 implementation running on the same device, allowing
   different versions of NETCONF to support a different set of YANG
@@ -1161,12 +1127,11 @@ split config/state trees and the combined config/state trees proposed
 in this architecture, then this can be achieved by having the device
 support both NETCONF v1 and NETCONF v2 at the same time:
 
- - The NETCONF v1 implementation could support existing YANG module
-   revisions defined with split config/state trees.
-
- - The NETCONF v2 implementation could support different YANG
-   modules, or YANG module revisions, with combined config/state
-   trees.
+- The NETCONF v1 implementation could support existing YANG module
+  revisions defined with split config/state trees.
+- The NETCONF v2 implementation could support different YANG
+  modules, or YANG module revisions, with combined config/state
+  trees.
 
 Clients can then decide on which type of models to use by expressing
 the appropriate version of the base NETCONF capability during
@@ -1182,34 +1147,29 @@ would use a combination of these updated models alongside new models
 that only follow the new datastore architecture.
 
 - NETCONF servers can support clients that are not aware of the
-revised datastore architecture, particularly if they continue to
-support the deprecated <get> operation:
-
+  revised datastore architecture, particularly if they continue to
+  support the deprecated <get> operation:
 -- For updated YANG modules they would see additional information
    returned via the <get> operation.
-
 -- For new YANG modules, some of the state nodes may not be available,
    i.e. for any state nodes that exist under a config node that has
    not been configured (e.g. statistics under a system created
    interface).
-
 - NETCONF servers can also support clients that are aware of the
   revised datastores architecture:
-
 -- For updated YANG modules they would see additional information
    returned under the legacy state trees.  This information can be
    excluded using appropriate subtree filters.
-
 -- New YANG modules, conforming to the datastores architecture, would
    work exactly as expected.
 
 ** Implications on RESTCONF
 
-This section describes the authors' thoughts on how RESTCONF ^RFC8040^ could be
-updated to support the datastore architecture described in this draft.
-It has been incorporated here as a temporary measure to facilitate
-easier review, but the expectation is that this work will be owned and
-standardized via the NETCONF working group.
+This section describes the authors' thoughts on how RESTCONF ^RFC8040^
+could be updated to support the datastore architecture described in
+this document.  It has been incorporated here as a temporary measure
+to facilitate easier review, but the expectation is that this work
+will be owned and standardized via the NETCONF working group.
 
 *** Introduction
 
@@ -1248,18 +1208,18 @@ entail.
   support on {+restconf}/datastore/<datastore-name>/data/ except for
   the following query parameters:
 
- - 'content' - is not supported on any of the new datastore paths.
+- 'content' - is not supported on any of the new datastore paths.
 
- - 'metadata' - is a new optional query parameter that filters the
-   returned data based on the metadata annotation.
+- 'metadata' - is a new optional query parameter that filters the
+  returned data based on the metadata annotation.
 
- - 'with-metadata' - is a new optional query parameter that
-   indicating that the metadata annotations should be included in the
-   reply.
+- 'with-metadata' - is a new optional query parameter that
+  indicating that the metadata annotations should be included in the
+  reply.
 
- - 'with-defaults' is supported on all configuration datastores, but
-   is not supported on the operational state datastore path, because
-   it has different default handling semantics.
+- 'with-defaults' is supported on all configuration datastores, but
+  is not supported on the operational state datastore path, because
+  it has different default handling semantics.
 
 - The handling of defaults (include the with-defaults query parameter)
   for the new configuration datastores is the same as the existing
@@ -1353,8 +1313,8 @@ The differences between RESTCONF version 2 (RESTCONF v2) and RESTCONF
 version 1 (RESTCONF v1) ^RFC8040^ can be summarized as:
 
 - RESTCONF v2 defines a new root resource (referred to as
-{+restconf2}, and a separate link relation in the
-/.well-known/host-meta resource.
+  {+restconf2}, and a separate link relation in the
+  /.well-known/host-meta resource.
 
 - RESTCONF v2 removes support for the {+restconf}/data path supported
   in RESTCONF v1.
@@ -1381,12 +1341,12 @@ split config/state trees, and the combined config/state trees proposed
 in this architecture, then this can be achieved by having the device
 support both RESTCONF v1 and RESTCONF v2 at the same time:
 
- - The RESTCONF v1 implementation could support existing YANG module
-   revisions defined with split config/state trees.
+- The RESTCONF v1 implementation could support existing YANG module
+  revisions defined with split config/state trees.
 
- - The RESTCONF v2 implementation could support different YANG
-   modules, or YANG module revisions, with combined config/state
-   trees.
+- The RESTCONF v2 implementation could support different YANG
+  modules, or YANG module revisions, with combined config/state
+  trees.
 
 Clients can then decide on which type of models to use by choosing
 whether to use the RESTCONF v1 root resource or the RESTCONF v2 root
