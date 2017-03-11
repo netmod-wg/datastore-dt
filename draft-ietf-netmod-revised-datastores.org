@@ -18,8 +18,8 @@ agreement on a common architectural model of datastores ensures that
 data models can be written in a network management protocol agnostic
 way.  This architectural framework identifies a set of conceptual
 datastores but it does not mandate that all network management
-protocols expose all these conceptual datastores.  Furthermore, the
-architecture does not detail how data is encoded by network management
+protocols expose all these conceptual datastores.  This architecture
+is agnostic with regard to the encoding used by network management
 protocols.
 
 * Terminology
@@ -27,6 +27,7 @@ protocols.
 This document defines the following terms:
 
 - configuration data: Data that determines how a device behaves.
+  This data is modeled in YANG using "config true" nodes.
   Configuration data can originate from different sources.
 - static configuration data: Configuration data that is eventually
   persistent and used to get a device from its initial default state
@@ -46,38 +47,48 @@ This document defines the following terms:
   configuration data such as read-only status information and
   collected statistics. State data is transient and modified by
   interactions with internal components or other systems.
+  State data is modeled in YANG using "config false" nodes.
 - datastore: A conceptual place to store and access information.  A
   datastore might be implemented, for example, using files, a
   database, flash memory locations, or combinations thereof.
+  A datastore maps to an instantiated YANG data tree.
 - configuration datastore: A datastore holding static configuration
   data that is required to get a device from its initial default state
-  into a desired operational state.
+  into a desired operational state.  A configuration datastore maps to
+  an instantiated YANG data tree consisting of configuration data
+  nodes and interior data nodes.
 - running configuration datastore: A configuration datastore holding
   the complete static configuration currently active on the device.
   The running configuration datastore always exists. It may include
-  inactive configuration or template configuration that require
-  further expansion.
+  inactive configuration or template-mechanism-oriented configuration
+  that require further expansion.
 - intended configuration datastore: A configuration datastore holding
   the complete configuration currently active on the device. It does
   not include inactive configuration and it does include the expansion
-  of any templates.
+  of any template mechanisms.
 - candidate configuration datastore: A configuration datastore that
   can be manipulated without impacting the device's running
   configuration datastore and that can be committed to the running
-  configuration datastore. Only present on devices that support and
-  expose candidate configuration datastores.
+  configuration datastore. This datastore is only present on devices
+  that support the "candidate" YANG feature.
 - startup configuration datastore: The configuration datastore holding
   the configuration loaded by the device into the running
-  configuration datastore when it boots. Only present on devices that
-  separate the startup configuration datastore from the running
-  configuration datastore.
-- control-plane datastore: A datastore holding dynamic configuration
+  configuration datastore when it boots. This datastore is only
+  present on devices that support the "startup" YANG feature.
+- dynamic datastore: A datastore holding dynamic configuration
   data.
 - applied configuration datastore: A datastore holding the currently
   active applied configuration data.
 - operational state datastore: A datastore holding the currently
   active applied configuration data as well as the device's state
   data.
+- origin: a metadata annotation indicating where the data originated
+  and who provided that data item.
+- remnant data: configuration data that remains in the system for a
+  period of time after it has be removed from a new configuration
+  data set.  The time period may be minimal, or may last until any
+  resources used by the newly-deleted configuration data
+  (e.g. network connections, memory allocations, file handles).
 
 The following additional terms are not datastore specific but commonly
 used and thus defined here as well:
@@ -101,7 +112,7 @@ Relationship to YANG 1.1 ^RFC7950^:
 - A configuration datastore maps to an instantiated YANG data tree
   consisting of configuration data nodes and interior data nodes.
 
-* Background
+* Introduction
 
 NETCONF ^RFC6241^ provides the following definitions:
 
@@ -144,9 +155,11 @@ intended configuration and applied configuration has developed.
 
 Furthermore, separating operational state data from configuration data
 in a separate branch in the data model has been found operationally
-complicated.  The relationship between the branches is not machine
-readable and filter expressions operating on configuration data and on
-related operational state data are different.
+complicated, and typically impacts the readability of module
+definitions due to overuse of groupings.  The relationship between the
+branches is not machine readable and filter expressions operating on
+configuration data and on related operational state data are
+different.
 
 ** Original Model of Datastores
 
@@ -174,16 +187,17 @@ currently used by NETCONF ^RFC6241^:
 
 #+END_EXAMPLE
 
-Note that read-only (ro) and read-write (rw) is to be understood at a
-conceptual level.  In NETCONF, for example, support for the <candidate>
-and <startup> datastores is optional and the <running> datastore does
-not have to be writable.  Furthermore, the <startup> datastore can only
-be modified by copying <running> to <startup> in the standardized
-NETCONF datastore editing model.  The RESTCONF protocol does not expose
-these differences and instead provides only a writable unified
-datastore, which hides whether edits are done through a <candidate>
-datastore or by directly modifying the <running> datastore or via some
-other implementation specific mechanism.  RESTCONF also hides how
+Note that this diagram simplifies the model: read-only (ro) and
+read-write (rw) is to be understood at a conceptual level.  In
+NETCONF, for example, support for the <candidate> and <startup>
+datastores is optional and the <running> datastore does not have to be
+writable.  Furthermore, the <startup> datastore can only be modified
+by copying <running> to <startup> in the standardized NETCONF
+datastore editing model.  The RESTCONF protocol does not expose these
+differences and instead provides only a writable unified datastore,
+which hides whether edits are done through a <candidate> datastore or
+by directly modifying the <running> datastore or via some other
+implementation specific mechanism.  RESTCONF also hides how
 configuration is made persistent.  Note that implementations may also
 have additional datastores that can propagate changes to the <running>
 datastore.  NETCONF explicitly mentions so called named datastores.
@@ -207,9 +221,9 @@ Some observations:
   with the inactive data removed.  Inactive data is conceptually
   removed during validation.
 - Some implementations have proprietary mechanisms that allow clients
-  to define configuration templates in <running>.  These templates
-  are expanded automatically by the system, and the resulting
-  configuration is applied internally.
+  to define configuration templates in <running>.  These
+  templates are expanded automatically by the system, and the
+  resulting configuration is applied internally.
 - Some operators have reported that it is essential for them to be
   able to retrieve the configuration that has actually been
   successfully applied, which may be a subset or a superset of the
@@ -244,7 +258,7 @@ model in order reflect the experience gained with the original model.
                          |   +------ auto-discovery
                          |   +------ dynamic configuration protocols
                          |   +------ control-plane protocols
-                         |   +------ control-plane datastores
+                         |   +------ dynamic datastores
                          |   |
                          v   v
                  +---------------+
@@ -258,13 +272,13 @@ model in order reflect the experience gained with the original model.
 
 #+END_EXAMPLE
 
-The model foresees control-plane datastores that are by definition not
+The model foresees dynamic datastores that are by definition not
 part of the persistent configuration of a device.  In some contexts,
 these have been termed ephemeral datastores since the information is
-ephemeral, i.e., lost upon reboot.  The control-plane datastores
+ephemeral, i.e., lost upon reboot.  The dynamic datastores
 interact with the rest of the system through the <operational>
 datastore.  Note that the ephemeral datastore discussed in I2RS
-documents maps to a control-plane datastore in the datastore
+documents maps to a dynamic datastore in the datastore
 model described here.
 
 ** The <intended> datastore
@@ -290,7 +304,6 @@ configuration.
 Another example is support for templates.  Templates are expanded
 when copied into <intended>, and the result is validated.
 
-
 ** The <operational> datastore
 
 The <operational> datastore is a read-only datastore that
@@ -301,21 +314,42 @@ expose all operational settings without having to replicate
 definitions in the data models.
 
 The <operational> datastore contains all configuration data actually
-used by the system, i.e., all applied configuration, system
-configuration and data-model-defined configuration.  In addition,
+used by the system, including all applied configuration, system-provided
+configuration and values defined by any supported
+data models.  In addition,
 the <operational> datastore also contains state data.
 
-In the <operational> datastore, semantic constraints defined
-in the data model are not applied.  See ^issues^.
+Changes to configuration data may take time to percolate through to
+the <operational> datastore.  During this period, the <operational>
+datastore will return data nodes for both the incoming and outgoing
+configuration, as closely as possible tracking the current operation
+of the device.  These "remnant" of the previous configuration persist
+while the system has released resources used by the newly-deleted
+configuration data (e.g. network connections, memory allocations, file
+handles).
+
+As a result of these remnants, the semantic constraints defined
+in the data model cannot be relied upon for the <operational>
+datastore, since the system may have remnants whose constraints were
+valid with the previous configuration that are not valid with the
+incoming configuration.  Since constraints on "config false" nodes may
+refer to "config true" nodes, remnants may force the violation of
+those constraints.  The constraints that may not hold include "when",
+"must", and "max-elements".  Note that syntactic constraints cannot be
+violated, including hierarchical organization, identifiers, and
+type-based constraints.  See also ^issues^.
 
 *** Missing Resources
 
-Sometimes parts of <intended> configuration refer to resources
-that are not present and hence parts of the <intended> configuration
-cannot be applied.  A typical example is an interface configuration
-that refers to an interface that is not currently present.  In such a
-situation, the interface configuration remains in <intended> but the
-interface configuration will not appear in <operational>.
+The <intended> configuration can refer to resources that are not
+available or otherwise not physically present.  In these situations,
+these parts of the <intended> configuration are not applied.  The data
+appears in <intended> but does not appear in <operational>.
+
+A typical example is an interface configuration that refers to an
+interface that is not currently present.  In such a situation, the
+interface configuration remains in <intended> but the interface
+configuration will not appear in <operational>.
 
 *** System-controlled Resources
 
@@ -335,28 +369,34 @@ origin.  The "origin" metadata annotation is defined in ^yang-module^.
  The values are YANG identities.  The following identities are defined:
 
   +-- origin
-      +-- static
+      +-- intended
       +-- dynamic
       +-- data-model
-      +-- system
+      +-- operational
 
 These identities can be further refined, e.g., there might be an
 identity "dhcp" derived from "dynamic".
 
+The "intended" origin represents data provided by the <intended>
+datastore.  The "dynamic" origin represents data provided by a dynamic
+datastore.  The "data-model" origin represents data values specified
+in the data model, using either the "default" statement or the
+"description" statement.  Finally, the "operational" origin represents
+data learned from the normal operational of the system, including
+control-plane protocols.
 
+* Guidelines for Defining Dynamic Datastores @guidelines@
 
-* Guidelines for Defining Control-Plane Datastores. @guidelines@
-
-The definition of a control-plane datastore SHOULD be provided in a
-document (e.g., an RFC) purposed to the definition of the control-plane
-datastore.  When it makes sense, more than one control-plane datastore
+The definition of a dynamic datastore SHOULD be provided in a
+document (e.g., an RFC) purposed to the definition of the dynamic
+datastore.  When it makes sense, more than one dynamic datastore
 MAY be defined in the same document (e.g., when the datastores are
-logically connected).  Each control-plane datastore's definition
+logically connected).  Each dynamic datastore's definition
 SHOULD address the points specified in the sections below.
 
-** Define a name for the control-plane datastore. @def-name@
+** Define a name for the dynamic datastore @def-name@
 
-Each control-plane datastores MUST have a name using the character set
+Each dynamic datastores MUST have a name using the character set
 described by Section 6.2 of ^RFC7950^.  The name SHOULD be consistent
 in length to other datastore names described in this document (i.e.
 less than 12 characters).
@@ -366,50 +406,50 @@ be uniquely qualified by the namespace of the module in which it is
 defined (^def-module^).  This means that names such as "running" and
 "operational" are valid datastore names.
 
-** Define which YANG modules can be used in the datastore.
+** Define which YANG modules can be used in the datastore
 
 Not all YANG modules may be used in all datastores.  Some datastores may
 constrain which data models can be used in them.  If it is desirable that
-a subset of all modules can be targeted to the control-plane datastore,
-then the documentation defining the control-plane datastore MUST use the
+a subset of all modules can be targeted to the dynamic datastore,
+then the documentation defining the dynamic datastore MUST use the
 mechanisms described in ^yang-lib-impl^ to provide the necessary hooks for
 module-designers to indicate that their module is to be accessible in the
-control-plane datastore.
+dynamic datastore.
 
-** Define which subset of YANG-modeled data applies.
+** Define which subset of YANG-modeled data applies
 
-By default, the data in a control-plane datastore is modeled by all
+By default, the data in a dynamic datastore is modeled by all
 YANG statements in the available YANG modules.  However, it is
 possible to specify criteria YANG statements must satisfy in order to
-be present in a control-plane datastore.  For instance, maybe only
+be present in a dynamic datastore.  For instance, maybe only
 config true nodes are present, or config false nodes that also have a
 specific YANG extension (e.g., ephemeral true) are present in the
-control-plane datastore.
+dynamic datastore.
 
-** Define how control-plane data is actualized.
+** Define how dynamic data is actualized
 
-The diagram in ^datastore-model^ depicts control-plane datastores
+The diagram in ^datastore-model^ depicts dynamic datastores
 feeding into the <operational> datastore.  How this interaction
-occurs must be defined by the control-plane datastore.  In some
+occurs must be defined by the dynamic datastore.  In some
 cases, it may occur implicitly, as soon as the data is put into
-the control-plane datastore while, in other cases, an explicit
+the dynamic datastore while, in other cases, an explicit
 action (e.g., an RPC) may be required to trigger the application
-of the control-plane datastore's data.
+of the dynamic datastore's data.
 
-** Define which protocols can be used.
+** Define which protocols can be used
 
 By default, it is assumed that both the NETCONF and RESTCONF
-protocols can be used to interact with a control-plane datastore.
+protocols can be used to interact with a dynamic datastore.
 However, it may be that only a specific protocol can be used
 (e.g., Forces) or that a subset of all protocol operations or
 capabilities are available (e.g., no locking, no xpath-based
 filtering, etc.).
 
-** Define a module for the control-plane datastore. @def-module@
+** Define a module for the dynamic datastore @def-module@
 
-Each control-plane datastore MUST be defined by a YANG module.
+Each dynamic datastore MUST be defined by a YANG module.
 This module is used by servers to indicate (e.g., via YANG Library)
-their support for the control-plane datastore.
+their support for the dynamic datastore.
 
 It is RECOMMENDED that IETF module names follow the convention
 "ietf-ds-<datastore-name>".  Though it is understood that this
@@ -525,14 +565,14 @@ in <operational>:
 + Better name for "intended"?
 
 
-* Ephemeral Control-Plane Datastore Example @ephemeral-ds-example@
+* Ephemeral Dynamic Datastore Example @ephemeral-ds-example@
 
-The section defines documentation for an example control-plane
+The section defines documentation for an example dynamic
 datastore using the guidelines provided in ^guidelines^.
 While this example is very terse, it is expected to be that a
 standalone RFC would be needed when fully expanded.
 
-This example defines a control-plane datastore called :ephemeral,
+This example defines a dynamic datastore called :ephemeral,
 which is loosely modeled after the work done in the I2RS working
 group.
 
@@ -562,7 +602,7 @@ group.
     identity or-ephemeral {
       base ds:dynamic;
       description
-        "Denotes data from the ephemeral control-plane datastore.";
+        "Denotes data from the ephemeral dynamic datastore.";
     }
   }
 
