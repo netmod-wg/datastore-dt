@@ -826,7 +826,12 @@ will appear as follows:
 
 * Open Issues @issues@
 
-We will place a list of open issues here.
+We will place a list of open issues here.  
+
+- NETCONF needs to be able to filter data based on the origin
+metadata.  Possibly this could be done as part of the <get-data>
+operation.
+
 
 * Ephemeral Dynamic Datastore Example @ephemeral-ds-example@
 
@@ -1028,20 +1033,18 @@ entail.
   to return the contents of a datastore.  For configuration
   datastores, this operation returns the same data that would be
   returned by the existing <get-config> operation.
-- A new "metadata-filter" capability allows a device to indicate that
-  it supports queries using YANG metadata as a <filter> element.
-  E.g. <filter type=metadata/> in <get> and <get-config> requests.
-- DISCUSS, does the capability need to be able to differentiate between
-  different types of YANG metadata?  [Move to Open Issue, perhaps add
-  to new <get-data> operation?]
+- Some form of new filtering mechanism is required to allow the device
+  to filter the data based on the YANG metadata in addition to other
+  filters (such as the subtree filter).  See also ^issues^.
 - A new "with-metadata" capability allows a device to indicate that it
   supports the capability of including YANG metadata annotations in
   the responses to <get> and <get-config> requests.  This is achieved
   in a similar way to with-defaults ^RFC6243^, by introducing a
   <with-metadata> XML element to <get> and <get-config> requests.
-- DISCUSS, does the capability, and XML element, need to be able to
-  differentiate between different types of YANG metadata annotations?
-  [should be controlled by a feature statement]
+-- The capability would allow a device to indicate which types of
+   metadata are supported.
+-- The XML element would specify which types of metadata are included
+   in the response.
 - The handling of defaults for the new configuration datastores is as
   described in with-defaults ^RFC6243^, but that does not apply for
   the operational state datastore that defines new semantics.
