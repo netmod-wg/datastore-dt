@@ -52,25 +52,24 @@ module ietf-datastores {
       "RFC XXXX: A Revised Conceptual Model for YANG Datastores";
   }
 
-  /*
-   * Identities
-   */
+
+  // Datastore Identities
 
   identity datastore {
     description
      "Abstract base identity for the datastore identity.";
   }
 
-  identity candidate {
-    base datastore;
-    description
-     "The 'candidate' datastore.";
-  }
-
   identity running {
     base datastore;
     description
      "The 'running' datastore.";
+  }
+
+  identity candidate {
+    base datastore;
+    description
+     "The 'candidate' datastore.";
   }
 
   identity startup {
@@ -85,21 +84,18 @@ module ietf-datastores {
      "The 'intended' datastore.";
   }
 
-  identity applied {
-    base datastore;
-    description
-     "The 'applied' datastore.";
-  }
-
-  identity operational-state {
+  identity operational {
     base datastore;
     description
      "The 'operational-state' datastore.";
   }
 
+
+  // Origin Identities
+
   identity origin {
     description
-      "Abstract base identitiy for the origin annotation.";
+      "Abstract base identity for the origin annotation.";
   }
 
   identity static {
@@ -128,12 +124,11 @@ module ietf-datastores {
       "Denotes data that does not have an explicitly configured
        value, but has a default value in use.  Covers both simple
        defaults and defaults defined via an explanation in a
-       decription statement.";
+       description statement.";
   }
 
-  /*
-   * Metadata annotations
-   */
+
+  // Metadata annotations
 
   md:annotation origin {
     type identityref {

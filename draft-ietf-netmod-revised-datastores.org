@@ -95,7 +95,7 @@ Relationship to YANG 1.1 ^RFC7950^:
 
 - Configuration data maps to all schema nodes marked "config true".
 - Data-model-defined configuration data maps to schema nodes with an
-  explict default statement or an explanation in the decription
+  explicit default statement or an explanation in the description
   statement how a default value is determined.
 - A datastore maps to an instantiated YANG data tree.
 - A configuration datastore maps to an instantiated YANG data tree
@@ -239,22 +239,18 @@ model in order reflect the experience gained with the original model.
                    | (ct, ro)   |
                    +------------+
                          |
-                         |        // e.g., missing resources or
-                         |        // delays
-                         v
-                   +-----------+
-                   | <applied> |<---+--- dynamic configuration
-                   | (ct, ro)  |    |      protocols
-                   +-----------+    +--- control-plane datastores
+                         |        // e.g. missing resources, delays
                          |
-                         |          +--- auto-discovery
-                         |    +-----+--- control-plane protocols
-                         |    |     +--- control-plane datastores
-                         v    v
-               +---------------------+
-               | <operational-state> |
-               | (ct + cf, ro)       |
-               +---------------------+
+                         |   +------ auto-discovery
+                         |   +------ dynamic configuration protocols
+                         |   +------ control-plane protocols
+                         |   +------ control-plane datastores
+                         |   |
+                         v   v
+                 +---------------+
+                 | <operational> |
+                 | (ct + cf, ro) |
+                 +---------------+
 
   ct = config true; cf = config false
   rw = read-write; ro = read-only
@@ -266,9 +262,8 @@ The model foresees control-plane datastores that are by definition not
 part of the persistent configuration of a device.  In some contexts,
 these have been termed ephemeral datastores since the information is
 ephemeral, i.e., lost upon reboot.  The control-plane datastores
-interact with the rest of the system through the <applied> or
-<operational-state> datastores, depending on the type of data they
-contain.  Note that the ephemeral datastore discussed in I2RS
+interact with the rest of the system through the <operational>
+datastore.  Note that the ephemeral datastore discussed in I2RS
 documents maps to a control-plane datastore in the datastore
 model described here.
 
@@ -295,20 +290,49 @@ configuration.
 Another example is support for templates.  Templates are expanded
 when copied into <intended>, and the result is validated.
 
-** The <applied> datastore @applied-ds@
 
-The <applied> datastore is a read-only datastore that consists of
-config true nodes.  It contains the currently active configuration on
-the device.  This data can come from several sources; from <intended>,
-from dynamic configuration protocols (e.g., DHCP), or from
-control-plane datastores.
+** The <operational> datastore
 
-As data flows into the <applied> and <operational-state> datastores,
-it is conceptually marked with a metadata annotation (^RFC7952^) that
-indicates its origin.  [DISCUSS: the following should be moved into
-its own section] The "origin" metadata annotation is defined in
-^module^.  The values are YANG identities.  The following identities
-are defined:
+The <operational> datastore is a read-only datastore that
+consists of config true and config false nodes.  In the original
+NETCONF model the operational state only had config false nodes.  The
+reason for incorporating config true nodes here is to be able to
+expose all operational settings without having to replicate
+definitions in the data models.
+
+The <operational> datastore contains all configuration data actually
+used by the system, i.e., all applied configuration, system
+configuration and data-model-defined configuration.  In addition,
+the <operational> datastore also contains state data.
+
+In the <operational> datastore, semantic constraints defined
+in the data model are not applied.  See ^issues^.
+
+*** Missing Resources
+
+Sometimes parts of <intended> configuration refer to resources
+that are not present and hence parts of the <intended> configuration
+cannot be applied.  A typical example is an interface configuration
+that refers to an interface that is not currently present.  In such a
+situation, the interface configuration remains in <intended> but the
+interface configuration will not appear in <operational>.
+
+*** System-controlled Resources
+
+Sometimes resources are controlled by the device and such system
+controlled resources appear in (and disappear from) <operational>
+dynamically.  If a system controlled resource has matching
+configuration in <intended> when it appears, the system will
+try to apply the configuration, which causes the configuration to
+appear in <operational> eventually (if application of the
+configuration was successful).
+
+*** Origin Metadata Annotation
+
+As data flows into the <operational> datastore, it is conceptually
+marked with a metadata annotation (^RFC7952^) that indicates its
+origin.  The "origin" metadata annotation is defined in ^yang-module^.
+ The values are YANG identities.  The following identities are defined:
 
   +-- origin
       +-- static
@@ -319,58 +343,28 @@ are defined:
 These identities can be further refined, e.g., there might be an
 identity "dhcp" derived from "dynamic".
 
-The <applied> datastore contains the subset of the
-instances in the <operational-state> datastore where the "origin"
-values are derived from or equal to "static" or "dynamic".
 
-*** Missing Resources
 
-Sometimes some parts of <intended> configuration refer to resources
-that are not present and hence parts of the <intended> configuration
-cannot be applied.  A typical example is an interface configuration
-that refers to an interface that is not currently present.  In such a
-situation, the interface configuration remains in <intended> but the
-interface configuration will not appear in <applied>.
+* Guidelines for Defining Control-Plane Datastores. @guidelines@
 
-*** System-controlled Resources
+The definition of a control-plane datastore SHOULD be provided in a
+document (e.g., an RFC) purposed to the definition of the control-plane
+datastore.  When it makes sense, more than one control-plane datastore
+MAY be defined in the same document (e.g., when the datastores are
+logically connected).  Each control-plane datastore's definition
+SHOULD address the points specified in the sections below.
 
-Sometimes resources are controlled by the device and such system
-controlled resources appear in (and disappear from) the
-<operational-state> dynamically.  If a system controlled resource has
-matching configuration in <intended> when it appears, the system will
-try to apply the configuration, which causes the configuration to
-appear in <applied> eventually (if application of the configuration
-was successful).
+** Define a name for the control-plane datastore. @def-name@
 
-** The <operational-state> datastore
+Each control-plane datastores MUST have a name using the character set
+described by Section 6.2 of ^RFC7950^.  The name SHOULD be consistent
+in length to other datastore names described in this document (i.e.
+less than 12 characters).
 
-The <operational-state> datastore is a read-only datastore that
-consists of config true and config false nodes.  In the original
-NETCONF model the operational state only had config false nodes.  The
-reason for incorporating config true nodes here is to be able to
-expose all operational settings without having to replicate
-definitions in the data models.
-
-The <operational-state> datastore contains all configuration data actually
-used by the system, i.e., all applied configuration, system
-configuration and data-model-defined configuration.  This data is marked with the
-"origin" metadata annotation.  In addition, the <operational-state>
-datastore also contains state data.
-
-In the <operational-state> datastore, semantic constraints defined
-in the data model are not applied.  See ^issues^.
-
-* Guidelines for Defining Control-Plane Datastores @cp-ds-guidelines@
-
-The following provides guidelines for control-plane datastore
-designers.
-
-** Define the control-plane datastore's name.
-
-All datastores, including control-plane datastores, MUST have
-a globally unique name.  To ensure this, all datastores MUST
-register their names with IANA, along with the RFC number
-that defined it, using the registry defined in ^ds-name-reg^.
+The datastore's name does not need to be globally unique, as it will
+be uniquely qualified by the namespace of the module in which it is
+defined (^def-module^).  This means that names such as "running" and
+"operational" are valid datastore names.
 
 ** Define which YANG modules can be used in the datastore.
 
@@ -395,12 +389,12 @@ control-plane datastore.
 ** Define how control-plane data is actualized.
 
 The diagram in ^datastore-model^ depicts control-plane datastores
-feeding into the <applied> and <operational-state> datastores.  How
-this interaction occurs must be defined by the control-plane
-datastore.  In some cases, it may occur implicitly, as soon as the
-data is put into the control-plane datastore while, in other cases,
-an explicit action (e.g., an RPC) may be required to trigger the
-application of the control-plane datastore's data.
+feeding into the <operational> datastore.  How this interaction
+occurs must be defined by the control-plane datastore.  In some
+cases, it may occur implicitly, as soon as the data is put into
+the control-plane datastore while, in other cases, an explicit
+action (e.g., an RPC) may be required to trigger the application
+of the control-plane datastore's data.
 
 ** Define which protocols can be used.
 
@@ -411,63 +405,40 @@ However, it may be that only a specific protocol can be used
 capabilities are available (e.g., no locking, no xpath-based
 filtering, etc.).
 
-** Define a module
+** Define a module for the control-plane datastore. @def-module@
 
-Each control-plane datastore definition MUST define a YANG module
-that can be used to 1) identify servers that support the datastore,
-2) define a 'datastore' identity that can be used to identity the
-datastore in protocol operations, and 3) define an 'origin' 
-identity that can be used for data that originates from the
-datastore.
+Each control-plane datastore MUST be defined by a YANG module.
+This module is used by servers to indicate (e.g., via YANG Library)
+their support for the control-plane datastore.
 
-IETF modules MUST be called "ietf-ds-<datastore-name>".
+It is RECOMMENDED that IETF module names follow the convention
+"ietf-ds-<datastore-name>".  Though it is understood that this
+convention places a uniqueness constraint of datastore names
+(^def-name^) defined by the IETF.
 
-All modules MUST import "ietf-datastores" in order to obtain
-the base origin identity used (e.g., 'dynamic' for control-plane
-datastores).
+The YANG module MUST import the "ietf-datastores" module, defined
+in this document.  This is necessary in order to access the base
+identities it defines.
+
+The YANG module MUST define an identity that uses the 'datastore'
+identity as its base.  This identity is necessary so that the datastore
+can be referenced in protocol operations (e.g., <get-data>).
+
+The YANG module MUST define an identity that uses the 'dynamic'
+identity as its base.  This identity is necessary so that data
+originating from the datastore can be identified as such via
+the 'origin' metadata attribute define in ^yang-module^.
 
 An example of these guidelines in use is provided in 
 ^ephemeral-ds-example^.
 
 
-* Data Model @module@
+* YANG Module @yang-module@
 
 !! include-figure ietf-datastores.yang extract-to="ietf-datastores@2016-10-13.yang"
 
+
 * IANA Considerations @iana-con@
-
-** The Datastore Name Registry @ds-name-reg@
-
-This document defines a registry for datastore names called
-"Network Management Datastore Names".
-
-The registry shall record for each entry:
-
-- the name of the datastore
-- a reference to the datastore's documentation (e.g., the RFC number)
-
-Initial assignments for this registry follows:
-
-   Name: startup
-   Reference: RFC 6241
-
-   Name: running
-   Reference: RFC 6241
-
-   Name: candidate
-   Reference: RFC 6241
-
-   Name: intended
-   Reference: RFC XXXX
-
-   Name: applied
-   Reference: RFC XXXX
-
-   Name: operational-state
-   Reference: RFC XXXX
-
-All datastore names in the registry MUST be unique.
-
 
 ** Updates to the IETF XML Registry
 
@@ -477,7 +448,6 @@ the format in ^RFC3688^, the following registration is requested:
    URI: urn:ietf:params:xml:ns:yang:ietf-datastores
    Registrant Contact: The NETMOD WG of the IETF.
    XML: N/A, the requested URI is an XML namespace.
-
 
 ** Updates to the YANG Module Names Registry
 
@@ -538,37 +508,33 @@ contents of <intended> is:
 The system has detected that the hardware for one of the configured
 interfaces ("eth1") is not yet present, so the configuration for that
 interface is not applied.  Further, the system has received a host name
-and an additional IP address for "eth0" over DHCP.  This is reflected
-in <applied>:
-
-!! include-figure ex-applied.load
-
-In <operational-state>, all data from <applied> is present, in
-addition to a default value, a loopback interface automatically added
-by the system, and the result of the "speed" auto-negotiation:
+and an additional IP address for "eth0" over DHCP.  In addition to a
+default value, a loopback interface is automatically added by the system,
+and the result of the "speed" auto-negotiation.  All of this is reflected
+in <operational>:
 
 !! include-figure ex-oper.load
 
 
 * Open Issues @issues@
 
-+ How do we handle semantical constraints in <operational-state>?  Are
++ How do we handle semantical constraints in <operational>?  Are
   they just ignored?  Do we need a new YANG statement to define if a
-  "must" constraints applies to the <operational-state>?
+  "must" constraints applies to the <operational>?
 + Better name for "static configuration"?
 + Better name for "intended"?
 
 
 * Ephemeral Control-Plane Datastore Example @ephemeral-ds-example@
 
-  The section defines documentation for an example control-plane
-  datastore using the guidelines provided in ^cp-ds-guidelines^.
-  While this example is very terse, it is expected to be that a
-  standalone RFC would be needed when fully expanded.
+The section defines documentation for an example control-plane
+datastore using the guidelines provided in ^guidelines^.
+While this example is very terse, it is expected to be that a
+standalone RFC would be needed when fully expanded.
 
-  This example defines a control-plane datastore called :ephemeral,
-  which is loosely modeled after the work done in the I2RS working
-  group.
+This example defines a control-plane datastore called :ephemeral,
+which is loosely modeled after the work done in the I2RS working
+group.
 
   1. Name            : ephemeral  (register with IANA)
   2. YANG modules    : all (default)
@@ -577,28 +543,28 @@ by the system, and the result of the "speed" auto-negotiation:
   5. Protocols       : NC/RC (default)
   6. YANG Module     : (see below)
 
-    module ietf-ds-ephemeral {
-      namespace "urn:ietf:params:xml:ns:yang:ietf-ds-ephemeral";
-      prefix e;
+  module ietf-ds-ephemeral {
+    namespace "urn:ietf:params:xml:ns:yang:ietf-ds-ephemeral";
+    prefix e;
 
-      import ietf-datastores {
-        prefix ds;
-      }
-
-      // add datastore identity
-      identity ephemeral {
-        base ds:datastore;
-        description
-          "The 'ephemeral' datastore.";
-      }
-
-      // add origin identity
-      identity ephemeral {
-        base ds:dynamic;
-        description
-          "Denotes data from the ephemeral control-plane datastore.";
-      }
+    import ietf-datastores {
+      prefix ds;
     }
+
+    // add datastore identity
+    identity ds-ephemeral {
+      base ds:datastore;
+      description
+        "The 'ephemeral' datastore.";
+    }
+
+    // add origin identity
+    identity or-ephemeral {
+      base ds:dynamic;
+      description
+        "Denotes data from the ephemeral control-plane datastore.";
+    }
+  }
 
 
 
@@ -710,7 +676,7 @@ Note: This section describes the authors' thoughts on how YANG Library
 ^RFC7895^ could be updated to support the datastore architecture described
 in this draft.  It has been incorporated here as a temporary measure
 to facilitate easier review, but the expectation is that this work will
-be owned and standized via the NETCONF working group.
+be owned and standardized via the NETCONF working group.
 
 [TBD (mbj)] FIXME
 
@@ -722,12 +688,12 @@ Note: This section describes the authors' thoughts on how Guidelines for
 Authors and Reviewers of YANG Data Model Documents ^I-D.ietf-netmod-rfc6087bis^
 could be updated to support the datastore architecture described in this draft.
 It has been incorporated here as a temporary measure to facilitate easier
-review, but the expectation is that this work will be owned and standized via
+review, but the expectation is that this work will be owned and standardized via
 the NETCONF working group.
 
 It is important to design data models with clear semantics that work
 equally well for instantiation in a configuration datastore and
-instantiation in the <operational-state> datastore.
+instantiation in the <operational> datastore.
 
 *** Nodes with different config/state value sets
 
@@ -754,7 +720,7 @@ Note: This section describes the authors' thoughts on how NETCONF ^RFC6241^ coul
 updated to support the datastore architecture described in this draft.
 It has been incorporated here as a temporary measure to facilitate
 easier review, but the expectation is that this work will be owned and
-standized via the NETCONF working group.
+standardized via the NETCONF working group.
 
 *** Introduction
 
@@ -786,7 +752,7 @@ entail.
   datastores it supports.  Implementations can choose which datastores
   they expose, but MUST at least expose both the <running> and
   <operational> datastores.  They MAY expose additional datastores,
-  such as <intended>, <applied>, <candidate>, etc.
+  such as <intended>, <candidate>, etc.
 
 - A new <get-data> operation is introduced that allows the client
   to return the contents of a datastore.  For configuration
@@ -798,16 +764,18 @@ entail.
   E.g. <filter type=metadata/> in <get> and <get-config> requests.
 
  - DISCUSS, does the capability need to be able to differentiate between
-   different types of YANG metadata?
+   different types of YANG metadata?  [Move to Open Issue, perhaps add
+   to new <get-data> operation?]
 
 - A new "with-metadata" capability allows a device to indicate that it
   supports the capability of including YANG metadata annotations in
   the responses to <get> and <get-config> requests.  This is achieved
   in a similar way to with-defaults ^RFC6243^, by introducing a
-  <with-metadata> XML element to <get> and <get-config> requets.
+  <with-metadata> XML element to <get> and <get-config> requests.
 
  - DISCUSS, does the capability, and XML element, need to be able to
    differentiate between different types of YANG metadata annotations?
+   [should be controlled by a feature statement]
 
 - The handling of defaults for the new configuration datastores is as
   described in with-defaults ^RFC6243^, but that does not apply for
@@ -815,7 +783,7 @@ entail.
 
 **** Operational State Datastore Defaults Handling
 
-The normal semantics for the <operational-state> datastore are that
+The normal semantics for the <operational> datastore are that
 all values that match the default specified in the schema are included
 in response to requests on the operational state datastore. This is
 equivalent to the 'report-all' mode of the with-defaults handling.
@@ -835,7 +803,7 @@ implicitly having the default value.
 
 This section describes NETCONF version 2, by explaining the
 differences to NETCONF version 1.1.  Where not explicitly specified,
-the behaviour of NETCONF version 2 is the same as for NETCONF
+the behavior of NETCONF version 2 is the same as for NETCONF
 version 1.1 ^RFC6241^.
 
 **** Benefits of defining a new NETCONF version
@@ -849,13 +817,13 @@ version 1.1) has several benefits:
 
 - It could allow the existing <get-config> operation to also be
   removed, replaced by the more generic <get-data> that is named
-  appropriately to also apply to the operational-state datastore.
+  appropriately to also apply to the operational datastore.
 
 - It makes it easier for clients and servers to know what reasonable
   common baseline functionality to expect, rather than a collection of
   capabilities that may not be implemented in a consistent fashion.
   In particular, clients will able to assume support for the
-  <operational-state> datatstore.
+  <operational> datastore.
 
 - It can gracefully coexist with NETCONF v1.  A server could implement
   both versions.  Existing YANG models exposing split config/state
@@ -874,10 +842,7 @@ as:
   to use.
 
 - NETCONF v2 removes support for the existing <get> operation, that is
-  replaced by the <get-data> on the operational-state datstore.
-
- - DISCUSS: Should there be an optional capability defined to indicate
-   that <get> is still supported for backwards compatibility.
+  replaced by the <get-data> on the operational datastore.
 
 - NETCONF v2 can publish a separate version of YANG library from a
   NETCONF v1.1 implementation running on the same device, allowing
@@ -897,7 +862,7 @@ Two different migration strategies are considered:
 
 ***** Migration Path using two instances of NETCONF
 
-If, for backwards compatbility reasons, a server intends to support both
+If, for backwards compatability reasons, a server intends to support both
 split config/state trees and the combined config/state trees proposed
 in this architecture, then this can be achieved by having the device
 support both NETCONF v1 and NETCONF v2 at the same time:
@@ -952,7 +917,7 @@ This section describes the authors' thoughts on how RESTCONF ^RFC8040^ could be
 updated to support the datastore architecture described in this draft.
 It has been incorporated here as a temporary measure to facilitate
 easier review, but the expectation is that this work will be owned and
-standized via the NETCONF working group.
+standardized via the NETCONF working group.
 
 *** Introduction
 
@@ -975,13 +940,12 @@ entail.
 *** Overview of additions to RESTCONF
 
 - A new path {+restconf}/datastore/<datastore-name>/data/
-  to provide a YANG datatree for each datastore that is exposed via
+  to provide a YANG data tree for each datastore that is exposed via
   RESTCONF.
 
 - Implementations can choose which datastores they expose, but MUST at
   least expose both the <running> and <operational> datastores.  They
-  MAY expose additional datastores, such as <intended> or <applied>.
-  TODO - Document how supported datastores are advertised.
+  MAY expose the <intended> datastores as needed.
 
 - The same HTTP Methods supported on {+restconf}/data/ are also
   supported on {+restconf}/datastore/<datastore-name>/data/ but
@@ -1014,7 +978,7 @@ entail.
 
 All configuration datastores support all HTTP Methods.
 
-The <operational-state> datastore only supports the following HTTP methods:
+The <operational> datastore only supports the following HTTP methods:
 OPTIONS, HEAD, GET, and POST to invoke an RFC operation.
 
 **** Query parameters
@@ -1024,9 +988,10 @@ datastores because its functionality has been obsoletely by the
 revised datastores architecture.
 
 [DISCUSS, actually, is there any harm in leaving the 'content' query parameter as is?]
+- we agreed to leave the 'content' param in for now.
 
 ^RFC7952^ specifies how a YANG data tree can be annotated with generic
-metadata inforation, that is used by this document to annotate data
+metadata information, that is used by this document to annotate data
 nodes with origin information indicating the mechanism by which the
 operational value came into effect.
 
@@ -1043,13 +1008,12 @@ in use.
 Both of the generic mechanisms could be controlled by a new capability.
 A new capability is defined to indicate whether a device supports
 filtering on, or annotating responses with, the origin meta data.
-DISCUSS: Presume that one capability is sufficient because if a device
-can filter on the origin metadata then it should also be able to
-annotate.
+
+
 
 **** Operational State Datastore Defaults Handling
 
-The normal semantics for the <operational-state> datastore are that
+The normal semantics for the <operational> datastore are that
 all values that match the default specified in the schema are included
 in response to requests on the operational state datastore. This is
 equivalent to the 'report-all' mode of the with-defaults handling.
@@ -1070,7 +1034,7 @@ implicitly having the default value.
 
 This section describes RESTCONF version 2, by explaining the
 differences to RESTCONF version 1.  Where not explicitly specified,
-the behaviour of RESTCONF version 2 is the same as for RESTCONF
+the behavior of RESTCONF version 2 is the same as for RESTCONF
 version 1 ^RFC8040^.
 
 **** Benefits of defining a new RESTCONF version
@@ -1122,7 +1086,7 @@ the revised architectural framework presented in this document will
 have a single tree "/foo" with a combination of config true and config
 false nodes.
 
-If for backwards compatbility reasons, a server intends to support both
+If for backwards compatability reasons, a server intends to support both
 split config/state trees, and the combined config/state trees proposed
 in this architecture, then this can be achieved by having the device
 support both RESTCONF v1 and RESTCONF v2 at the same time:
