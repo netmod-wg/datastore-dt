@@ -272,16 +272,7 @@ model in order reflect the experience gained with the original model.
 
 #+END_EXAMPLE
 
-The model foresees dynamic datastores that are by definition not
-part of the persistent configuration of a device.  In some contexts,
-these have been termed ephemeral datastores since the information is
-ephemeral, i.e., lost upon reboot.  The dynamic datastores
-interact with the rest of the system through the <operational>
-datastore.  Note that the ephemeral datastore discussed in I2RS
-documents maps to a dynamic datastore in the datastore
-model described here.
-
-** The <intended> datastore
+** The <intended> Datastore
 
 The <intended> datastore is a read-only datastore that consists of
 config true nodes.  It is tightly coupled to <running>.  When data is
@@ -304,7 +295,19 @@ configuration.
 Another example is support for templates.  Templates are expanded
 when copied into <intended>, and the result is validated.
 
-** The <operational> datastore
+** Dynamic Datastores
+
+The model recognizes the need for dynamic datastores that are by
+definition not part of the persistent configuration of a device.  In
+some contexts, these have been termed ephemeral datastores since the
+information is ephemeral, i.e., lost upon reboot.  The dynamic
+datastores interact with the rest of the system through the
+<operational> datastore.
+
+Note that the ephemeral datastore discussed in I2RS documents maps to
+a dynamic datastore in the datastore model described here.
+
+** The <operational> Datastore
 
 The <operational> datastore is a read-only datastore that
 consists of config true and config false nodes.  In the original
@@ -366,7 +369,7 @@ configuration was successful).
 As data flows into the <operational> datastore, it is conceptually
 marked with a metadata annotation (^RFC7952^) that indicates its
 origin.  The "origin" metadata annotation is defined in ^yang-module^.
- The values are YANG identities.  The following identities are defined:
+The values are YANG identities.  The following identities are defined:
 
   +-- origin
       +-- intended
@@ -536,6 +539,13 @@ under its Seventh Framework Programme.
 
 * Example Data
 
+The use of datastores is complex, and many of the subtle effects are
+more easily presented using examples.  This section presents a series
+of example data models with some sample contents of the various
+datastores.
+
+** System Example
+
 In this example, the following fictional module is used:
 
 !! include-figure example-system.yang
@@ -556,14 +566,266 @@ in <operational>:
 !! include-figure ex-oper.load
 
 
+** BGP Example
+
+Consider the following piece of a ersatz BGP module:
+
+    container bgp {
+        leaf local-as {
+            type uint32;
+        }
+        leaf peer-as {
+            type uint32;
+        }
+        list peer {
+            key name;
+            leaf name {
+                type ipaddress;
+            }
+            leaf local-as {
+                type uint32;
+		description ".... Defaults to ../local-as";
+            }
+            leaf peer-as {
+                type uint32;
+		description "... Defaults to ../peer-as";
+            }
+	    leaf local-port {
+                type inet:port;
+            }
+	    leaf remote-port {
+                type inet:port;
+                default 179;
+            }
+            leaf state {
+                config false;
+                type enumeration {
+                    enum init;
+                    enum established;
+                    enum closing;
+                }
+            }
+        }
+    }
+
+In this example model, both bgp/peer/local-as and bgp/peer/peer-as
+have complex hierarchical values, allowing the user to specify default
+values for all peers in a single location.
+
+The model also follows the pattern of fully integrating state ("config
+false") nodes with configuration ("config true") nodes.  There is not
+separate "bgp-state" hierarchy, with the accompanying repetition of
+containment and naming nodes.  This makes the model simpler and more
+readable.
+
+*** Datastores
+
+Each datastore represents differing views of these data nodes.  The
+<running> datastore will hold the configuration data provided by the
+user, for example a single BGP peer.  The <intended> datastore will
+conceptually hold the data as validated, after the removal of data not
+intended for validation and after any local template mechanisms are
+performed.  The <operational> datastore will show data from <intended>
+as well as any "config false" nodes.
+
+*** Adding a Peer
+
+If the user configures a single BGP peer, then that peer will be
+visible in both the <running> and <intended> datastores.  It may also
+appear in the <candidate> datastore, if the server supports the
+"candidate" feature.  Retrieving the peer will return only the
+user-specified values.
+
+No time delay should exist between the appearance of the peer in
+<running> and <intended>.
+
+In this scenario, we've added the following to <running>:
+
+  <bgp>
+    <local-as>64642</local-as>
+    <peer-as>65000</peer-as>
+    <peer>
+      <name>10.1.2.3</name>
+    </peer>
+  </bgp>
+
+**** <operational>
+
+The <operational> datastore will contain the fully expanded peer data,
+including "config false" nodes.  In our example, this means the
+"state" node will appear.
+
+In addition, the <operational> datastore will contain the "currently
+in use" values for all nodes.  This means that local-as and peer-as
+will be populated even if they are not given values in
+<intended>.  The value of bgp/local-as will be used if
+bgp/peer/local-as is not provided; bgp/peer-as and bgp/peer/peer-as
+will have the same relationship.  In the operational view, this means
+that every peer will have values for their local-as and peer-as, even
+if those values are not explicitly configured but are provided by
+bgp/local-as and bgp/peer-as.
+
+Each BGP peer has a TCP connection associated with it, using the
+values of local-port and remote-port from the intended datastore.  If
+those values are not supplied, the system will select values.  When
+the connection is established, the <operational> datastore will
+contain the current values for the local-port and remote-port nodes
+regardless of the origin.  If the system has chosen the values, the
+"origin" attribute will be set to "operational".  Before the
+connection is established, one or both of the nodes may not appear,
+since the system may not yet have their values.
+
+  <bgp origin="orgn:intended" xmlns="urn:example:bgp">
+    <local-as origin="orgn:intended">64642</local-as>
+    <peer-as origin="orgn:intended">65000</peer-as>
+    <peer origin="orgn:intended">
+      <name origin="orgn:intended">10.1.2.3</name>
+      <local-as origin="orgn:data-model">64642</local-as>
+      <peer-as origin="orgn:data-model">65000</peer-as>
+      <local-port origin="orgn:operational">60794</local-port>
+      <remote-port origin="orgn:data-model">179</remote-port>
+    </peer>
+  </bgp>
+
+? Need means of inheriting @origin values, so whole hierarchies can
+avoid the noise.
+
+*** Removing a Peer
+
+Changes to configuration data may take time to percolate through the
+various software components involved.  During this period, it is
+imperative to continue to give an accurate view of the working of the
+device.  The <operational> datastore will return data nodes for both
+the incoming and outgoing configuration, as closely as possible
+tracking the current operation of the device.
+
+Consider the scenario where a client removes a BGP peer.  When a peer
+is removed, the operational state will continue to reflect the
+existence of that peer until the peer's resources are released,
+including closing the peer's connection.  During this period, the
+current data values will continue to be visible in the <operational>
+datastore, with the "origin" attribute set to indicate the
+origin of the original data.
+
+  <bgp origin="orgn:intended">
+    <local-as origin="orgn:intended">64642</local-as>
+    <peer-as origin="orgn:intended">65000</peer-as>
+    <peer origin="orgn:intended">
+      <name origin="orgn:intended">10.1.2.3</name>
+      <local-as origin="orgn:data-model">64642</local-as>
+      <peer-as origin="orgn:data-model">65000</peer-as>
+      <local-port origin="orgn:intended">60794</local-port>
+      <remote-port origin="orgn:intended">179</remote-port>
+    </peer>
+  </bgp>
+
+Once resources are released and the connection is closed, the
+peer's data is removed from the <operational> datastore.
+
+** Interface Example
+
+In this section, we'll use this simple interface data model:
+
+    container interfaces {
+        list interface {
+            key name;
+            leaf name {
+                type string;
+            }
+            leaf description {
+                type string;
+            }
+            leaf mtu {
+                type uint;
+            }
+            leaf ipv4-address {
+                type yang:ipv4-prefix;
+            }
+        }
+    }
+
+*** Ephemeral Interfaces
+
+One common issue in networking devices is the support of Field
+Replaceable Units (FRUs) that can be inserted and removed from the
+device without requiring a reboot or interfering with normal
+operation.  These FRUs are typically interface cards, and the devices
+support "pre-configuration" of these interfaces, something called
+"ephemeral interfaces".
+
+Configuration validity cannot depend on the current state of FRUs,
+since that would imply the removing a FRU might render the
+configuration invalid.  This is unacceptable, especially given that
+rebooting such a device would fail to boot due to an invalid
+configuration.  So we allow configuration for missing FRUs to exist in
+<running> and <intended>, but since the missing FRU is not operational
+data, it will not appear in <operational>.
+
+If a client creates an interface "et-0/0/0" but the interface does not
+physically exist at this point, then the <intended> datastore might
+contain the following:
+
+    <interfaces>
+      <interface>
+        <name>et-0/0/0</name>
+        <description>Test interface</description>
+      </interface>
+    </interfaces>
+
+Since the interface does not exist, this data does not appear in the
+<operational> datastore.
+
+When a FRU containing this interface is inserted, the system will
+detect it and process the associated configuration.  The <operational>
+will contain the data from <intended>, as well as the "config false"
+nodes, such as the current value of the interface's MTU.
+
+    <interfaces origin="orgn:intended">
+      <interface origin="orgn:intended">
+        <name origin="orgn:intended">et-0/0/0</name>
+        <description origin="orgn:intended"
+                     >Test interface</description>
+        <mtu origin="orgn:operational">1500</mtu>
+      </interface>
+    </interfaces>
+
+If the FRU is removed, the interface data is removed from the
+<operational> datastore.
+
+*** System-provided Interface
+
+Imagine if the system provides a loopback interface (named "lo0") with
+a default ipv4-prefix of "127.0.0.1/32".  The system will only provide
+configuration for this interface if the is no data for it in <intended>.
+
+When no configuration for "lo0" appears in <intended>, then
+<operational> will show the system-provided data:
+
+    <interfaces origin="orgn:intended">
+      <interface origin="orgn:operational">
+        <name origin="orgn:operational">lo0</name>
+        <ipv4-address origin="orgn:operational"
+                      >127.0.0.1/32</ipv4-address>
+      </interface>
+    </interfaces>
+
+When configuration for "lo0" does appear in <intended>, then
+<operational> will show that data with the origin set to "intended".
+If the "ipv4-address" is not provided, then the system-provided value
+will appear as follows:
+
+    <interfaces origin="orgn:intended">
+      <interface origin="orgn:intended">
+        <name origin="orgn:intended">lo0</name>
+        <description origin="orgn:intended">loopback</description>
+        <ipv4-address origin="orgn:operational"
+                      >127.0.0.1/32</ipv4-address>
+      </interface>
+    </interfaces>
+
 * Open Issues @issues@
 
-+ How do we handle semantical constraints in <operational>?  Are
-  they just ignored?  Do we need a new YANG statement to define if a
-  "must" constraints applies to the <operational>?
-+ Better name for "static configuration"?
-+ Better name for "intended"?
-
+We will place a list of open issues here.
 
 * Ephemeral Dynamic Datastore Example @ephemeral-ds-example@
 
@@ -606,8 +868,6 @@ group.
     }
   }
 
-
-
 * Implications on Data Models
 
 Since the NETCONF <get/> operation returns the content of the
@@ -635,28 +895,28 @@ changes:
 - All status 'current' data nodes under the existing 'state' trees are
   copied to the equivalent place under the 'config' tree:
 
-  - If a node with the same name and type already exists under the
-    equivalent path in the config tree then the nodes are merged and
-    the description updated.
+-- If a node with the same name and type already exists under the
+   equivalent path in the config tree then the nodes are merged and
+   the description updated.
 
-  - If a node with the same name but different type exists under the
-    equivalent path in the config tree, then the module authors must
-    choose the appropriate mechanism to combine the config and state
-    nodes in a backwards compatible way based on the data model design
-    guidelines below.  This may require the state node to be added to
-    the config tree with a modified name.  This scenario is expected
-    to be relatively uncommon.
+-- If a node with the same name but different type exists under the
+   equivalent path in the config tree, then the module authors must
+   choose the appropriate mechanism to combine the config and state
+   nodes in a backwards compatible way based on the data model design
+   guidelines below.  This may require the state node to be added to
+   the config tree with a modified name.  This scenario is expected
+   to be relatively uncommon.
 
-  - If no node with the same name and path already exists under the
-    config tree then the state node schema is copied verbatim into the
-    config tree.
+-- If no node with the same name and path already exists under the
+   config tree then the state node schema is copied verbatim into the
+   config tree.
 
-  - As the state nodes are copied into the config trees, any
-    leafrefs that reference other nodes in the state tree are adjusted
-    to reference the equivalent path in the config tree.
+-- As the state nodes are copied into the config trees, any
+   leafrefs that reference other nodes in the state tree are adjusted
+   to reference the equivalent path in the config tree.
 
-  - All status 'current' nodes under the existing 'state' trees are
-    marked as 'status' deprecated.
+-- All status 'current' nodes under the existing 'state' trees are
+   marked as 'status' deprecated.
 
 - Augmentations are similarly handled to data nodes as described
   above.
@@ -668,18 +928,14 @@ should be designed to conform to the revised datastore architecture,
 following the design guidelines described below, and only need to
 provide combined config/state trees.
 
-
-
 * Implications on other Drafts
 
 The sections below describe the authors' thoughts on how various other
 drafts may be updated to support the datastore architecture described
- in this draft.  They have been incorporated as an appendix of this document
-to facilitate easier review, but the expectation is that this work will be
-moved into another document as soon as the appropriate working group
-decides to take on the work.
-
-
+in this draft.  They have been incorporated as an appendix of this
+document to facilitate easier review, but the expectation is that this
+work will be moved into another document as soon as the appropriate
+working group decides to take on the work.
 
 ** Implications on YANG
 
@@ -708,8 +964,6 @@ the work.
   datastores they apply to and perhaps change the default xpath context
   from running plus state to the operational state datastore.]
 
-
-
 ** Implications on YANG Library @yang-lib-impl@
 
 Note: This section describes the authors' thoughts on how YANG Library
@@ -719,8 +973,6 @@ to facilitate easier review, but the expectation is that this work will
 be owned and standardized via the NETCONF working group.
 
 [TBD (mbj)] FIXME
-
-
 
 ** Implications to YANG Guidelines 
 
@@ -751,8 +1003,6 @@ value.  Another example is Ethernet auto-negotiation of link speed.  In
 such a situation, it is recommended to model this as two separate
 leafs, one config true leaf for the input to the auto-negotiation
 process, and one config false leaf for the output from the process.
-
-
 
 ** Implications on NETCONF
 
@@ -803,9 +1053,9 @@ entail.
   it supports queries using YANG metadata as a <filter> element.
   E.g. <filter type=metadata/> in <get> and <get-config> requests.
 
- - DISCUSS, does the capability need to be able to differentiate between
-   different types of YANG metadata?  [Move to Open Issue, perhaps add
-   to new <get-data> operation?]
+- DISCUSS, does the capability need to be able to differentiate between
+  different types of YANG metadata?  [Move to Open Issue, perhaps add
+  to new <get-data> operation?]
 
 - A new "with-metadata" capability allows a device to indicate that it
   supports the capability of including YANG metadata annotations in
@@ -813,9 +1063,9 @@ entail.
   in a similar way to with-defaults ^RFC6243^, by introducing a
   <with-metadata> XML element to <get> and <get-config> requests.
 
- - DISCUSS, does the capability, and XML element, need to be able to
-   differentiate between different types of YANG metadata annotations?
-   [should be controlled by a feature statement]
+- DISCUSS, does the capability, and XML element, need to be able to
+  differentiate between different types of YANG metadata annotations?
+  [should be controlled by a feature statement]
 
 - The handling of defaults for the new configuration datastores is as
   described in with-defaults ^RFC6243^, but that does not apply for
@@ -931,10 +1181,10 @@ that only follow the new datastore architecture.
 revised datastore architecture, particularly if they continue to
 support the deprecated <get> operation:
 
- - For updated YANG modules they would see additional information
+-- For updated YANG modules they would see additional information
    returned via the <get> operation.
 
- - For new YANG modules, some of the state nodes may not be available,
+-- For new YANG modules, some of the state nodes may not be available,
    i.e. for any state nodes that exist under a config node that has
    not been configured (e.g. statistics under a system created
    interface).
@@ -942,14 +1192,12 @@ support the deprecated <get> operation:
 - NETCONF servers can also support clients that are aware of the
   revised datastores architecture:
 
- - For updated YANG modules they would see additional information
+-- For updated YANG modules they would see additional information
    returned under the legacy state trees.  This information can be
    excluded using appropriate subtree filters.
 
- - New YANG modules, conforming to the datastores architecture, would
+-- New YANG modules, conforming to the datastores architecture, would
    work exactly as expected.
-
-
 
 ** Implications on RESTCONF
 
@@ -1048,8 +1296,6 @@ in use.
 Both of the generic mechanisms could be controlled by a new capability.
 A new capability is defined to indicate whether a device supports
 filtering on, or annotating responses with, the origin meta data.
-
-
 
 **** Operational State Datastore Defaults Handling
 
