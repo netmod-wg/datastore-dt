@@ -1,10 +1,10 @@
 # -*- org -*-
 
-Datastores are a fundamental concept binding the YANG data modeling
-language to protocols transporting data defined in YANG data models,
-such as NETCONF or RESTCONF.  This document defines a
-conceptual model of datastores based on the experience gained with the
-initial simpler model and addressing requirements that were not well
+Datastores are a fundamental concept binding the data models written
+in the YANG data modeling language to network management protocols
+such as NETCONF and RESTCONF.  This document defines an architectural
+framework for datastores based on the experience gained with the
+initial simpler model, addressing requirements that were not well
 supported in the initial model.
 
 * Introduction
@@ -13,8 +13,8 @@ This document provides an architectural framework for
 datastores as they are used by network management protocols such as
 NETCONF ^RFC6241^, RESTCONF ^RFC8040^ and the YANG
 ^RFC7950^ data modeling language.  Datastores are a fundamental concept
-binding management data models to network management protocols and
-agreement on a common architectural model of datastores ensures that
+binding network management data models to network management protocols.
+Agreement on a common architectural model of datastores ensures that
 data models can be written in a network management protocol agnostic
 way.  This architectural framework identifies a set of conceptual
 datastores but it does not mandate that all network management
@@ -42,7 +42,7 @@ This document defines the following terms:
   with other systems and not persistent.
 - system configuration data: Configuration data that is supplied by
   the device itself.
-- data-model-defined configuration data: Configuration data that is not
+- default configuration data: Configuration data that is not
   explicitly provided but for which a value defined in the data model
   is used.
 - applied configuration data: Configuration data that is currently
@@ -74,24 +74,24 @@ This document defines the following terms:
 - candidate configuration datastore: A configuration datastore that
   can be manipulated without impacting the device's running
   configuration datastore and that can be committed to the running
-  configuration datastore. This datastore is only present on devices
-  that support the "candidate" YANG feature.
+  configuration datastore. A candidate datastore may not be supported
+  by all protocols or implementations.
 - startup configuration datastore: The configuration datastore holding
   the configuration loaded by the device into the running
-  configuration datastore when it boots. This datastore is only
-  present on devices that support the "startup" YANG feature.
+  configuration datastore when it boots. A startup datastore may not
+  be supported by all protocols or implementations.
 - dynamic datastore: A datastore holding dynamic configuration
   data.
 - operational state datastore: A datastore holding the currently
   active applied configuration data as well as the device's state
   data.
-- origin: a metadata annotation indicating where the data originated
-  and who provided that data item.
-- remnant data: configuration data that remains in the system for a
+- origin: A metadata annotation indicating the origin of a data item.
+- remnant data: Configuration data that remains in the system for a
   period of time after it has be removed from a new configuration
-  data set.  The time period may be minimal, or may last until any
-  resources used by the newly-deleted configuration data
-  (e.g. network connections, memory allocations, file handles).
+  datastore.  The time period may be minimal, or may last until all
+  resources used by the newly-deleted configuration data (e.g. network
+  connections, memory allocations, file handles) have been
+  deallocated.
 
 The following additional terms are not datastore specific but commonly
 used and thus defined here as well:
@@ -104,16 +104,6 @@ used and thus defined here as well:
   event has been recognized by the server.
 - remote procedure call: An operation that can be invoked by a client
   on a server.
-
-Relationship to YANG 1.1 ^RFC7950^:
-
-- Configuration data maps to all schema nodes marked "config true".
-- Data-model-defined configuration data maps to schema nodes with an
-  explicit default statement or an explanation in the description
-  statement how a default value is determined.
-- A datastore maps to an instantiated YANG data tree.
-- A configuration datastore maps to an instantiated YANG data tree
-  consisting of configuration data nodes and interior data nodes.
 
 * Introduction
 
@@ -222,7 +212,7 @@ Some observations:
   support the concept of inactive data; clients not indicating support
   for inactive data receive the content of the <running> datastore
   with the inactive data removed.  Inactive data is conceptually
-  removed during validation.
+  removed before validation.
 - Some implementations have proprietary mechanisms that allow clients
   to define configuration templates in <running>.  These
   templates are expanded automatically by the system, and the
@@ -235,7 +225,8 @@ Some observations:
 * Architectural Model of Datastores @datastore-model@
 
 Below is a new conceptual model of datastores extending the original
-model in order reflect the experience gained with the original model.
+model in order to reflect the experience gained with the original
+model.
 
 #+BEGIN_EXAMPLE
   +-------------+                 +-----------+
@@ -272,7 +263,6 @@ model in order reflect the experience gained with the original model.
   ct = config true; cf = config false
   rw = read-write; ro = read-only
   boxes denote datastores
-
 #+END_EXAMPLE
 
 ** The <intended> Datastore
@@ -296,7 +286,7 @@ and are thus not taken into account when validating the
 configuration.
 
 Another example is support for templates.  Templates are expanded
-when copied into <intended>, and the result is validated.
+when copied into <intended>, and the expanded result is validated.
 
 ** Dynamic Datastores
 
@@ -337,8 +327,8 @@ handles).
 As a result of these remnants, the semantic constraints defined
 in the data model cannot be relied upon for the <operational>
 datastore, since the system may have remnants whose constraints were
-valid with the previous configuration that are not valid with the
-incoming configuration.  Since constraints on "config false" nodes may
+valid with the previous configuration and that are not valid with the
+current configuration.  Since constraints on "config false" nodes may
 refer to "config true" nodes, remnants may force the violation of
 those constraints.  The constraints that may not hold include "when",
 "must", and "max-elements".  Note that syntactic constraints cannot be
@@ -389,18 +379,18 @@ The values are YANG identities.  The following identities are defined:
   +-- origin
       +-- static
       +-- dynamic
-      +-- data-model
-      +-- operational
+      +-- default
+      +-- system
 
 These identities can be further refined, e.g., there might be an
 identity "dhcp" derived from "dynamic".
 
 The "static" origin represents data provided by the <intended>
 datastore.  The "dynamic" origin represents data provided by a dynamic
-datastore.  The "data-model" origin represents data values specified
-in the data model, using either the "default" statement or the
-"description" statement.  Finally, the "operational" origin represents
-data learned from the normal operational of the system, including
+datastore.  The "default" origin represents data values specified in
+the data model, using either the "default" statement or the
+"description" statement.  Finally, the "system" origin represents data
+learned from the normal operational of the system, including
 control-plane protocols.
 
 * Guidelines for Defining Dynamic Datastores @guidelines@
@@ -416,13 +406,15 @@ SHOULD address the points specified in the sections below.
 
 Each dynamic datastores MUST have a name using the character set
 described by Section 6.2 of ^RFC7950^.  The name SHOULD be consistent
-in length to other datastore names described in this document (i.e.
-less than 12 characters).
+in style and length to other datastore names described in this
+document.
 
 The datastore's name does not need to be globally unique, as it will
 be uniquely qualified by the namespace of the module in which it is
 defined (^def-module^).  This means that names such as "running" and
-"operational" are valid datastore names.
+"operational" are valid datastore names. However, it is usually
+desirable to avoid using the same name for multiple different
+datastores.
 
 ** Define which YANG modules can be used in the datastore
 
@@ -469,11 +461,6 @@ Each dynamic datastore MUST be defined by a YANG module.
 This module is used by servers to indicate (e.g., via YANG Library)
 their support for the dynamic datastore.
 
-It is RECOMMENDED that IETF module names follow the convention
-"ietf-ds-<datastore-name>".  Though it is understood that this
-convention places a uniqueness constraint of datastore names
-(^def-name^) defined by the IETF.
-
 The YANG module MUST import the "ietf-datastores" module, defined
 in this document.  This is necessary in order to access the base
 identities it defines.
@@ -492,7 +479,7 @@ An example of these guidelines in use is provided in
 
 * YANG Module @yang-module@
 
-!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-03-11.yang"
+!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-03-12.yang"
 
 * IANA Considerations @iana-con@
 
@@ -693,10 +680,10 @@ since the system may not yet have their values.
     <peer-as origin="ds:static">65000</peer-as>
     <peer origin="ds:static">
       <name origin="ds:static">10.1.2.3</name>
-      <local-as origin="ds:data-model">64642</local-as>
-      <peer-as origin="ds:data-model">65000</peer-as>
-      <local-port origin="ds:operational">60794</local-port>
-      <remote-port origin="ds:data-model">179</remote-port>
+      <local-as origin="ds:default">64642</local-as>
+      <peer-as origin="ds:default">65000</peer-as>
+      <local-port origin="ds:system">60794</local-port>
+      <remote-port origin="ds:default">179</remote-port>
     </peer>
   </bgp>
 
@@ -725,8 +712,8 @@ origin of the original data.
     <peer-as origin="ds:static">65000</peer-as>
     <peer origin="ds:static">
       <name origin="ds:static">10.1.2.3</name>
-      <local-as origin="ds:data-model">64642</local-as>
-      <peer-as origin="ds:data-model">65000</peer-as>
+      <local-as origin="ds:default">64642</local-as>
+      <peer-as origin="ds:default">65000</peer-as>
       <local-port origin="ds:static">60794</local-port>
       <remote-port origin="ds:static">179</remote-port>
     </peer>
@@ -788,7 +775,7 @@ nodes, such as the current value of the interface's MTU.
     <interface origin="ds:static">
       <name origin="ds:static">et-0/0/0</name>
       <description origin="ds:static">Test interface</description>
-      <mtu origin="ds:operational">1500</mtu>
+      <mtu origin="ds:system">1500</mtu>
     </interface>
   </interfaces>
 
@@ -805,8 +792,8 @@ When no configuration for "lo0" appears in <intended>, then
 <operational> will show the system-provided data:
 
   <interfaces origin="ds:static">
-    <interface origin="ds:operational">
-      <name origin="ds:operational">lo0</name>
+    <interface origin="ds:system">
+      <name origin="ds:system">lo0</name>
       <ipv4-address origin="ds:system">127.0.0.1</ipv4-address>
     </interface>
   </interfaces>
@@ -820,7 +807,7 @@ will appear as follows:
     <interface origin="ds:static">
       <name origin="ds:static">lo0</name>
       <description origin="ds:static">loopback</description>
-      <ipv4-address origin="system">127.0.0.1</ipv4-address>
+      <ipv4-address origin="ds:system">127.0.0.1</ipv4-address>
     </interface>
   </interfaces>
 
@@ -1057,8 +1044,8 @@ in response to requests on the operational state datastore. This is
 equivalent to the 'report-all' mode of the with-defaults handling.
 
 The 'metadata-filter' query parameter can be used to exclude nodes
-with origin metadata matching 'data-model', that would exclude nodes
-that match the default value specified in the schema.
+with origin metadata matching 'default', that would exclude nodes that
+match the default value specified in the schema.
 
 If the server cannot return a value for any reason (e.g. the server
 cannot determine the value, or the value that would be returned is
@@ -1269,7 +1256,7 @@ in response to requests on the operational state datastore. This is
 equivalent to the 'report-all' mode of the with-defaults handling.
 
 The 'metadata' query parameter can be used to exclude nodes with a
-origin metadata matching 'data-model', that would exclude (only
+origin metadata matching 'default', that would exclude (only
 config true?) nodes that match the default value specified in the
 schema.
 

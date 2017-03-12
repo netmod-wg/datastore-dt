@@ -22,15 +22,15 @@ module ietf-datastores {
                <mailto:kwatsen@juniper.net>";
 
   description
-    "This YANG module defines an 'origin' metadata annotation,
-     and a set of identities for the origin value.  The 'origin'
-     metadata annotation is used to mark data in the applied
-     and operational state datastores with information on where
-     the data originated.
+    "This YANG module defines a set of identities for datastores.
+     These identities can be used to identify datastores in protocol
+     operations.
 
-     This YANG module also defines a set of identities for
-     datastores.  These identities can be used to identify
-     datastores in protocol operations.
+     This YANG module also defines an 'origin' metadata annotation,
+     and a set of identities for the origin value.  The 'origin'
+     metadata annotation is used to mark data in the applied and
+     operational state datastores with information on where the data
+     originated.
 
      Copyright (c) 2017 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
@@ -46,7 +46,7 @@ module ietf-datastores {
      (http://www.rfc-editor.org/info/rfcxxxx); see the RFC itself
      for full legal notices.";
 
-  revision 2017-03-11 {
+  revision 2017-03-12 {
     description
       "Initial revision.";
     reference
@@ -89,7 +89,7 @@ module ietf-datastores {
   identity operational {
     base datastore;
     description
-     "The 'operational-state' datastore.";
+     "The 'operational' state datastore.";
   }
 
   /*
@@ -121,7 +121,7 @@ module ietf-datastores {
        has been configured.";
   }
 
-  identity data-model {
+  identity default {
     base origin;
     description
       "Denotes data that does not have an explicitly configured
