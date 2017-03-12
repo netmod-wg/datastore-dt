@@ -865,23 +865,23 @@ changes:
   nodes are deprecated, to be obsoleted over time.
 - All status "current" data nodes under the existing "state" trees are
   copied to the equivalent place under the "config" tree:
--- If a node with the same name and type already exists under the
+ - If a node with the same name and type already exists under the
    equivalent path in the config tree then the nodes are merged
    and the description updated.
--- If a node with the same name but different type exists under the
+ - If a node with the same name but different type exists under the
    equivalent path in the config tree, then the module authors must
    choose the appropriate mechanism to combine the config and state
    nodes in a backwards compatible way based on the data model design
    guidelines below.  This may require the state node to be added to
    the config tree with a modified name.  This scenario is expected
    to be relatively uncommon.
--- If no node with the same name and path already exists under the
+ - If no node with the same name and path already exists under the
    config tree then the state node schema is copied verbatim into the
    config tree.
--- As the state nodes are copied into the config trees, any
+ - As the state nodes are copied into the config trees, any
    leafrefs that reference other nodes in the state tree are adjusted
    to reference the equivalent path in the config tree.
--- All status "current" nodes under the existing "state" trees are
+ - All status "current" nodes under the existing "state" trees are
    marked as "status" deprecated.
 
 - Augmentations are similarly handled to data nodes as described
@@ -1034,9 +1034,9 @@ entail.
   the responses to <get> and <get-config> requests.  This is achieved
   in a similar way to with-defaults ^RFC6243^, by introducing a
   <with-metadata> XML element to <get> and <get-config> requests.
--- The capability would allow a device to indicate which types of
+ - The capability would allow a device to indicate which types of
    metadata are supported.
--- The XML element would specify which types of metadata are included
+ - The XML element would specify which types of metadata are included
    in the response.
 - The handling of defaults for the new configuration datastores is as
   described in with-defaults ^RFC6243^, but that does not apply for
@@ -1145,18 +1145,18 @@ that only follow the new datastore architecture.
 - NETCONF servers can support clients that are not aware of the
   revised datastore architecture, particularly if they continue to
   support the deprecated <get> operation:
--- For updated YANG modules they would see additional information
+ - For updated YANG modules they would see additional information
    returned via the <get> operation.
--- For new YANG modules, some of the state nodes may not be available,
+ - For new YANG modules, some of the state nodes may not be available,
    i.e. for any state nodes that exist under a config node that has
    not been configured (e.g., statistics under a system created
    interface).
 - NETCONF servers can also support clients that are aware of the
   revised datastores architecture:
--- For updated YANG modules they would see additional information
+ - For updated YANG modules they would see additional information
    returned under the legacy state trees.  This information can be
    excluded using appropriate subtree filters.
--- New YANG modules, conforming to the datastores architecture, would
+ - New YANG modules, conforming to the datastores architecture, would
    work exactly as expected.
 
 ** Implications on RESTCONF
