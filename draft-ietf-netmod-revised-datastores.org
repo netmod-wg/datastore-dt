@@ -87,7 +87,7 @@ This document defines the following terms:
   data.
 - origin: A metadata annotation indicating the origin of a data item.
 - remnant data: Configuration data that remains in the system for a
-  period of time after it has be removed from a new configuration
+  period of time after it has be removed from a configuration
   datastore.  The time period may be minimal, or may last until all
   resources used by the newly-deleted configuration data (e.g., network
   connections, memory allocations, file handles) have been
