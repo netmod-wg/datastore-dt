@@ -89,7 +89,7 @@ This document defines the following terms:
 - remnant data: Configuration data that remains in the system for a
   period of time after it has be removed from a new configuration
   datastore.  The time period may be minimal, or may last until all
-  resources used by the newly-deleted configuration data (e.g. network
+  resources used by the newly-deleted configuration data (e.g., network
   connections, memory allocations, file handles) have been
   deallocated.
 
@@ -239,7 +239,7 @@ model.
                    | (ct, rw)  |
                    +-----------+
                          |
-                         |        // e.g., removal of 'inactive'
+                         |        // e.g., removal of "inactive"
                          |        // nodes, expansion of templates
                          v
                    +------------+
@@ -247,7 +247,7 @@ model.
                    | (ct, ro)   |
                    +------------+
                          |
-                         |        // e.g. missing resources, delays
+                         |        // e.g., missing resources, delays
                          |
                          |   +------ auto-discovery
                          |   +------ dynamic configuration protocols
@@ -319,9 +319,9 @@ Changes to configuration data may take time to percolate through to
 the <operational> datastore.  During this period, the <operational>
 datastore will return data nodes for both the incoming and outgoing
 configuration, as closely as possible tracking the current operation
-of the device.  These "remnant" of the previous configuration persist
+of the device.  These "remnants" of the previous configuration persist
 while the system has released resources used by the newly-deleted
-configuration data (e.g. network connections, memory allocations, file
+configuration data (e.g., network connections, memory allocations, file
 handles).
 
 As a result of these remnants, the semantic constraints defined
@@ -465,14 +465,14 @@ The YANG module MUST import the "ietf-datastores" module, defined
 in this document.  This is necessary in order to access the base
 identities it defines.
 
-The YANG module MUST define an identity that uses the 'datastore'
+The YANG module MUST define an identity that uses the "datastore"
 identity as its base.  This identity is necessary so that the datastore
 can be referenced in protocol operations (e.g., <get-data>).
 
-The YANG module MUST define an identity that uses the 'dynamic'
+The YANG module MUST define an identity that uses the "dynamic"
 identity as its base.  This identity is necessary so that data
 originating from the datastore can be identified as such via
-the 'origin' metadata attribute define in ^yang-module^.
+the "origin" metadata attribute define in ^yang-module^.
 
 An example of these guidelines in use is provided in
 ^ephemeral-ds-example^.
@@ -863,11 +863,11 @@ changes:
   module conforms to the revised datastore architecture with a
   combined config and state tree, and that the existing state tree
   nodes are deprecated, to be obsoleted over time.
-- All status 'current' data nodes under the existing 'state' trees are
-  copied to the equivalent place under the 'config' tree:
+- All status "current" data nodes under the existing "state" trees are
+  copied to the equivalent place under the "config" tree:
 -- If a node with the same name and type already exists under the
-   equivalent path in the config tree then the nodes are merged and
-   the description updated.
+   equivalent path in the config tree then the nodes are merged
+   and the description updated.
 -- If a node with the same name but different type exists under the
    equivalent path in the config tree, then the module authors must
    choose the appropriate mechanism to combine the config and state
@@ -881,8 +881,9 @@ changes:
 -- As the state nodes are copied into the config trees, any
    leafrefs that reference other nodes in the state tree are adjusted
    to reference the equivalent path in the config tree.
--- All status 'current' nodes under the existing 'state' trees are
-   marked as 'status' deprecated.
+-- All status "current" nodes under the existing "state" trees are
+   marked as "status" deprecated.
+
 - Augmentations are similarly handled to data nodes as described
   above.
 
@@ -907,9 +908,8 @@ working group decides to take on the work.
 Note: This section describes the authors' thoughts on how YANG ^RFC7950^
 could be updated to support the datastore architecture described in this
 document.  It has been incorporated here as a temporary measure to
-facilitate easier review, but the expectation is that this work will be
-moved into another document as soon as the NETMOD WG decides to take on
-the work.
+facilitate easier review, but the expectation is that this work will
+be owned and standardized via the NETCONF working group.
 
 - Some clarifications may be needed if this datastore model is
   adopted.  YANG currently describes validation in terms of the
@@ -943,7 +943,13 @@ we propose that the "ietf-yang-module" (^RFC7895^) is revised, with
 the following addition to the "module" list in the "module-list"
 grouping:
 
- // TBD
+  leaf-list datastore {
+    type identityref {
+      base ds:datastore;
+    }
+    description
+      "The datastores in which this module is supported.";
+  }
 
 ** Implications to YANG Guidelines
 
@@ -970,7 +976,7 @@ nodes for the configured and state values.
 
 Sometimes configuration leafs support special values that instruct the
 system to automatically configure a value.  An example is an MTU that
-is configured to 'auto' to let the system determine a suitable MTU
+is configured to "auto" to let the system determine a suitable MTU
 value.  Another example is Ethernet auto-negotiation of link speed.  In
 such a situation, it is recommended to model this as two separate
 leafs, one config true leaf for the input to the auto-negotiation
@@ -1041,13 +1047,13 @@ entail.
 The normal semantics for the <operational> datastore are that
 all values that match the default specified in the schema are included
 in response to requests on the operational state datastore. This is
-equivalent to the 'report-all' mode of the with-defaults handling.
+equivalent to the "report-all" mode of the with-defaults handling.
 
-The 'metadata-filter' query parameter can be used to exclude nodes
-with origin metadata matching 'default', that would exclude nodes that
+The "metadata-filter" query parameter can be used to exclude nodes
+with origin metadata matching "default", that would exclude nodes that
 match the default value specified in the schema.
 
-If the server cannot return a value for any reason (e.g. the server
+If the server cannot return a value for any reason (e.g., the server
 cannot determine the value, or the value that would be returned is
 outside the allowed leaf value range) then the server can choose to
 not return any value for a particular leaf, which MUST be interpreted
@@ -1077,7 +1083,7 @@ version 1.1) has several benefits:
   capabilities that may not be implemented in a consistent fashion.
   In particular, clients will able to assume support for the
   <operational> datastore.
-- It can gracefully coexist with NETCONF v1.  A server could implement
+- It can gracefully coexist with NETCONF v1.1.  A server could implement
   both versions.  Existing YANG models exposing split config/state
   trees could be exposed via NETCONF v1.1, whereas combined
   config/state YANG models could be exposed via NETCONF v2, providing
@@ -1089,7 +1095,7 @@ The differences between NETCONF v2 and NETCONF v1.1 can be summarized
 as:
 
 - NETCONF v2 advertises a new base NETCONF capability
-  "urn:ietf:params:netconf:base:2.0".  A service may advertise older
+  "urn:ietf:params:netconf:base:2.0".  A server may advertise older
   NETCONF versions as well, to allow a client to choose which version
   to use.
 - NETCONF v2 removes support for the existing <get> operation, that is
@@ -1143,7 +1149,7 @@ that only follow the new datastore architecture.
    returned via the <get> operation.
 -- For new YANG modules, some of the state nodes may not be available,
    i.e. for any state nodes that exist under a config node that has
-   not been configured (e.g. statistics under a system created
+   not been configured (e.g., statistics under a system created
    interface).
 - NETCONF servers can also support clients that are aware of the
   revised datastores architecture:
@@ -1198,16 +1204,14 @@ changes that might entail.
   support on {+restconf}/datastore/<datastore-name>/data/ except for
   the following query parameters:
 
-- 'content' - is not supported on any of the new datastore paths.
-
-- 'metadata' - is a new optional query parameter that filters the
+- "metadata" - is a new optional query parameter that filters the
   returned data based on the metadata annotation.
 
-- 'with-metadata' - is a new optional query parameter that
+- "with-metadata" - is a new optional query parameter that
   indicating that the metadata annotations should be included in the
   reply.
 
-- 'with-defaults' is supported on all configuration datastores, but
+- "with-defaults" is supported on all configuration datastores, but
   is not supported on the operational state datastore path, because
   it has different default handling semantics.
 
@@ -1225,10 +1229,6 @@ OPTIONS, HEAD, GET, and POST to invoke an RFC operation.
 
 **** Query parameters
 
-The 'content' query parameter is not supported by any of the new
-datastores because its functionality has been obsoletely by the
-revised datastores architecture.
-
 ^RFC7952^ specifies how a YANG data tree can be annotated with generic
 metadata information, that is used by this document to annotate data
 nodes with origin information indicating the mechanism by which the
@@ -1240,7 +1240,7 @@ annotations associated with the data node.
 
 RESTCONF could also be extended with an optional generic mechanism to
 choose whether metadata annotations should be included in the
-response, potentially filtering to a subset of annotations.  E.g. only
+response, potentially filtering to a subset of annotations.  E.g., only
 include @origin metadata annotations, and not any others that may be
 in use.
 
@@ -1253,14 +1253,14 @@ filtering on, or annotating responses with, the origin meta data.
 The normal semantics for the <operational> datastore are that
 all values that match the default specified in the schema are included
 in response to requests on the operational state datastore. This is
-equivalent to the 'report-all' mode of the with-defaults handling.
+equivalent to the "report-all" mode of the with-defaults handling.
 
-The 'metadata' query parameter can be used to exclude nodes with a
-origin metadata matching 'default', that would exclude (only
+The "metadata" query parameter can be used to exclude nodes with a
+origin metadata matching "default", that would exclude (only
 config true?) nodes that match the default value specified in the
 schema.
 
-If the server cannot return a value for any reason (e.g. the server
+If the server cannot return a value for any reason (e.g., the server
 cannot determine the value, or the value that would be returned is
 outside the allowed leaf value range) then the server can choose to
 not return any value for a particular leaf, which MUST be interpreted
