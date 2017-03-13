@@ -263,6 +263,7 @@ model.
   ct = config true; cf = config false
   rw = read-write; ro = read-only
   boxes denote datastores
+
 #+END_EXAMPLE
 
 ** The <intended> Datastore
@@ -809,18 +810,6 @@ will appear as follows:
     </interface>
   </interfaces>
 
-* Open Issues @issues@
-
-We will place a list of open issues here.  
-
-- NETCONF needs to be able to filter data based on the origin
-metadata.  Possibly this could be done as part of the <get-data>
-operation.
-
-- We need a means of inheriting @origin values, so whole hierarchies
-can avoid the noise of repeating parent values.  Should "origin='system'"
-(or whatever we call it) be the default?
-
 * Ephemeral Dynamic Datastore Example @ephemeral-ds-example@
 
 The section defines documentation for an example dynamic
@@ -916,18 +905,6 @@ be owned and standardized via the NETCONF working group.
   adopted.  YANG currently describes validation in terms of the
   <running> configuration datastore while it really happens on the
   <intended> configuration datastore.
-- [DISCUSS: We need to discuss somewhere how remote procedure calls
-  and notifications/actions tie into datastores RFC 7950 shows as an
-  example a ping action tied to an interface. Does this refer to an
-  interface defined in a configuration datastore? Or an interface
-  defined in the operational state datastore? Or the applied
-  configuration datastore? Similarly, RFC 7950 shows an example of a
-  link-failure notification; this likely applies implicitly to the
-  operational state datastore. The netconf-config-change notification
-  does explicitly identify a datastore. I think we generally need to
-  have remote procedure calls and notifications be explicit about which
-  datastores they apply to and perhaps change the default xpath context
-  from running plus state to the operational state datastore.]
 
 ** Implications on YANG Library @yang-lib-impl@
 
@@ -1338,6 +1315,29 @@ support both RESTCONF v1 and the new RESTCONF version at the same time:
 Clients can then decide on which type of models to use by choosing
 whether to use the RESTCONF v1 root resource or the root resource
 associated with the new RESTCONF version.
+
+* Open Issues @issues@
+
++ NETCONF needs to be able to filter data based on the origin
+  metadata.  Possibly this could be done as part of the <get-data>
+  operation.
+
++ We need a means of inheriting @origin values, so whole hierarchies
+  can avoid the noise of repeating parent values.  Should "origin='system'"
+  (or whatever we call it) be the default?
+
++ We need to discuss somewhere how remote procedure calls
+  and notifications/actions tie into datastores. RFC 7950 shows as an
+  example a ping action tied to an interface.  Does this refer to an
+  interface defined in a configuration datastore? Or an interface
+  defined in the operational state datastore? Or the applied
+  configuration datastore? Similarly, RFC 7950 shows an example of a
+  link-failure notification; this likely applies implicitly to the
+  operational state datastore. The netconf-config-change notification
+  does explicitly identify a datastore. I think we generally need to
+  have remote procedure calls and notifications be explicit about which
+  datastores they apply to and perhaps change the default xpath context
+  from running plus state to the operational state datastore.
 
 
 
