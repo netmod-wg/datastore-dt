@@ -433,7 +433,7 @@ YANG statements in the available YANG modules.  However, it is
 possible to specify criteria YANG statements must satisfy in order to
 be present in a dynamic datastore.  For instance, maybe only
 config true nodes are present, or config false nodes that also have a
-specific YANG extension (e.g., ephemeral true) are present in the
+specific YANG extension (e.g., i2rs:ephemeral true) are present in the
 dynamic datastore.
 
 ** Define how dynamic data is actualized

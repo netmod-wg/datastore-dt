@@ -20,4 +20,16 @@ module example-ds-ephemeral {
     description
       "Denotes data from the ephemeral dynamic datastore.";
   }
+
+  // define ephemeral extension
+  extension ephemeral {
+    description
+      "This extension is mixed into config false YANG nodes to indicate
+       that they are configurable nodes in the 'ephemeral' datastore.
+       This statement takes a single argument representing a boolean
+       having the values 'true' and 'false'.  The default value is
+       'false'.";
+    argument "value";
+  }
+
 }
