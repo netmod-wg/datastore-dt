@@ -386,12 +386,13 @@ These identities can be further refined, e.g., there might be an
 identity "dhcp" derived from "dynamic".
 
 The "static" origin represents data provided by the <intended>
-datastore.  The "dynamic" origin represents data provided by a dynamic
-datastore.  The "default" origin represents data values specified in
-the data model, using either the "default" statement or the
-"description" statement.  Finally, the "system" origin represents data
-learned from the normal operational of the system, including
-control-plane protocols.
+datastore.  The "dynamic" origin represents data provided by a
+dynamic datastore.  The "default" origin represents data values
+specified in the data model, using either simple values in the
+"default" statement or any values described in the "description"
+statement.  Finally, the "system" origin represents data learned
+from the normal operational of the system, including control-plane
+protocols.
 
 * Guidelines for Defining Dynamic Datastores @guidelines@
 
@@ -687,9 +688,6 @@ since the system may not yet have their values.
     </peer>
   </bgp>
 
-? Need means of inheriting @origin values, so whole hierarchies can
-avoid the noise.
-
 *** Removing a Peer
 
 Changes to configuration data may take time to percolate through the
@@ -819,6 +817,9 @@ We will place a list of open issues here.
 metadata.  Possibly this could be done as part of the <get-data>
 operation.
 
+- We need a means of inheriting @origin values, so whole hierarchies
+can avoid the noise of repeating parent values.  Should "origin='system'"
+(or whatever we call it) be the default?
 
 * Ephemeral Dynamic Datastore Example @ephemeral-ds-example@
 
