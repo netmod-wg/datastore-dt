@@ -1,7 +1,11 @@
-module ietf-datastores {
+module ietf-origin {
   yang-version 1.1;
-  namespace "urn:ietf:params:xml:ns:yang:ietf-datastores";
-  prefix ds;
+  namespace "urn:ietf:params:xml:ns:yang:ietf-origin";
+  prefix or;
+
+  import ietf-yang-metadata {
+    prefix md;
+  }
 
   organization
     "IETF NETMOD (NETCONF Data Modeling Language) Working Group";
@@ -27,9 +31,11 @@ module ietf-datastores {
                <rwilton@cisco.com>";
 
   description
-    "This YANG module defines a set of identities for datastores.
-     These identities can be used to identify datastores in protocol
-     operations.
+    "This YANG module defines  an 'origin' metadata annotation,
+     and a set of identities for the origin value.  The 'origin'
+     metadata annotation is used to mark data in the operational
+     state datastores with information on where the data 
+     originated.
 
      Copyright (c) 2017 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
@@ -53,52 +59,51 @@ module ietf-datastores {
   }
 
   /*
-   * Datastore Identities
+   * Origin Identities
    */
 
-  identity datastore {
+  identity origin {
     description
-     "Abstract base identity for datastore identities.";
+      "Abstract base identity for the origin annotation.";
   }
 
   identity static {
+    base origin;
     description
-     "Abstract base identity for static configuration datastores.";
+      "Denotes data from static configuration (e.g., <intended>).";
   }
 
   identity dynamic {
+    base origin;
     description
-     "Abstract base identity for dynamic configuration datastores.";
+      "Denotes data from dynamic configuration protocols
+       or dynamic datastores (e.g., DHCP).";
   }
 
-  identity running {
-    base static;
+  identity system {
+    base origin;
     description
-     "The 'running' datastore.";
+      "Denotes data created by the system independently of what
+       has been configured.";
   }
 
-  identity candidate {
-    base static;
+  identity default {
+    base origin;
     description
-     "The 'candidate' datastore.";
+      "Denotes data that does not have an explicitly configured
+       value, but has a default value in use.  Covers both simple
+       defaults and defaults defined via an explanation in a
+       description statement.";
   }
 
-  identity startup {
-    base static;
-    description
-     "The 'startup' datastore.";
-  }
+  /*
+   * Metadata annotations
+   */
 
-  identity intended {
-    base static;
-    description
-     "The 'intended' datastore.";
-  }
-
-  identity operational {
-    base datastore;
-    description
-     "The 'operational' state datastore.";
+  md:annotation origin {
+    type identityref {
+      base origin;
+    }
   }
 
 }

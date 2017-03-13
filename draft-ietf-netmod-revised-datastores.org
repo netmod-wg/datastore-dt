@@ -479,9 +479,11 @@ the "origin" metadata attribute define in ^yang-module^.
 An example of these guidelines in use is provided in
 ^ephemeral-ds-example^.
 
-* YANG Module @yang-module@
+* YANG Modules @yang-module@
 
-!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-03-12.yang"
+!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-03-13.yang"
+
+!! include-figure ietf-origin.yang extract-to="ietf-datastores@2017-03-13.yang"
 
 * IANA Considerations @iana-con@
 
@@ -677,15 +679,15 @@ regardless of the origin.  If the system has chosen the values, the
 connection is established, one or both of the nodes may not appear,
 since the system may not yet have their values.
 
-  <bgp origin="ds:static" xmlns="urn:example:bgp">
-    <local-as origin="ds:static">64642</local-as>
-    <peer-as origin="ds:static">65000</peer-as>
-    <peer origin="ds:static">
-      <name origin="ds:static">10.1.2.3</name>
-      <local-as origin="ds:default">64642</local-as>
-      <peer-as origin="ds:default">65000</peer-as>
-      <local-port origin="ds:system">60794</local-port>
-      <remote-port origin="ds:default">179</remote-port>
+  <bgp origin="or:static" xmlns="urn:example:bgp">
+    <local-as origin="or:static">64642</local-as>
+    <peer-as origin="or:static">65000</peer-as>
+    <peer origin="or:static">
+      <name origin="or:static">10.1.2.3</name>
+      <local-as origin="or:default">64642</local-as>
+      <peer-as origin="or:default">65000</peer-as>
+      <local-port origin="or:system">60794</local-port>
+      <remote-port origin="or:default">179</remote-port>
     </peer>
   </bgp>
 
@@ -706,15 +708,15 @@ current data values will continue to be visible in the <operational>
 datastore, with the "origin" attribute set to indicate the
 origin of the original data.
 
-  <bgp origin="ds:static">
-    <local-as origin="ds:static">64642</local-as>
-    <peer-as origin="ds:static">65000</peer-as>
-    <peer origin="ds:static">
-      <name origin="ds:static">10.1.2.3</name>
-      <local-as origin="ds:default">64642</local-as>
-      <peer-as origin="ds:default">65000</peer-as>
-      <local-port origin="ds:static">60794</local-port>
-      <remote-port origin="ds:static">179</remote-port>
+  <bgp origin="or:static">
+    <local-as origin="or:static">64642</local-as>
+    <peer-as origin="or:static">65000</peer-as>
+    <peer origin="or:static">
+      <name origin="or:static">10.1.2.3</name>
+      <local-as origin="or:default">64642</local-as>
+      <peer-as origin="or:default">65000</peer-as>
+      <local-port origin="or:static">60794</local-port>
+      <remote-port origin="or:static">179</remote-port>
     </peer>
   </bgp>
 
@@ -770,11 +772,11 @@ detect it and process the associated configuration.  The <operational>
 will contain the data from <intended>, as well as the "config false"
 nodes, such as the current value of the interface's MTU.
 
-  <interfaces origin="ds:static">
-    <interface origin="ds:static">
-      <name origin="ds:static">et-0/0/0</name>
-      <description origin="ds:static">Test interface</description>
-      <mtu origin="ds:system">1500</mtu>
+  <interfaces origin="or:static">
+    <interface origin="or:static">
+      <name origin="or:static">et-0/0/0</name>
+      <description origin="or:static">Test interface</description>
+      <mtu origin="or:system">1500</mtu>
     </interface>
   </interfaces>
 
@@ -790,10 +792,10 @@ configuration for this interface if the is no data for it in <intended>.
 When no configuration for "lo0" appears in <intended>, then
 <operational> will show the system-provided data:
 
-  <interfaces origin="ds:static">
-    <interface origin="ds:system">
-      <name origin="ds:system">lo0</name>
-      <ipv4-address origin="ds:system">127.0.0.1</ipv4-address>
+  <interfaces origin="or:static">
+    <interface origin="or:system">
+      <name origin="or:system">lo0</name>
+      <ipv4-address origin="or:system">127.0.0.1</ipv4-address>
     </interface>
   </interfaces>
 
@@ -802,11 +804,11 @@ When configuration for "lo0" does appear in <intended>, then
 If the "ipv4-address" is not provided, then the system-provided value
 will appear as follows:
 
-  <interfaces origin="ds:static">
-    <interface origin="ds:static">
-      <name origin="ds:static">lo0</name>
-      <description origin="ds:static">loopback</description>
-      <ipv4-address origin="ds:system">127.0.0.1</ipv4-address>
+  <interfaces origin="or:static">
+    <interface origin="or:static">
+      <name origin="or:static">lo0</name>
+      <description origin="or:static">loopback</description>
+      <ipv4-address origin="or:system">127.0.0.1</ipv4-address>
     </interface>
   </interfaces>
 
