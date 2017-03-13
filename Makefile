@@ -69,7 +69,7 @@ validate-std-yang:
 	pyang --ietf $(std-yang)
 
 validate-ex-yang:
-	pyang --canonical $(ex-yang)
+	pyang --canonical --max-line-length 69 $(ex-yang)
 
 validate-ex-xml: ietf-datastores.yang example-system.yang \
 	example-system.oper.yang
