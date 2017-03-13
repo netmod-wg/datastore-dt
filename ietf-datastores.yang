@@ -53,7 +53,7 @@ module ietf-datastores {
   }
 
   /*
-   * Datastore Identities
+   * Identities
    */
 
   identity datastore {

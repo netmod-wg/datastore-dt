@@ -71,10 +71,9 @@ validate-std-yang:
 validate-ex-yang:
 	pyang --canonical --max-line-length 69 $(ex-yang)
 
-validate-ex-xml: ietf-datastores.yang example-system.yang \
+validate-ex-xml: ietf-origin.yang example-system.yang \
 	example-system.oper.yang
 	yang2dsdl -j -t data -v ex-intended.xml $< example-system.yang
-	yang2dsdl -j -t data -v ex-applied.xml $< example-system.yang
 	yang2dsdl -j -t data -v ex-oper.xml $< example-system.oper.yang
 
 back.xml: back.xml.src

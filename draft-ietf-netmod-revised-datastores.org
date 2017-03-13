@@ -126,7 +126,7 @@ but note that NETCONF was defined before YANG did exist):
   datastore is realized as an instantiated data tree with
   configuration data.
 
-RFC 6244 defined operational state data as follows:
+^RFC6244^ defined operational state data as follows:
 
 - Operational state data is a set of data that has been obtained by
   the system at runtime and influences the system's behavior similar
@@ -134,7 +134,7 @@ RFC 6244 defined operational state data as follows:
   operational state is transient and modified by interactions with
   internal components or other systems via specialized protocols.
 
-Section 4.3.3 of RFC 6244 discusses operational state and among other
+Section 4.3.3 of ^RFC6244^ discusses operational state and among other
 things mentions the option to consider operational state as being
 stored in another datastore.  Section 4.4 of this document then
 concludes that at the time of the writing, modeling state as a
@@ -318,23 +318,23 @@ the <operational> datastore also contains state data.
 
 Changes to configuration data may take time to percolate through to
 the <operational> datastore.  During this period, the <operational>
-datastore will return data nodes for both the incoming and outgoing
+datastore will return data nodes for both the previous and current
 configuration, as closely as possible tracking the current operation
 of the device.  These "remnants" of the previous configuration persist
 while the system has released resources used by the newly-deleted
 configuration data (e.g., network connections, memory allocations, file
 handles).
 
-As a result of these remnants, the semantic constraints defined
-in the data model cannot be relied upon for the <operational>
-datastore, since the system may have remnants whose constraints were
-valid with the previous configuration and that are not valid with the
-current configuration.  Since constraints on "config false" nodes may
-refer to "config true" nodes, remnants may force the violation of
-those constraints.  The constraints that may not hold include "when",
-"must", and "max-elements".  Note that syntactic constraints cannot be
-violated, including hierarchical organization, identifiers, and
-type-based constraints.  See also ^issues^.
+As a result of these remnants, the semantic constraints defined in the
+data model cannot be relied upon for the <operational> datastore,
+since the system may have remnants whose constraints were valid with
+the previous configuration and that are not valid with the current
+configuration.  Since constraints on "config false" nodes may refer to
+"config true" nodes, remnants may force the violation of those
+constraints.  The constraints that may not hold include "when",
+"must", "min-elements", and "max-elements".  Note that syntactic
+constraints cannot be violated, including hierarchical organization,
+identifiers, and type-based constraints.
 
 *** Missing Resources
 
@@ -358,17 +358,13 @@ in <operational>.
 
 *** System-controlled Resources
 
-Sometimes resources are controlled by the device and such system
-controlled resources appear in (and disappear from) <operational>
+Sometimes resources are controlled by the device and the corresponding
+system controlled data appear in (and disappear from) <operational>
 dynamically.  If a system controlled resource has matching
-configuration in <intended> when it appears, the system will
-try to apply the configuration, which causes the configuration to
-appear in <operational> eventually (if application of the
-configuration was successful).
-
-? I can't really follow this section; not sure if it's really talking
-about missing resources or system-controlled data.  Seems to be both,
-sort of.
+configuration in <intended> when it appears, the system will try to
+apply the configuration, which causes the configuration to appear in
+<operational> eventually (if application of the configuration was
+successful).
 
 *** Origin Metadata Annotation
 
@@ -463,18 +459,18 @@ Each dynamic datastore MUST be defined by a YANG module.
 This module is used by servers to indicate (e.g., via YANG Library)
 their support for the dynamic datastore.
 
-The YANG module MUST import the "ietf-datastores" module, defined
-in this document.  This is necessary in order to access the base
-identities it defines.
+The YANG module MUST import the "ietf-datastores" and "ietf-origin"
+modules, defined in this document.  This is necessary in order to
+access the base identities they define.
 
-The YANG module MUST define an identity that uses the "datastore"
+The YANG module MUST define an identity that uses the "ds:datastore"
 identity as its base.  This identity is necessary so that the datastore
 can be referenced in protocol operations (e.g., <get-data>).
 
-The YANG module MUST define an identity that uses the "dynamic"
+The YANG module MUST define an identity that uses the "or:dynamic"
 identity as its base.  This identity is necessary so that data
 originating from the datastore can be identified as such via
-the "origin" metadata attribute define in ^yang-module^.
+the "origin" metadata attribute defined in ^yang-module^.
 
 An example of these guidelines in use is provided in
 ^ephemeral-ds-example^.
@@ -489,22 +485,31 @@ An example of these guidelines in use is provided in
 
 ** Updates to the IETF XML Registry
 
-This document registers one URI in the IETF XML registry ^RFC3688^.  Following
-the format in ^RFC3688^, the following registration is requested:
+This document registers two URIs in the IETF XML registry ^RFC3688^.  Following
+the format in ^RFC3688^, the following registrations are requested:
 
    URI: urn:ietf:params:xml:ns:yang:ietf-datastores
-   Registrant Contact: The NETMOD WG of the IETF.
+   Registrant Contact: The IESG.
+   XML: N/A, the requested URI is an XML namespace.
+
+   URI: urn:ietf:params:xml:ns:yang:ietf-origin
+   Registrant Contact: The IESG.
    XML: N/A, the requested URI is an XML namespace.
 
 ** Updates to the YANG Module Names Registry
 
-This document registers one YANG module in the YANG Module Names registry
-^RFC6020^.  Following the format in ^RFC6020^, the the following registration
-is requested:
+This document registers two YANG modules in the YANG Module Names registry
+^RFC6020^.  Following the format in ^RFC6020^, the the following registrations
+are requested:
 
    name:         ietf-datastores
    namespace:    urn:ietf:params:xml:ns:yang:ietf-datastores
    prefix:       ds
+   reference:    RFC XXXX
+
+   name:         ietf-origin
+   namespace:    urn:ietf:params:xml:ns:yang:ietf-origin
+   prefix:       or
    reference:    RFC XXXX
 
 * Security Considerations @sec-con@
@@ -697,7 +702,7 @@ Changes to configuration data may take time to percolate through the
 various software components involved.  During this period, it is
 imperative to continue to give an accurate view of the working of the
 device.  The <operational> datastore will return data nodes for both
-the incoming and outgoing configuration, as closely as possible
+the previous and current configuration, as closely as possible
 tracking the current operation of the device.
 
 Consider the scenario where a client removes a BGP peer.  When a peer
@@ -929,7 +934,18 @@ grouping:
     }
     description
       "The datastores in which this module is supported.";
+
   }
+
+## Not used for now, seems a bit complicated...
+# "When an identity representing a datastore is present in this
+#  leaf-list, it means that the server supports the module in all
+#  server-supported datastores derived from that identity.
+#
+#  For example, if the server supports the datastores 'candidate',
+#  'running', and 'intended', and this leaf-list contains the
+#  identity 'or:static', it means that the module is supported
+#  in 'candidate', 'running', and 'intended'.";
 
 ** Implications to YANG Guidelines
 

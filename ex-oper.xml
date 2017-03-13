@@ -1,14 +1,14 @@
 <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
 <system
     xmlns="urn:example:system"
-    xmlns:ds="urn:ietf:params:xml:ns:yang:ietf-datastores">
+    xmlns:or="urn:ietf:params:xml:ns:yang:ietf-origin">
 
-  <hostname ds:origin="ds:dynamic">bar</hostname>
+  <hostname or:origin="or:dynamic">bar</hostname>
 
-  <interface ds:origin="ds:static">
+  <interface or:origin="or:static">
     <name>eth0</name>
     <auto-negotiation>
-      <enabled ds:origin="ds:default">true</enabled>
+      <enabled or:origin="or:default">true</enabled>
       <speed>1000</speed>
     </auto-negotiation>
     <speed>100</speed>
@@ -16,13 +16,13 @@
       <ip>2001:db8::10</ip>
       <prefix-length>32</prefix-length>
     </address>
-    <address ds:origin="ds:dynamic">
+    <address or:origin="or:dynamic">
       <ip>2001:db8::1:100</ip>
       <prefix-length>32</prefix-length>
     </address>
   </interface>
 
-  <interface ds:origin="ds:system">
+  <interface or:origin="or:system">
     <name>lo0</name>
     <address>
       <ip>::1</ip>
