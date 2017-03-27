@@ -785,7 +785,7 @@ If the FRU is removed, the interface data is removed from the
 
 Imagine if the system provides a loopback interface (named "lo0") with
 a default ipv4-address of "127.0.0.1".  The system will only provide
-configuration for this interface if the is no data for it in <intended>.
+configuration for this interface if there is no data for it in <intended>.
 
 When no configuration for "lo0" appears in <intended>, then
 <operational> will show the system-provided data:
