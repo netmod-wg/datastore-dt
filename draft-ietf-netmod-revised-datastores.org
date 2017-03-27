@@ -391,18 +391,18 @@ statement.  Finally, the "system" origin represents data learned
 from the normal operational of the system, including control-plane
 protocols.
 
-* Guidelines for Defining Dynamic Datastores @guidelines@
+* Guidelines for Defining Datastores @guidelines@
 
-The definition of a dynamic datastore SHOULD be provided in a
-document (e.g., an RFC) purposed to the definition of the dynamic
-datastore.  When it makes sense, more than one dynamic datastore
-MAY be defined in the same document (e.g., when the datastores are
-logically connected).  Each dynamic datastore's definition
-SHOULD address the points specified in the sections below.
+The definition of a new datastore in this architecture SHOULD be
+provided in a document (e.g., an RFC) purposed to the definition of
+the datastore.  When it makes sense, more than one datastore MAY be
+defined in the same document (e.g., when the datastores are logically
+connected).  Each datastore's definition SHOULD address the points
+specified in the sections below.
 
-** Define a name for the dynamic datastore @def-name@
+** Define a name for the datastore @def-name@
 
-Each dynamic datastores MUST have a name using the character set
+Each datastore MUST have a name using the character set
 described by Section 6.2 of ^RFC7950^.  The name SHOULD be consistent
 in style and length to other datastore names described in this
 document.
@@ -418,59 +418,62 @@ datastores.
 
 Not all YANG modules may be used in all datastores.  Some datastores may
 constrain which data models can be used in them.  If it is desirable that
-a subset of all modules can be targeted to the dynamic datastore,
-then the documentation defining the dynamic datastore MUST use the
+a subset of all modules can be targeted to the datastore,
+then the documentation defining the datastore MUST use the
 mechanisms described in ^yang-lib-impl^ to provide the necessary hooks for
 module-designers to indicate that their module is to be accessible in the
-dynamic datastore.
+datastore.
 
 ** Define which subset of YANG-modeled data applies
 
-By default, the data in a dynamic datastore is modeled by all
+By default, the data in a datastore is modeled by all
 YANG statements in the available YANG modules.  However, it is
 possible to specify criteria YANG statements must satisfy in order to
-be present in a dynamic datastore.  For instance, maybe only
+be present in a datastore.  For instance, maybe only
 config true nodes are present, or config false nodes that also have a
 specific YANG extension (e.g., i2rs:ephemeral true) are present in the
-dynamic datastore.
+datastore.
 
-** Define how dynamic data is actualized
+** Define how data is actualized
 
-The diagram in ^datastore-model^ depicts dynamic datastores
-feeding into the <operational> datastore.  How this interaction
-occurs must be defined by the dynamic datastore.  In some
-cases, it may occur implicitly, as soon as the data is put into
-the dynamic datastore while, in other cases, an explicit
-action (e.g., an RPC) may be required to trigger the application
-of the dynamic datastore's data.
+The new datastore must specify how it interacts with other datastores.
+For example, the diagram in ^datastore-model^ depicts dynamic
+datastores feeding into the <operational> datastore.  How this
+interaction occurs must be defined by any dynamic datastore.  In some
+cases, it may occur implicitly, as soon as the data is put into the
+dynamic datastore while, in other cases, an explicit action (e.g., an
+RPC) may be required to trigger the application of the dynamic
+datastore's data.
 
 ** Define which protocols can be used
 
 By default, it is assumed that both the NETCONF and RESTCONF
-protocols can be used to interact with a dynamic datastore.
+protocols can be used to interact with a datastore.
 However, it may be that only a specific protocol can be used
 (e.g., Forces) or that a subset of all protocol operations or
 capabilities are available (e.g., no locking, no xpath-based
 filtering, etc.).
 
-** Define a module for the dynamic datastore @def-module@
+** Define a module for the datastore @def-module@
 
-Each dynamic datastore MUST be defined by a YANG module.
+Each datastore MUST be defined by a YANG module.
 This module is used by servers to indicate (e.g., via YANG Library)
-their support for the dynamic datastore.
+their support for the datastore.
 
 The YANG module MUST import the "ietf-datastores" and "ietf-origin"
 modules, defined in this document.  This is necessary in order to
 access the base identities they define.
 
 The YANG module MUST define an identity that uses the "ds:datastore"
-identity as its base.  This identity is necessary so that the datastore
-can be referenced in protocol operations (e.g., <get-data>).
+identity or one of its derived identites as its base.  This identity
+is necessary so that the datastore can be referenced in protocol
+operations (e.g., <get-data>).
 
-The YANG module MUST define an identity that uses the "or:dynamic"
-identity as its base.  This identity is necessary so that data
-originating from the datastore can be identified as such via
-the "origin" metadata attribute defined in ^yang-module^.
+The YANG module MAY define an identity that uses the "or:origin"
+identity or one its derived identities as its base.  This identity is
+needed if the datastore interacts with <operational> so that data
+originating from the datastore can be identified as such via the
+"origin" metadata attribute defined in ^yang-module^.
 
 An example of these guidelines in use is provided in
 ^ephemeral-ds-example^.
@@ -906,7 +909,7 @@ Note: This section describes the authors' thoughts on how YANG ^RFC7950^
 could be updated to support the datastore architecture described in this
 document.  It has been incorporated here as a temporary measure to
 facilitate easier review, but the expectation is that this work will
-be owned and standardized via the NETCONF working group.
+be owned and standardized via the NETMOD working group.
 
 - Some clarifications may be needed if this datastore model is
   adopted.  YANG currently describes validation in terms of the
