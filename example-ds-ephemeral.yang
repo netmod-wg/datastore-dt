@@ -6,6 +6,9 @@ module example-ds-ephemeral {
   import ietf-datastores {
     prefix ds;
   }
+  import ietf-origin {
+    prefix or;
+  }
 
   // add datastore identity
   identity ds-ephemeral {
@@ -16,7 +19,7 @@ module example-ds-ephemeral {
 
   // add origin identity
   identity or-ephemeral {
-    base ds:dynamic;
+    base or:dynamic;
     description
       "Denotes data from the ephemeral dynamic datastore.";
   }
