@@ -958,7 +958,7 @@ for Authors and Reviewers of YANG Data Model Documents
 architecture described in this document.  It has been incorporated
 here as a temporary measure to facilitate easier review, but the
 expectation is that this work will be owned and standardized via the
-NETCONF working group.
+NETMOD working group.
 
 It is important to design data models with clear semantics that work
 equally well for instantiation in a configuration datastore and
