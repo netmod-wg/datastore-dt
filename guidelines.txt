@@ -1,0 +1,71 @@
+#
+# Phil Shafer, March 2017
+#
+
+* Advice to Modelers
+
+The "Revised Datastore" ^I-D.netmod-revised-datastore^ draft adds the
+ability to inspect the current operational values for configuration,
+allowing clients to use identical paths for retrieving the configured
+values and the operational values.  This change will simplify models,
+but will create a period of churn as the draft proceeds to a standard
+and becomes widely implemented.  During that interim, the following
+guidelines should help modelers find an optimal path forward:
+
+(a) For new models or models with a sufficiently long development time
+line, the model should target the "revised datastore" world, with the
+expectation that their models will be used by datastore-capable
+implementations and their operational values will be available via
+the <operational> datastore.
+
+(b) For models that have no serious dependency on the operational
+values, the model should also target the "revised datastore" world,
+since the impact would be minimal.  When datastore-capable
+implementations arrived, their operational values will be available.
+
+(c) For models that need visibility into the operational values and
+are not able to delay for the revised datastore implementations, a
+"state" container should be created that will hold duplicate "config
+false" leafs to hold the operational state of "config true" nodes.
+These "state" containers can be marked as deprecated, since the
+<operational> datastore will provide those values.
+
+(d) For models that currently use distinct "config" and "state"
+containers to segregate operational values, the models should be
+changed where possible to prepare for the revised datastore world.
+This means the "config" container contents should be moved to the
+parent node and the "config" container removed.  Any nodes under the
+"state" node for which there is no configuration should similarly be
+moved to the parent node.  This gives a structure aligned to the
+future, while allowing the operational values to be visible under
+current implementations.  These "state" container can be marked as
+deprecated, since the revised datastores will provide those values.
+
+(e) For current models that are using the top-level state container
+(aka "/foo-state"), the modeler has a difficult decision, since the
+current structure is not well-aligned to the future.  Whenever
+possible, the model should be restructured, moving nodes from the
+"/foo-state" under an appropriate location within the "/foo" hierarchy.
+
+- For state nodes which have no corresponding "config true" node,
+move the nodes to the corresponding node within the primary tree.
+- For state nodes which have a corresponding "config true" node,
+move the nodes under a "state" container that is peer to the "config
+true" node.
+
+(f) There are models for which the revised datastore structure makes
+little sense, e.g. because the operational data is organized in a
+completely different structure than the configuration data.  [Need
+example.]  For such models, retaining a distinct "/foo-state"
+hierarchy may continue to make sense.
+
+(g) For models that augment other models, the modeler will have to consider
+the structure of the base model and the guidelines listed above.  In
+general, augmenting "state" containers should be avoided, with the
+expectation that the base model will be re-released with any state
+containers marked as deprecated.
+
+It is critical to consider these as guidelines, understanding that our
+goal is to make models that will see continued use in the long term.
+We will need to balance short term needs against a desire for consistent
+and usable models in the future.
