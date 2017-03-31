@@ -34,12 +34,14 @@ This document defines the following terms:
 - configuration data: Data that determines how a device behaves.
   This data is modeled in YANG using "config true" nodes.
   Configuration data can originate from different sources.
+- dynamic data: Data that is obtained
+  dynamically during the operation of a device through interaction
+  with other systems and is not persistent.
 - static configuration data: Configuration data that is eventually
   persistent and used to get a device from its initial default state
   into its desired operational state.
-- dynamic configuration data: Configuration data that is obtained
-  dynamically during the operation of a device through interaction
-  with other systems and not persistent.
+- dynamic configuration data: Dynamic data that is also configuration
+  data.
 - system configuration data: Configuration data that is supplied by
   the device itself.
 - default configuration data: Configuration data that is not
@@ -61,7 +63,7 @@ This document defines the following terms:
   data that is required to get a device from its initial default state
   into a desired operational state.  A configuration datastore maps to
   an instantiated YANG data tree consisting of configuration data
-  nodes and interior data nodes.
+  nodes.
 - running configuration datastore: A configuration datastore holding
   the complete static configuration currently active on the device.
   The running configuration datastore always exists. It may include
@@ -80,8 +82,7 @@ This document defines the following terms:
   the configuration loaded by the device into the running
   configuration datastore when it boots. A startup datastore may not
   be supported by all protocols or implementations.
-- dynamic datastore: A datastore holding dynamic configuration
-  data.
+- dynamic datastore: A datastore holding dynamic data.
 - operational state datastore: A datastore holding the currently
   active applied configuration data as well as the device's state
   data.
@@ -105,7 +106,7 @@ used and thus defined here as well:
 - remote procedure call: An operation that can be invoked by a client
   on a server.
 
-* Introduction
+* Background
 
 NETCONF ^RFC6241^ provides the following definitions:
 
@@ -266,16 +267,37 @@ model.
 
 #+END_EXAMPLE
 
+** The <startup> Datastore
+
+The <startup> datastore is an optional configuration datastore holding the
+configuration loaded by the device when it boots.  <startup> is only
+present on devices that separate the startup configuration
+from the running configuration datastore.
+
+** The <candidate> Datastore
+
+The <candidate> datastore is an optional configuration datastore that
+can be manipulated without impacting the device's current
+configuration and that can be committed to the <running> configuration
+datastore.
+
+** The <running> Datastore
+
+The <running> configuration datastore holds the complete static
+configuration currently active on the device.  The running
+configuration datastore always exists. It may include inactive
+configuration or template-mechanism-oriented configuration that
+require further expansion.
+
 ** The <intended> Datastore
 
-The <intended> datastore is a read-only datastore that consists of
-config true nodes.  It is tightly coupled to <running>.  When data is
-written to <running>, the data that is to be validated is also
-conceptually written to <intended>.  Validation is performed on the
-contents of <intended>.
+The <intended> datastore is a read-only configuration datastore.  It
+is tightly coupled to <running>.  When data is written to <running>,
+the data that is to be validated is also conceptually written to
+<intended>.  Validation is performed on the contents of <intended>.
 
-On a traditional NETCONF implementation, <running> and <intended> are
-always the same.
+In simple implementations, <running> and <intended> are always the
+same.
 
 Currently there are no standard mechanisms defined that affect
 <intended> so that it would have different contents than <running>,
@@ -310,18 +332,18 @@ reason for incorporating config true nodes here is to be able to
 expose all operational settings without having to replicate
 definitions in the data models.
 
-The <operational> datastore contains all configuration data actually
-used by the system, including all applied configuration, system-provided
-configuration and values defined by any supported
-data models.  In addition,
-the <operational> datastore also contains state data.
+The <operational> datastore contains state data and all configuration
+data actually used by the system.  This includes all applied data from
+<intended>, system-provided configuration, and default values defined
+by any supported data models.  In addition, the <operational>
+datastore also contains data from dynamic datastores.
 
 Changes to configuration data may take time to percolate through to
 the <operational> datastore.  During this period, the <operational>
 datastore will return data nodes for both the previous and current
 configuration, as closely as possible tracking the current operation
 of the device.  These "remnants" of the previous configuration persist
-while the system has released resources used by the newly-deleted
+until the system has released resources used by the newly-deleted
 configuration data (e.g., network connections, memory allocations, file
 handles).
 
@@ -373,23 +395,19 @@ marked with a metadata annotation (^RFC7952^) that indicates its
 origin.  The "origin" metadata annotation is defined in ^yang-module^.
 The values are YANG identities.  The following identities are defined:
 
-  +-- origin
-      +-- static
-      +-- dynamic
-      +-- default
-      +-- system
+- origin: abstract base identity from which the other identites are
+  derived.
+- intended: represents data provided by the <intended> datastore.
+- dynamic: represents data provided by a dynamic datastore or a
+  dynamic configuration protocol.
+- default: represents data values specified in the data model, using
+  either simple values in the "default" statement or any values
+  described in the "description" statement.
+- system: represents data learned from the normal operations of the
+  system, including control-plane protocols.
 
 These identities can be further refined, e.g., there might be an
 identity "dhcp" derived from "dynamic".
-
-The "static" origin represents data provided by the <intended>
-datastore.  The "dynamic" origin represents data provided by a
-dynamic datastore.  The "default" origin represents data values
-specified in the data model, using either simple values in the
-"default" statement or any values described in the "description"
-statement.  Finally, the "system" origin represents data learned
-from the normal operational of the system, including control-plane
-protocols.
 
 * Guidelines for Defining Datastores @guidelines@
 
@@ -687,11 +705,11 @@ regardless of the origin.  If the system has chosen the values, the
 connection is established, one or both of the nodes may not appear,
 since the system may not yet have their values.
 
-  <bgp origin="or:static" xmlns="urn:example:bgp">
-    <local-as origin="or:static">64642</local-as>
-    <peer-as origin="or:static">65000</peer-as>
-    <peer origin="or:static">
-      <name origin="or:static">10.1.2.3</name>
+  <bgp origin="or:intended" xmlns="urn:example:bgp">
+    <local-as>64642</local-as>
+    <peer-as>65000</peer-as>
+    <peer>
+      <name>10.1.2.3</name>
       <local-as origin="or:default">64642</local-as>
       <peer-as origin="or:default">65000</peer-as>
       <local-port origin="or:system">60794</local-port>
@@ -716,15 +734,15 @@ current data values will continue to be visible in the <operational>
 datastore, with the "origin" attribute set to indicate the
 origin of the original data.
 
-  <bgp origin="or:static">
-    <local-as origin="or:static">64642</local-as>
-    <peer-as origin="or:static">65000</peer-as>
-    <peer origin="or:static">
-      <name origin="or:static">10.1.2.3</name>
+  <bgp origin="or:intended">
+    <local-as>64642</local-as>
+    <peer-as>65000</peer-as>
+    <peer>
+      <name>10.1.2.3</name>
       <local-as origin="or:default">64642</local-as>
       <peer-as origin="or:default">65000</peer-as>
-      <local-port origin="or:static">60794</local-port>
-      <remote-port origin="or:static">179</remote-port>
+      <local-port>60794</local-port>
+      <remote-port>179</remote-port>
     </peer>
   </bgp>
 
@@ -781,9 +799,9 @@ will contain the data from <intended>, as well as the "config false"
 nodes, such as the current value of the interface's MTU.
 
   <interfaces origin="or:static">
-    <interface origin="or:static">
-      <name origin="or:static">et-0/0/0</name>
-      <description origin="or:static">Test interface</description>
+    <interface>
+      <name>et-0/0/0</name>
+      <description>Test interface</description>
       <mtu origin="or:system">1500</mtu>
     </interface>
   </interfaces>
@@ -842,6 +860,8 @@ group.
 
 * Implications on Data Models
 
+[NOTE: This section will be removed before publication as an RFC.]
+
 Since the NETCONF <get/> operation returns the content of the
 <running> configuration datastore and the operational state together
 in one tree, data models were often forced to branch at the top-level
@@ -849,8 +869,8 @@ into a config true branch and a structurally similar config false
 branch that replicated some of the config true nodes and added state
 nodes.  With the datastore model described here this is not needed
 anymore since the different datastores handle the different lifetimes
-of data objects.  Introducing this model together with the deprecation
-of the <get/> operation makes it possible to write simpler models.
+of data objects.  Introducing this model makes it possible to write
+simpler models.
 
 ** Proposed migration of existing YANG Data Models
 
@@ -915,6 +935,18 @@ be owned and standardized via the NETMOD working group.
   adopted.  YANG currently describes validation in terms of the
   <running> configuration datastore while it really happens on the
   <intended> configuration datastore.
+
+TODO:
+
+if this arch is supported:
+- running doesn't have to be valid
+- notif/rpc/action xpath context to <opertional>
+- intended is valid
+- no validation in operational
+- by default, any rpc/notif/action is validated towards operational,
+  but may affect any datastore (eg edit-config).  descriptions can be
+  used to modify this behavior.
+- writable identity??
 
 ** Implications on YANG Library @yang-lib-impl@
 
@@ -1018,9 +1050,9 @@ entail.
 
 - A new "supported datastores" capability allows a device to list all
   datastores it supports.  Implementations can choose which datastores
-  they expose, but MUST at least expose both the <running> and
+  they expose, but MUST at least expose the <running>, <intended>, and
   <operational> datastores.  They MAY expose additional datastores,
-  such as <intended>, <candidate>, etc.
+  such as <candidate> etc.
 - A new <get-data> operation is introduced that allows the client
   to return the contents of a datastore.  For configuration
   datastores, this operation returns the same data that would be
