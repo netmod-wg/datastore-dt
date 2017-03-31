@@ -62,11 +62,13 @@ module ietf-datastores {
   }
 
   identity static {
+    base datastore;
     description
      "Abstract base identity for static configuration datastores.";
   }
 
   identity dynamic {
+    base datastore;
     description
      "Abstract base identity for dynamic configuration datastores.";
   }

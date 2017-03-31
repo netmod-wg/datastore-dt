@@ -66,24 +66,24 @@ module ietf-origin {
       "Abstract base identity for the origin annotation.";
   }
 
-  identity static {
+  identity intended {
     base origin;
     description
-      "Denotes data from static configuration (e.g., <intended>).";
+      "Denotes data from the intended configuration.";
   }
 
   identity dynamic {
     base origin;
     description
-      "Denotes data from dynamic configuration protocols
-       or dynamic datastores (e.g., DHCP).";
+      "Denotes data from dynamic datastores or dynamic configuration
+       protocols (e.g., DHCP).";
   }
 
   identity system {
     base origin;
     description
-      "Denotes data created by the system independently of what
-       has been configured.";
+      "Denotes data learned from the normal operations of the system,
+       including control-plane protocols.";
   }
 
   identity default {
