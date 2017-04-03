@@ -101,10 +101,9 @@ create models that can take advantage of the NMDA.
 
 It is the strong recommendation that models SHOULD move as quickly as
 possible to the NMDA.  We feel this is key to the future of these
-models, and the NETMOD WG will be moving aggressively to rework
-existing models to this architecture.  The following guidelines,
-ordered by precedence, are intended for situations where this is not
-possible:
+models, and the NETMOD WG will rework existing models to this
+architecture.  The following guidelines, ordered by precedence, are
+intended for situations where this is not possible:
 
 (a) For new models or models with a sufficiently long development time
 line, the model should target the NMDA, with the expectation that their
