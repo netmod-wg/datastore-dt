@@ -99,8 +99,12 @@ model, along with the number of concrete implementations of the model.
 The intent is not to destabilize the IETF modeling community, but to
 create models that can take advantage of the NMDA.
 
-When evaluating the impact to a particular data model, the following
-guidelines should be considered:
+It is the strong recommendation that models SHOULD move as quickly as
+possible to the NMDA.  We feel this is key to the future of these
+models, and the NETMOD WG will be moving aggressively to rework
+existing models to this architecture.  The following guidelines,
+ordered by precedence, are intended for situations where this is not
+possible:
 
 (a) For new models or models with a sufficiently long development time
 line, the model should target the NMDA, with the expectation that their
