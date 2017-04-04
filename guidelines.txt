@@ -16,10 +16,10 @@ NETCONF (^RFC6241^) was developed with a focus on configuration data,
 and has unfortunate gaps in its treatment of operational data.  The
 <get-config> operation can return configuration data (defined as nodes
 with "config true") stored in the <running> datastore.  This data is
-typically only the data created by CLI users and NETCONF clients.  The
+typically the only data created by CLI users and NETCONF clients.  The
 <get> operation is defined as returning all the data on the device,
 including the contents of the <running> datastore, as well as any
-operational data.  While the NETCONF designers intended to merge
+operational state data.  While the NETCONF designers intended to merge
 "config false" nodes with the contents of running, there are two
 issues involved.
 
@@ -34,7 +34,8 @@ operational data even when there is no corresponding configuration
 data.  An example would be built-in networking interfaces that always
 appear in operational data.
 
-A similar situation exists while the device is processing configuration
+A similar situation to the second issue discussed above exists
+while the device is processing configuration
 data changes.  When configuration data is deleted, the operational
 data will continue to exist during the time period in which the device
 is releasing resources associated with the data.  An example would be
@@ -42,8 +43,8 @@ deleting a BGP peer, where the peer continues to exist in operational
 data until the connection is closed and any other resources are
 released.
 
-To address these issues with NETCONF, two distinct strategies have
-been adopted:
+In an attempt to address these issues, without entailing protocol
+modificiation, two distinct strategies have been adopted:
 
 The first strategy makes two distinct top-level containers, one for
 configuration and one for state.  These are sometimes referred to as
@@ -55,7 +56,7 @@ visibility of the operational values of configured nodes.  This leads
 to over-use of YANG groupings in ways that affect the readability of
 the models, as well as creating opportunities to incorrectly mirror
 the model's hierarchies.  Also this "stitching together" of data from
-the two trees is completely a convention, not a formal relationship.
+the two trees is merely a convention, not a formal relationship.
 
 The second strategy uses two sibling containers, named "config" and
 "state", placed deeper within the hierarchy.  The "config" container
@@ -70,12 +71,14 @@ system-created data and deleted peers scenarios discussed above.
 
 ** Network Management Datastores Architecture
 
-The Network Management Datastores Architecture (NMDA) addresses these
-problems with NETCONF by creating a distinct datastore for operational
-data, called <operational>.  When retrieving data from <operational>,
-all currently "in use" values are returned.  This allows modelers to
-use a single hierarchy for both configuration and operational data,
-without concerns about missing vital operational data.
+The Network Management Datastores Architecture (NMDA) addresses the
+problems mentioned above by creating a distinct datastore for operational
+data, called <operational>.  This datastore is defined as containing both
+config true and config false nodes, with the formal understanding that the
+"in use" values are returned for the config true nodes.  This allows modelers
+to use a single hierarchy for all configuration and operational data,
+which both improves readability and removes any possibility for a modeling
+inconsistency that might impact programatic access.
 
 In addition, another datastore named <intended> is defined that gives
 a complete view of the configuration data, even in the presence of
