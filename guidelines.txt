@@ -85,7 +85,7 @@ they exist and need to be handled appropriately.  In the future, such
 mechanisms may become standardized.
 
 The NMDA also deprecates NETCONF's <get> operation, removing the
-source of these issues.  Similar changes are planned for RESTCONF
+source of these issues.  Similar changes are planned for RESTCONF.
 (^RFC8040^).
 
 ** Guidelines for Modelers
@@ -115,6 +115,13 @@ operational data, the model should target the NMDA, since the
 impact would be minimal.  When NMDA-capable implementations arrived,
 the operational data will be available in the <operational> datastore.
 
+(c) For models under development that are using the top-level state
+container (aka "/foo-state"), the modeler has a difficult decision,
+since the current structure is not well-aligned to the future.
+Whenever possible, the model should be restructured in an
+NMDA-compatible manner, moving nodes from the "/foo-state" to an
+appropriate location within the "/foo" hierarchy.
+
 (d) For models under development that currently use distinct "config"
 and "state" containers to segregate operational values, the modeler
 has a difficult decision, since the current structure is not
@@ -128,13 +135,6 @@ implementations will be duplication of operational state under both
 to confusion when a <get-data> operation from the <operational>
 datastore returns a "config" container that contains operational
 state, not configuration values.
-
-(c) For models under development that are using the top-level state
-container (aka "/foo-state"), the modeler has a difficult decision,
-since the current structure is not well-aligned to the future.
-Whenever possible, the model should be restructured in an
-NMDA-compatible manner, moving nodes from the "/foo-state" to an
-appropriate location within the "/foo" hierarchy.
 
 (e) For models that augment other models, the modeler will have to
 consider the structure of the base model and the guidelines listed
