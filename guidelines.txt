@@ -3,12 +3,12 @@
 
 The "Network Management Datastore Architecture" (NMDA)
 ^I-D.netmod-revised-datastore^ adds the ability to inspect the current
-operational values for configuration, allowing clients to use
-identical paths for retrieving the configured values and the
-operational values.  This change will simplify models and help
-modelers, but will create a period of churn as NMDA becomes a standard
-and is widely implemented.  During that interim, the guidelines given
-in this section should help modelers find an optimal path forward.
+operational values for configuration, allowing clients to use identical
+paths for retrieving the configured values and the operational values.
+This change will simplify models and help modelers, but will create a
+period of churn as NMDA becomes a standard and is widely implemented.
+During that interim, the guidelines given in this section should help
+modelers find an optimal path forward.
 
 ** Background
 
@@ -34,17 +34,16 @@ operational data even when there is no corresponding configuration
 data.  An example would be built-in networking interfaces that always
 appear in operational data.
 
-A similar situation to the second issue discussed above exists
-while the device is processing configuration
-data changes.  When configuration data is deleted, the operational
-data will continue to exist during the time period in which the device
-is releasing resources associated with the data.  An example would be
-deleting a BGP peer, where the peer continues to exist in operational
-data until the connection is closed and any other resources are
-released.
+A similar situation to the second issue discussed above exists while
+the device is processing configuration data changes.  When configuration
+data is deleted, the operational data will continue to exist during the
+time period in which the device is releasing resources associated with
+the data.  An example would be deleting a BGP peer, where the peer
+continues to exist in operational data until the connection is closed
+and any other resources are released.
 
 In an attempt to address these issues, without entailing protocol
-modificiation, two distinct strategies have been adopted:
+modification, two distinct strategies have been adopted:
 
 The first strategy makes two distinct top-level containers, one for
 configuration and one for state.  These are sometimes referred to as
@@ -72,13 +71,14 @@ system-created data and deleted peers scenarios discussed above.
 ** Network Management Datastores Architecture
 
 The Network Management Datastores Architecture (NMDA) addresses the
-problems mentioned above by creating a distinct datastore for operational
-data, called <operational>.  This datastore is defined as containing both
-config true and config false nodes, with the formal understanding that the
-"in use" values are returned for the config true nodes.  This allows modelers
-to use a single hierarchy for all configuration and operational data,
-which both improves readability and removes any possibility for a modeling
-inconsistency that might impact programatic access.
+problems mentioned above by creating a distinct datastore for
+operational data, called <operational>.  This datastore is defined
+as containing both config true and config false nodes, with the formal
+understanding that the "in use" values are returned for the config
+true nodes.  This allows modelers to use a single hierarchy for all
+configuration and operational data, which both improves readability
+and removes any possibility for a modeling inconsistency that might
+impact programatic access.
 
 In addition, another datastore named <intended> is defined that gives
 a complete view of the configuration data, even in the presence of
@@ -88,7 +88,7 @@ they exist and need to be handled appropriately.  In the future, such
 mechanisms may become standardized.
 
 The NMDA also deprecates NETCONF's <get> operation, removing the
-source of these issues.  Similar changes are planned for RESTCONF.
+source of these issues.  Similar changes are planned for RESTCONF
 (^RFC8040^).
 
 ** Guidelines for Modelers
@@ -103,46 +103,47 @@ The intent is not to destabilize the IETF modeling community, but to
 create models that can take advantage of the NMDA.
 
 It is the strong recommendation that models SHOULD move as quickly as
-possible to the NMDA.  We feel this is key to the future of these
+possible to the NMDA.  This is key to the future of these
 models, and the NETMOD WG will rework existing models to this
 architecture.  The following guidelines, ordered by precedence, are
 intended for situations where this is not possible:
 
 (a) For new models or models with a sufficiently long development time
-line, the model should target the NMDA, with the expectation that their
+line, the model SHOULD target the NMDA, with the expectation that their
 models will be used by NMDA-capable implementations and their
 operational data will be available via the <operational> datastore.
 
 (b) For models under development that have no serious dependency on
-operational data, the model should target the NMDA, since the
+operational data, the model SHOULD target the NMDA, since the
 impact would be minimal.  When NMDA-capable implementations arrived,
 the operational data will be available in the <operational> datastore.
 
 (c) For models under development that are using the top-level state
 container (aka "/foo-state"), the modeler has a difficult decision,
 since the current structure is not well-aligned to the future.
-Whenever possible, the model should be restructured in an
-NMDA-compatible manner, moving nodes from the "/foo-state" to an
-appropriate location within the "/foo" hierarchy.
+Whenever possible, the model SHOULD be restructured in an
+NMDA-compatible manner, by moving nodes from "/foo-state" to an
+appropriate location within the "/foo" hierarchy and deprecating
+the "/foo-state" container.
 
 (d) For models under development that currently use distinct "config"
 and "state" containers to segregate operational values, the modeler
 has a difficult decision, since the current structure is not
-well-aligned to the future.  Whenever possible, the model should be
+well-aligned to the future.  Whenever possible, the model SHOULD be
 restructured in an NMDA-compatible manner, by deprecating the "state"
 containers and moving the contents of the "config" containers to their
 parent nodes.  But where the maturity of the model and the active
 development work makes that problematic, the impact for NMDA-capable
 implementations will be duplication of operational state under both
 "config" and "state" in the <operational> datastore.  This will lead
-to confusion when a <get-data> operation from the <operational>
+to confusion when a (e.g. <get-data>) response from the <operational>
 datastore returns a "config" container that contains operational
 state, not configuration values.
 
 (e) For models that augment other models, the modeler will have to
 consider the structure of the base model and the guidelines listed
-above.  In general, augmenting "state" containers should be avoided,
-with the expectation that the base model will be re-released with any
+above.  In general, augmenting "state" containers SHOULD be avoided,
+with the expectation that the base model will be re-released with the
 state containers marked as deprecated.
 
 It is critical to consider these as guidelines, understanding that our
@@ -150,13 +151,15 @@ goal is to make models that will see continued use in the long term.
 There needs to be a balance between short term needs and a desire
 for consistent, usable models in the future.
 
-For models using guideline (c), (d), or (e), one additional guideline
-should be considered.  Publishing a model for a distinct "/foo-state"
-tree means that even implementations that are NMDA-capable will be
-forced to duplicate operational state under that hierarchy.  Hence
-modelers should mark their "/foo-state" hierarchy as "status
-deprecated" to allow NMDA-capable implementations to avoid the cost of
-duplicating those nodes.  Non-NMDA-capable implementations would
-implement them as a means of allowing access to these operational
-values.  This decision would need to take into account the progress of
-the NMDA and the availability of NMDA-capable implementations.
+Regarding the deprecation of state trees, as recommended in guidelines
+(c) or (d), please note that deprecation signals that the node is
+targeted for removal, but (per ^RFC7950^) permits new/continued
+implementation in order to foster interoperability with older/existing
+implementations. The deprecation of state trees is recommended as it
+allows NMDA-capable implementations to avoid the cost of duplicating
+the state nodes, while enabling non-NMDA-capable implementations to
+implement them to provide access to the operational values.  Ultimately,
+however, the decision to deprecate the state trees needs to take into
+account the progress of the NMDA and the availability of NMDA-capable
+implementations.
+
