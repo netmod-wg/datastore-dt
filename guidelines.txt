@@ -19,15 +19,15 @@ with "config true") stored in the <running> datastore.  This data is
 typically the only data created by CLI users and NETCONF clients.  The
 <get> operation is defined as returning all the data on the device,
 including the contents of the <running> datastore, as well as any
-operational state data.  While the NETCONF designers intended to merge
-"config false" nodes with the contents of running, there are two
-issues involved.
+operational state data.  While the NETCONF design envisioned YANG
+models to merge "config false" nodes with the contents of running,
+there are two issues involved.
 
 First, the desire of clients to see the true operational "in use" value
-of configuration data means that two distinct leafs were required to
-show both the configured value and the operational value.  An example
-would be the speed of an interface, where the configured value may not
-be the value that is currently used.
+of configuration data resulted in the need for two distinct leafs, one
+to show the configured value and the other to show the operational value.
+An example would be the speed of an interface, where the configured value
+may not be the value that is currently used.
 
 Second, devices often have "system created" resources that exist as
 operational data even when there is no corresponding configuration
@@ -42,8 +42,8 @@ the data.  An example would be deleting a BGP peer, where the peer
 continues to exist in operational data until the connection is closed
 and any other resources are released.
 
-In an attempt to address these issues, without entailing protocol
-modification, two distinct strategies have been adopted:
+To address these issues, without requiring a protocol modification, two
+distinct YANG modeling strategies have been adopted:
 
 The first strategy makes two distinct top-level containers, one for
 configuration and one for state.  These are sometimes referred to as
@@ -91,7 +91,7 @@ The NMDA also deprecates NETCONF's <get> operation, removing the
 source of these issues.  Similar changes are planned for RESTCONF
 (^RFC8040^).
 
-** Guidelines for Modelers
+** Guidelines for YANG Modelers
 
 The following guidelines are meant to help modelers develop models
 that will maximize the utility of the model with both current
