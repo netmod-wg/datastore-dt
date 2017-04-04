@@ -78,7 +78,7 @@ understanding that the "in use" values are returned for the config
 true nodes.  This allows modelers to use a single hierarchy for all
 configuration and operational data, which both improves readability
 and removes any possibility for a modeling inconsistency that might
-impact programatic access.
+impact programmatic access.
 
 In addition, another datastore named <intended> is defined that gives
 a complete view of the configuration data, even in the presence of
