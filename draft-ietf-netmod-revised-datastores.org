@@ -36,12 +36,16 @@ This document defines the following terms:
   Configuration data can originate from different sources.
 - dynamic data: Data that is obtained
   dynamically during the operation of a device through interaction
-  with other systems and is not persistent.
+  with other systems.  The dynamic data is not persistent.
 - static configuration data: Configuration data that is eventually
   persistent and used to get a device from its initial default state
   into its desired operational state.
 - dynamic configuration data: Dynamic data that is also configuration
   data.
+- intended configuration data: Static configuration data that is intended to
+  be used by the device.  Intended configuration data excludes any
+  inactive configuration data and it includes configuration data
+  produced through the expansion of templates.
 - system configuration data: Configuration data that is supplied by
   the device itself.
 - default configuration data: Configuration data that is not
@@ -55,24 +59,23 @@ This document defines the following terms:
   collected statistics. State data is transient and modified by
   interactions with internal components or other systems.
   State data is modeled in YANG using "config false" nodes.
+- operational state data: The combination of applied configuration
+  data, system configuration data, default configuration data, and
+  state data.
 - datastore: A conceptual place to store and access information.  A
   datastore might be implemented, for example, using files, a
   database, flash memory locations, or combinations thereof.
   A datastore maps to an instantiated YANG data tree.
 - configuration datastore: A datastore holding static configuration
-  data that is required to get a device from its initial default state
-  into a desired operational state.  A configuration datastore maps to
-  an instantiated YANG data tree consisting of configuration data
-  nodes.
+  data.  A configuration datastore maps to an instantiated YANG data
+  tree consisting of configuration data nodes.
 - running configuration datastore: A configuration datastore holding
-  the complete static configuration currently active on the device.
+  the complete static configuration of the device.
   The running configuration datastore always exists. It may include
   inactive configuration or template-mechanism-oriented configuration
   that require further expansion.
 - intended configuration datastore: A configuration datastore holding
-  the complete configuration currently active on the device. It does
-  not include inactive configuration and it does include the expansion
-  of any template mechanisms.
+  the complete intended configuration of the device.
 - candidate configuration datastore: A configuration datastore that
   can be manipulated without impacting the device's running
   configuration datastore and that can be committed to the running
@@ -83,9 +86,8 @@ This document defines the following terms:
   configuration datastore when it boots. A startup datastore may not
   be supported by all protocols or implementations.
 - dynamic datastore: A datastore holding dynamic data.
-- operational state datastore: A datastore holding the currently
-  active applied configuration data as well as the device's state
-  data.
+- operational state datastore: A datastore holding the
+  complete operational state data of the device.
 - origin: A metadata annotation indicating the origin of a data item.
 - remnant data: Configuration data that remains in the system for a
   period of time after it has be removed from a configuration
@@ -409,6 +411,22 @@ The values are YANG identities.  The following identities are defined:
 These identities can be further refined, e.g., there might be an
 identity "dhcp" derived from "dynamic".
 
+* Implications on YANG
+
+# TODO:
+#
+# if this arch is supported:
+# - running doesn't have to be valid
+# - intended is valid
+# - no validation in operational
+#
+# Do we need more text than what we already have for the issues above?
+#
+# - notif/rpc/action xpath context to <opertional>
+# - by default, any rpc/notif/action is validated towards operational,
+#   but may affect any datastore (eg edit-config).  descriptions can be
+#   used to modify this behavior.
+
 * Guidelines for Defining Datastores @guidelines@
 
 The definition of a new datastore in this architecture SHOULD be
@@ -437,10 +455,7 @@ datastores.
 Not all YANG modules may be used in all datastores.  Some datastores may
 constrain which data models can be used in them.  If it is desirable that
 a subset of all modules can be targeted to the datastore,
-then the documentation defining the datastore MUST use the
-mechanisms described in ^yang-lib-impl^ to provide the necessary hooks for
-module-designers to indicate that their module is to be accessible in the
-datastore.
+then the documentation defining the datastore must indicate this.
 
 ** Define which subset of YANG-modeled data applies
 
@@ -914,461 +929,6 @@ should be designed to conform to the revised datastore architecture,
 following the design guidelines described below, and only need to
 provide combined config/state trees.
 
-* Implications on other Documents
-
-The sections below describe the authors' thoughts on how various other
-documents may be updated to support the datastore architecture described
-in this document.  They have been incorporated as an appendix of this
-document to facilitate easier review, but the expectation is that this
-work will be moved into another document as soon as the appropriate
-working group decides to take on the work.
-
-** Implications on YANG
-
-Note: This section describes the authors' thoughts on how YANG ^RFC7950^
-could be updated to support the datastore architecture described in this
-document.  It has been incorporated here as a temporary measure to
-facilitate easier review, but the expectation is that this work will
-be owned and standardized via the NETMOD working group.
-
-- Some clarifications may be needed if this datastore model is
-  adopted.  YANG currently describes validation in terms of the
-  <running> configuration datastore while it really happens on the
-  <intended> configuration datastore.
-
-TODO:
-
-if this arch is supported:
-- running doesn't have to be valid
-- notif/rpc/action xpath context to <opertional>
-- intended is valid
-- no validation in operational
-- by default, any rpc/notif/action is validated towards operational,
-  but may affect any datastore (eg edit-config).  descriptions can be
-  used to modify this behavior.
-- writable identity??
-
-** Implications on YANG Library @yang-lib-impl@
-
-Note: This section describes the authors' thoughts on how YANG Library
-^RFC7895^ could be updated to support the datastore architecture described
-in this document.  It has been incorporated here as a temporary measure
-to facilitate easier review, but the expectation is that this work will
-be owned and standardized via the NETCONF working group.
-
-With the introduction of multiple datastores, it is important that a
-server can advertise to clients which modules are supported in the
-different datastores implemented by the server.  In order to do this,
-we propose that the "ietf-yang-module" (^RFC7895^) is revised, with
-the following addition to the "module" list in the "module-list"
-grouping:
-
-  leaf-list datastore {
-    type identityref {
-      base ds:datastore;
-    }
-    description
-      "The datastores in which this module is supported.";
-
-  }
-
-## Not used for now, seems a bit complicated...
-# "When an identity representing a datastore is present in this
-#  leaf-list, it means that the server supports the module in all
-#  server-supported datastores derived from that identity.
-#
-#  For example, if the server supports the datastores 'candidate',
-#  'running', and 'intended', and this leaf-list contains the
-#  identity 'or:static', it means that the module is supported
-#  in 'candidate', 'running', and 'intended'.";
-
-** Implications to YANG Guidelines
-
-Note: This section describes the authors' thoughts on how Guidelines
-for Authors and Reviewers of YANG Data Model Documents
-^I-D.ietf-netmod-rfc6087bis^ could be updated to support the datastore
-architecture described in this document.  It has been incorporated
-here as a temporary measure to facilitate easier review, but the
-expectation is that this work will be owned and standardized via the
-NETMOD working group.
-
-It is important to design data models with clear semantics that work
-equally well for instantiation in a configuration datastore and
-instantiation in the <operational> datastore.
-
-*** Nodes with different config/state value sets
-
-There may be some differences in the value set of some nodes that are
-used for both configuration and state.  At this point of time, these
-are considered to be rare cases that can be dealt with using different
-nodes for the configured and state values.
-
-*** Auto-configured or Auto-negotiated Values
-
-Sometimes configuration leafs support special values that instruct the
-system to automatically configure a value.  An example is an MTU that
-is configured to "auto" to let the system determine a suitable MTU
-value.  Another example is Ethernet auto-negotiation of link speed.  In
-such a situation, it is recommended to model this as two separate
-leafs, one config true leaf for the input to the auto-negotiation
-process, and one config false leaf for the output from the process.
-
-** Implications on NETCONF
-
-Note: This section describes the authors' thoughts on how NETCONF
-^RFC6241^ could be updated to support the datastore architecture
-described in this document.  It has been incorporated here as a
-temporary measure to facilitate easier review, but the expectation is
-that this work will be owned and standardized via the NETCONF working
-group.
-
-*** Introduction
-
-The NETCONF protocol ^RFC6241^ defines a simple mechanism through
-which a network device can be managed, configuration data information
-can be retrieved, and new configuration data can be uploaded and
-manipulated.
-
-NETCONF already has support for configuration datastores, but it does
-not define an operational datastore.  Instead, it provides the <get>
-operation that returns the contents of the <running> datastore along
-with all config false leaves.  However, this <get> operation is
-incompatible with the new datastore architecture defined in this
-document, and hence should be deprecated.
-
-There are two possible ways that NETCONF could be extended to support
-the new architecture: Either as new optional capabilities extending
-the current version of NETCONF (v1.1, ^RFC6241^), or by defining a new
-version of NETCONF.
-
-Many of the required additions are common to both approaches, and are
-described below.  A following section then describes the benefits of
-defining a new NETCONF version, and the additional changes that would
-entail.
-
-*** Overview of additions to NETCONF
-
-- A new "supported datastores" capability allows a device to list all
-  datastores it supports.  Implementations can choose which datastores
-  they expose, but MUST at least expose the <running>, <intended>, and
-  <operational> datastores.  They MAY expose additional datastores,
-  such as <candidate> etc.
-- A new <get-data> operation is introduced that allows the client
-  to return the contents of a datastore.  For configuration
-  datastores, this operation returns the same data that would be
-  returned by the existing <get-config> operation.
-- Some form of new filtering mechanism is required to allow the device
-  to filter the data based on the YANG metadata in addition to other
-  filters (such as the subtree filter).  See also ^issues^.
-- A new "with-metadata" capability allows a device to indicate that it
-  supports the capability of including YANG metadata annotations in
-  the responses to <get> and <get-config> requests.  This is achieved
-  in a similar way to with-defaults ^RFC6243^, by introducing a
-  <with-metadata> XML element to <get> and <get-config> requests.
- - The capability would allow a device to indicate which types of
-   metadata are supported.
- - The XML element would specify which types of metadata are included
-   in the response.
-- The handling of defaults for the new configuration datastores is as
-  described in with-defaults ^RFC6243^, but that does not apply for
-  the operational state datastore that defines new semantics.
-
-**** Operational State Datastore Defaults Handling
-
-The normal semantics for the <operational> datastore are that
-all values that match the default specified in the schema are included
-in response to requests on the operational state datastore. This is
-equivalent to the "report-all" mode of the with-defaults handling.
-
-The "metadata-filter" query parameter can be used to exclude nodes
-with origin metadata matching "default", that would exclude nodes that
-match the default value specified in the schema.
-
-If the server cannot return a value for any reason (e.g., the server
-cannot determine the value, or the value that would be returned is
-outside the allowed leaf value range) then the server can choose to
-not return any value for a particular leaf, which MUST be interpreted
-by the client as the value of that leaf not being known, rather than
-implicitly having the default value.
-
-*** Overview of NETCONF version 2
-
-This section describes NETCONF version 2, by explaining the
-differences to NETCONF version 1.1.  Where not explicitly specified,
-the behavior of NETCONF version 2 is the same as for NETCONF
-version 1.1 ^RFC6241^.
-
-**** Benefits of defining a new NETCONF version
-
-Defining a new version of NETCONF (as opposed to extending NETCONF
-version 1.1) has several benefits:
-
-- It allows for removal of the existing <get> RPC operation, that
-  returns content from both the running configuration datastore
-  combined with all config false leaves.
-- It could allow the existing <get-config> operation to also be
-  removed, replaced by the more generic <get-data> that is named
-  appropriately to also apply to the operational datastore.
-- It makes it easier for clients and servers to know what reasonable
-  common baseline functionality to expect, rather than a collection of
-  capabilities that may not be implemented in a consistent fashion.
-  In particular, clients will able to assume support for the
-  <operational> datastore.
-- It can gracefully coexist with NETCONF v1.1.  A server could implement
-  both versions.  Existing YANG models exposing split config/state
-  trees could be exposed via NETCONF v1.1, whereas combined
-  config/state YANG models could be exposed via NETCONF v2, providing
-  a viable server upgrade path.
-
-**** Proposed changes for NETCONF v2
-
-The differences between NETCONF v2 and NETCONF v1.1 can be summarized
-as:
-
-- NETCONF v2 advertises a new base NETCONF capability
-  "urn:ietf:params:netconf:base:2.0".  A server may advertise older
-  NETCONF versions as well, to allow a client to choose which version
-  to use.
-- NETCONF v2 removes support for the existing <get> operation, that is
-  replaced by the <get-data> on the operational datastore.
-- NETCONF v2 can publish a separate version of YANG library from a
-  NETCONF v1.1 implementation running on the same device, allowing
-  different versions of NETCONF to support a different set of YANG
-  modules.
-
-**** Possible Migration Paths
-
-A common approach in current data models is to have two separate trees
-"/foo" and "/foo-state", where the former contains config true nodes,
-and the latter config false nodes.  A data model that is designed for
-the revised architectural framework presented in this document will
-have a single tree "/foo" with a combination of config true and config
-false nodes.
-
-Two different migration strategies are considered:
-
-***** Migration Path using two instances of NETCONF
-
-If, for backwards compatability reasons, a server intends to support both
-split config/state trees and the combined config/state trees proposed
-in this architecture, then this can be achieved by having the device
-support both NETCONF v1 and NETCONF v2 at the same time:
-
-- The NETCONF v1 implementation could support existing YANG module
-  revisions defined with split config/state trees.
-- The NETCONF v2 implementation could support different YANG
-  modules, or YANG module revisions, with combined config/state
-  trees.
-
-Clients can then decide on which type of models to use by expressing
-the appropriate version of the base NETCONF capability during
-capability exchange.
-
-***** Migration Path using a single instance of NETCONF
-
-The proposed strategy for updating existing published data models is
-to publish new revisions with the state trees' nodes copied under the
-config tree, and for the existing state trees to have all of their
-nodes marked as deprecated.  The expectation is that NETCONF servers
-would use a combination of these updated models alongside new models
-that only follow the new datastore architecture.
-
-- NETCONF servers can support clients that are not aware of the
-  revised datastore architecture, particularly if they continue to
-  support the deprecated <get> operation:
- - For updated YANG modules they would see additional information
-   returned via the <get> operation.
- - For new YANG modules, some of the state nodes may not be available,
-   i.e. for any state nodes that exist under a config node that has
-   not been configured (e.g., statistics under a system created
-   interface).
-- NETCONF servers can also support clients that are aware of the
-  revised datastores architecture:
- - For updated YANG modules they would see additional information
-   returned under the legacy state trees.  This information can be
-   excluded using appropriate subtree filters.
- - New YANG modules, conforming to the datastores architecture, would
-   work exactly as expected.
-
-** Implications on RESTCONF
-
-This section describes the authors' thoughts on how RESTCONF ^RFC8040^
-could be updated to support the datastore architecture described in
-this document.  It has been incorporated here as a temporary measure
-to facilitate easier review, but the expectation is that this work
-will be owned and standardized via the NETCONF working group.
-
-*** Introduction
-
-RESTCONF ^RFC8040^ defines a protocol based on HTTP for configuring
-data defined in YANG version 1 or 1.1, using a conceptual datastore
-that is compatible with a server that implements NETCONF 1.1 compliant
-datastores.
-
-The combined conceptual datastore defined in RESTCONF is incompatible
-with the new datastore architecture defined in this document. There
-are two possible ways that RESTCONF could be extended to support the
-new architecture: Either as new optional capabilities extending the
-existing RESTCONF RFC, or possibly as an new version of RESTCONF.
-
-Many of the required additions are common to both approaches, and are
-described below.  A following section then describes the potential
-benefits of defining a new RESTCONF version, and the additional
-changes that might entail.
-
-*** Overview of additions to RESTCONF
-
-- A new path {+restconf}/datastore/<datastore-name>/data/
-  to provide a YANG data tree for each datastore that is exposed via
-  RESTCONF.
-
-- Implementations can choose which datastores they expose, but MUST at
-  least expose both the <running> and <operational> datastores.  They
-  MAY expose the <intended> datastores as needed.
-
-- The same HTTP Methods supported on {+restconf}/data/ are also
-  supported on {+restconf}/datastore/<datastore-name>/data/ but
-  suitably constrained depending on whether the datastore can be
-  written to by the client, or is read-only.
-
-- The same query parameters supported on {+restconf}/data/ are also
-  support on {+restconf}/datastore/<datastore-name>/data/ except for
-  the following query parameters:
-
-- "metadata" - is a new optional query parameter that filters the
-  returned data based on the metadata annotation.
-
-- "with-metadata" - is a new optional query parameter that
-  indicating that the metadata annotations should be included in the
-  reply.
-
-- "with-defaults" is supported on all configuration datastores, but
-  is not supported on the operational state datastore path, because
-  it has different default handling semantics.
-
-- The handling of defaults (include the with-defaults query parameter)
-  for the new configuration datastores is the same as the existing
-  conceptual datastore, but does not apply for the operational state
-  datastore that defines new semantics.
-
-**** HTTP Methods
-
-All configuration datastores support all HTTP Methods.
-
-The <operational> datastore only supports the following HTTP methods:
-OPTIONS, HEAD, GET, and POST to invoke an RFC operation.
-
-**** Query parameters
-
-^RFC7952^ specifies how a YANG data tree can be annotated with generic
-metadata information, that is used by this document to annotate data
-nodes with origin information indicating the mechanism by which the
-operational value came into effect.
-
-RESTCONF could be extended with an optional generic mechanism to allow
-the filtering of nodes returned in a query based on metadata
-annotations associated with the data node.
-
-RESTCONF could also be extended with an optional generic mechanism to
-choose whether metadata annotations should be included in the
-response, potentially filtering to a subset of annotations.  E.g., only
-include @origin metadata annotations, and not any others that may be
-in use.
-
-Both of the generic mechanisms could be controlled by a new capability.
-A new capability is defined to indicate whether a device supports
-filtering on, or annotating responses with, the origin meta data.
-
-**** Operational State Datastore Defaults Handling
-
-The normal semantics for the <operational> datastore are that
-all values that match the default specified in the schema are included
-in response to requests on the operational state datastore. This is
-equivalent to the "report-all" mode of the with-defaults handling.
-
-The "metadata" query parameter can be used to exclude nodes with a
-origin metadata matching "default", that would exclude (only
-config true?) nodes that match the default value specified in the
-schema.
-
-If the server cannot return a value for any reason (e.g., the server
-cannot determine the value, or the value that would be returned is
-outside the allowed leaf value range) then the server can choose to
-not return any value for a particular leaf, which MUST be interpreted
-by the client as the value of that leaf not being known, rather than
-implicitly having the default value.
-
-*** Overview of a possible new RESTCONF version
-
-This section describes a notional new RESTCONF version, by explaining
-the differences to RESTCONF version 1.  Where not explicitly
-specified, the behavior of a new RESTCONF version is the same as for
-RESTCONF version 1 ^RFC8040^.
-
-**** Potential benefits of defining a new RESTCONF version
-
-Defining a new version of RESTCONF (as opposed to extending RESTCONF
-version 1) has several potential benefits:
-
-- It could expose datastores, and models designed for the revised
-  datastore architecture, in a clean and consistent way.
-
-- It would allow the parts of RESTCONF that do not work well with the
-  revised datastore architecture to be omitted from the new RESTCONF
-  version.
-
-- It would make it easier for clients and servers to know what
-  reasonable common baseline functionality to expect, rather than a
-  collection of capabilities that may not be implemented in a
-  consistent fashion.
-
-- It could gracefully coexist with RESTCONF v1.  A server could
-  implement both versions.  Existing YANG models exposing split
-  config/state trees could be exposed via RESTCONF v1, whereas
-  combined config/state YANG models could be exposed via a new
-  RESTCONF version, providing a viable server upgrade path.
-
-**** Possible changes for a new RESTCONF version
-
-The differences between a notional new RESTCONF version and RESTCONF
-version 1 (RESTCONF v1) ^RFC8040^ can be summarized as:
-
-- A new RESTCONF version would define a new root resource, and a
-  separate link relation in the /.well-known/host-meta resource.
-
-- A new RESTCONF version could remove support for the
-  {+restconf}/data path supported in RESTCONF v1.
-
-- A new RESTCONF version could publish a separate version of YANG
-  library from a RESTCONF v1 implementation running on the same
-  device, allowing different versions of RESTCONF to support a
-  different set of YANG modules.
-
-**** Possible Migration Path using a new RESTCONF version
-
-A common approach in current data models is to have two separate trees
-"/foo" and "/foo-state", where the former contains config true nodes,
-and the latter config false nodes.  A data model that is designed for
-the revised architectural framework presented in this document will
-have a single tree "/foo" with a combination of config true and config
-false nodes.
-
-If for backwards compatability reasons, a server intends to support both
-split config/state trees, and the combined config/state trees proposed
-in this architecture, then this could be achieved by having the device
-support both RESTCONF v1 and the new RESTCONF version at the same time:
-
-- The RESTCONF v1 implementation could support existing YANG module
-  revisions defined with split config/state trees.
-
-- The implementation of the new RESTCONF version could support different
-  YANG modules, or YANG module revisions, with combined config/state
-  trees.
-
-Clients can then decide on which type of models to use by choosing
-whether to use the RESTCONF v1 root resource or the root resource
-associated with the new RESTCONF version.
-
 * Open Issues @issues@
 
 + NETCONF needs to be able to filter data based on the origin
@@ -1376,8 +936,10 @@ associated with the new RESTCONF version.
   operation.
 
 + We need a means of inheriting @origin values, so whole hierarchies
-  can avoid the noise of repeating parent values.  Should "origin='system'"
-  (or whatever we call it) be the default?
+  can avoid the noise of repeating parent values.  This should
+  probably be a representation issue - logically all nodes have the
+  property, but in XML/JSON it makes sense to avoid repeating it for a
+  node if it is the same as its parent.
 
 + We need to discuss somewhere how remote procedure calls
   and notifications/actions tie into datastores. RFC 7950 shows as an
@@ -1391,6 +953,11 @@ associated with the new RESTCONF version.
   have remote procedure calls and notifications be explicit about which
   datastores they apply to and perhaps change the default xpath context
   from running plus state to the operational state datastore.
+
++ Should we add an identity "datastore-writable"?  If we do, we would
+  let "running" and "candidate" (and future i2rs) derive from it, and
+  then also define "edit-data" to take a parameter "target" that is
+  derived from "datastore-writable".
 
 
 

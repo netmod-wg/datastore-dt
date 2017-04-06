@@ -8,8 +8,6 @@
 
   ietf-ref:RFC7952
 
-  ietf-ref:RFC7895
-
   ietf-ref:RFC7950
 
   ietf-ref:RFC8040
@@ -22,11 +20,7 @@
 
   ietf-ref:RFC6020
 
-  ietf-ref:RFC6243
-
   ietf-ref:RFC6244
-
-  ietf-ref:I-D.ietf-netmod-rfc6087bis
 
   ietf-ref:I-D.ietf-netmod-opstate-reqs
 
