@@ -19,15 +19,16 @@ with "config true") stored in the <running> datastore.  This data is
 typically the only data created by CLI users and NETCONF clients.  The
 <get> operation is defined as returning all the data on the device,
 including the contents of the <running> datastore, as well as any
-operational state data.  While the NETCONF design envisioned YANG
-models to merge "config false" nodes with the contents of running,
-there are two issues involved.
+operational state data.  While the NETCONF design envisioned models
+merging "config false" nodes with the contents of running, there are
+two issues involved.
 
-First, the desire of clients to see the true operational "in use" value
-of configuration data resulted in the need for two distinct leafs, one
-to show the configured value and the other to show the operational value.
-An example would be the speed of an interface, where the configured value
-may not be the value that is currently used.
+First, the desire of clients to see the true operational "in use"
+value of configuration data resulted in the need for data models to
+have two distinct leafs, one to show the configured value and the
+other to show the operational value.  An example would be the speed of
+an interface, where the configured value may not be the value that is
+currently used.
 
 Second, devices often have "system created" resources that exist as
 operational data even when there is no corresponding configuration
@@ -43,7 +44,7 @@ continues to exist in operational data until the connection is closed
 and any other resources are released.
 
 To address these issues, without requiring a protocol modification, two
-distinct YANG modeling strategies have been adopted:
+distinct strategies have been adopted in YANG model design:
 
 The first strategy makes two distinct top-level containers, one for
 configuration and one for state.  These are sometimes referred to as
@@ -71,14 +72,15 @@ system-created data and deleted peers scenarios discussed above.
 ** Network Management Datastores Architecture
 
 The Network Management Datastores Architecture (NMDA) addresses the
-problems mentioned above by creating a distinct datastore for
-operational data, called <operational>.  This datastore is defined
-as containing both config true and config false nodes, with the formal
-understanding that the "in use" values are returned for the config
-true nodes.  This allows modelers to use a single hierarchy for all
-configuration and operational data, which both improves readability
-and removes any possibility for a modeling inconsistency that might
-impact programmatic access.
+problems mentioned above by creating an architectural framework which
+includes a distinct datastore for operational data, called
+<operational>.  This datastore is defined as containing both config
+true and config false nodes, with the formal understanding that the
+"in use" values are returned for the config true nodes.  This allows
+modelers to use a single hierarchy for all configuration and
+operational data, which both improves readability and reduces the
+possibility of modeling inconsistencies that might impact
+programmatic access.
 
 In addition, another datastore named <intended> is defined that gives
 a complete view of the configuration data, even in the presence of
@@ -87,14 +89,15 @@ While such mechanisms are currently non-standard, the NMDA recognizes
 they exist and need to be handled appropriately.  In the future, such
 mechanisms may become standardized.
 
-The NMDA also deprecates NETCONF's <get> operation, removing the
-source of these issues.  Similar changes are planned for RESTCONF
-(^RFC8040^).
+The NMDA allows the deprecation of NETCONF's <get> operation, removing
+the source of these issues.  The new operations <get-data> and
+<edit-data> will support a parameter indicating the target datastore.
+Similar changes are planned for RESTCONF (^RFC8040^).
 
 ** Guidelines for YANG Modelers
 
-The following guidelines are meant to help modelers develop models
-that will maximize the utility of the model with both current
+The following guidelines are meant to help modelers develop YANG
+models that will maximize the utility of the model with both current
 implementations and NMDA-capable implementations.
 
 The direction taken should be based on both the maturity of the data
@@ -103,63 +106,148 @@ The intent is not to destabilize the IETF modeling community, but to
 create models that can take advantage of the NMDA.
 
 It is the strong recommendation that models SHOULD move as quickly as
-possible to the NMDA.  This is key to the future of these
-models, and the NETMOD WG will rework existing models to this
-architecture.  The following guidelines, ordered by precedence, are
-intended for situations where this is not possible:
+possible to the NMDA.  This is key to the future of these models, and
+the NETMOD WG will rework existing models to this architecture.  Given
+the permanence and gravity of work published by the IETF, creating
+future-proof data models is vital.
 
-(a) For new models or models with a sufficiently long development time
-line, the model SHOULD target the NMDA, with the expectation that their
-models will be used by NMDA-capable implementations and their
-operational data will be available via the <operational> datastore.
+The two current strategies ("/foo-state" and "config"/"state"
+containers) mix data retrieval details into the data model,
+complicating the models and impairing their readability.  Rather than
+maintain these details inside the data model, models can be
+post-processed with tools to add this derivative information.
 
-(b) For models under development that have no serious dependency on
-operational data, the model SHOULD target the NMDA, since the
-impact would be minimal.  When NMDA-capable implementations arrived,
-the operational data will be available in the <operational> datastore.
+Both the "/foo-state" contents and the "config"/"state" containers'
+contents can be automatically generated from simpler, more readable
+published models.  An example of such tooling would be the [name needed]
+model-generating back-end to the "pyang" YANG compiler [ref needed].
 
-(c) For models under development that are using the top-level state
-container (aka "/foo-state"), the modeler has a difficult decision,
-since the current structure is not well-aligned to the future.
-Whenever possible, the model SHOULD be restructured in an
-NMDA-compatible manner, by moving nodes from "/foo-state" to an
-appropriate location within the "/foo" hierarchy and deprecating
-the "/foo-state" container.
+These derived models will use distinct namespaces, allowing servers to
+announce their support for the base or derived models.  A small suffix
+can be appended to the base model's name and namespace string.
+Alternatively, a YANG extension statement can be created to hold this
+information within the data model, where it can be visible to the
+tools.
 
-(d) For models under development that currently use distinct "config"
-and "state" containers to segregate operational values, the modeler
-has a difficult decision, since the current structure is not
-well-aligned to the future.  Whenever possible, the model SHOULD be
-restructured in an NMDA-compatible manner, by deprecating the "state"
-containers and moving the contents of the "config" containers to their
-parent nodes.  But where the maturity of the model and the active
-development work makes that problematic, the impact for NMDA-capable
-implementations will be duplication of operational state under both
-"config" and "state" in the <operational> datastore.  This will lead
-to confusion when a (e.g. <get-data>) response from the <operational>
-datastore returns a "config" container that contains operational
-state, not configuration values.
+For example, consider the following trivial model:
 
-(e) For models that augment other models, the modeler will have to
+    model ietf-thermostat {
+        namespace "tag:ietf:thermostat";
+        container thermostat {
+            leaf high-temperature {
+                type int;
+            }
+            leaf low-temperature {
+                type int;
+            }
+            leaf current-temperature {
+                type int;
+                config false;
+            }
+        }
+    }
+
+This model could be processed to create a "/foo-state" style model by
+mirroring the entire tree under a top-level "config false" container,
+while "config false" nodes are removed from the "config true" hierarchy:
+
+    model ietf-thermostat-top-state {
+        namespace "tag:ietf:thermostat-top-state";
+        container thermostat {
+            leaf high-temperature {
+                type int;
+            }
+            leaf low-temperature {
+                type int;
+            }
+        }
+        container thermostat-state {
+            config false;
+            leaf high-temperature {
+                type int;
+            }
+            leaf low-temperature {
+                type int;
+            }
+            leaf current-temperature {
+                type int;
+            }
+        }
+    }
+
+A "config"/"state"-style model can also be derived by creating
+"config" containers with only "config true" nodes and "state"
+containers with both "config false" nodes and "config false" versions
+of the "config true" nodes:
+
+    model ietf-thermostat-dual-containers {
+        namespace "tag:ietf:thermostat-dual-containers";
+        container thermostat {
+            container config {
+                leaf high-temperature {
+                    type int;
+                }
+                leaf low-temperature {
+                    type int;
+                }
+            }
+            container state {
+                config false;
+                leaf high-temperature {
+                    type int;
+                }
+                leaf low-temperature {
+                    type int;
+                }
+                leaf current-temperature {
+                    type int;
+                }
+            }
+        }
+    }
+
+By adopting a tools-based solution for supporting existing
+implementations of models that are currently under development, models
+can be quickly restructured to the NMDA-compatible while giving
+continuity to their community of developers.  When NMDA-capable
+implementations become available, the base data models can be use
+directly.
+
+It is critical to consider the following guidelines, understanding
+that our goal is to make models that will see continued use in the
+long term, balancing short term needs against a desire for consistent,
+usable models in the future:
+
+(a) For new models, the model SHOULD target the NMDA, with the
+expectation that their models will be used by NMDA-capable
+implementations and their operational data will be available via the
+<operational> datastore.
+
+(b) For models currently under development, the model SHOULD target
+the NMDA, using the tools-based approach outlined above to give
+continuity to early implementations.
+
+(c) For published models, the model should be republished with an
+NMDA-compatible structure, deprecating non-NMDA constructs.  For
+example, the "ietf-interfaces" model in ^RFC7223^ will be restructured
+as an NMDA-compatible model.  The "/interfaces-state" hierarchy marked
+"status deprecated".
+
+(d) For models that augment other models, the modeler will have to
 consider the structure of the base model and the guidelines listed
 above.  In general, augmenting "state" containers SHOULD be avoided,
 with the expectation that the base model will be re-released with the
-state containers marked as deprecated.
+state containers marked as deprecated.  It is RECOMMENDED to augment
+only the "/foo" hierarchy of the base model.
 
-It is critical to consider these as guidelines, understanding that our
-goal is to make models that will see continued use in the long term.
-There needs to be a balance between short term needs and a desire
-for consistent, usable models in the future.
-
-Regarding the deprecation of state trees, as recommended in guidelines
-(c) or (d), please note that deprecation signals that the node is
-targeted for removal, but (per ^RFC7950^) permits new/continued
-implementation in order to foster interoperability with older/existing
-implementations. The deprecation of state trees is recommended as it
-allows NMDA-capable implementations to avoid the cost of duplicating
-the state nodes, while enabling non-NMDA-capable implementations to
-implement them to provide access to the operational values.  Ultimately,
+Regarding the deprecation of state trees recommended in guideline (c),
+deprecation signals that the node is targeted for removal, but (per
+^RFC7950^) permits new, continued implementation in order to foster
+interoperability with older, existing implementations.  Models that
+mark their "/foo-state" hierarchy with "status deprecated" will allow
+NMDA-capable implementations to avoid the cost of duplicating the
+state nodes, while enabling non-NMDA-capable implementations to
+provide them for access to the operational values.  Ultimately,
 however, the decision to deprecate the state trees needs to take into
 account the progress of the NMDA and the availability of NMDA-capable
 implementations.
-
