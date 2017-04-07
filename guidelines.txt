@@ -103,7 +103,9 @@ implementations and NMDA-capable implementations.
 The direction taken should be based on both the maturity of the data
 model, along with the number of concrete implementations of the model.
 The intent is not to destabilize the IETF modeling community, but to
-create models that can take advantage of the NMDA.
+create models that can take advantage of the NMDA, while pragmatically
+allowing those models to be used with the existing network
+configuration protocol implementations.
 
 It is the strong recommendation that models SHOULD move as quickly as
 possible to the NMDA.  This is key to the future of these models, and
@@ -230,24 +232,17 @@ continuity to early implementations.
 (c) For published models, the model should be republished with an
 NMDA-compatible structure, deprecating non-NMDA constructs.  For
 example, the "ietf-interfaces" model in ^RFC7223^ will be restructured
-as an NMDA-compatible model.  The "/interfaces-state" hierarchy marked
-"status deprecated".
+as an NMDA-compatible model.  The "/interfaces-state" hierarchy will
+be marked "status deprecated".  Models that mark their "/foo-state"
+hierarchy with "status deprecated" will allow NMDA-capable
+implementations to avoid the cost of duplicating the state nodes,
+while enabling non-NMDA-capable implementations to provide them for
+access to the operational values.
 
-(d) For models that augment other models, the modeler will have to
-consider the structure of the base model and the guidelines listed
-above.  In general, augmenting "state" containers SHOULD be avoided,
-with the expectation that the base model will be re-released with the
-state containers marked as deprecated.  It is RECOMMENDED to augment
-only the "/foo" hierarchy of the base model.
-
-Regarding the deprecation of state trees recommended in guideline (c),
-deprecation signals that the node is targeted for removal, but (per
-^RFC7950^) permits new, continued implementation in order to foster
-interoperability with older, existing implementations.  Models that
-mark their "/foo-state" hierarchy with "status deprecated" will allow
-NMDA-capable implementations to avoid the cost of duplicating the
-state nodes, while enabling non-NMDA-capable implementations to
-provide them for access to the operational values.  Ultimately,
-however, the decision to deprecate the state trees needs to take into
-account the progress of the NMDA and the availability of NMDA-capable
-implementations.
+(d) For models that augment models which have not been structured with
+the NMDA, the modeler will have to consider the structure of the base
+model and the guidelines listed above.  In general, augmenting "state"
+containers SHOULD be avoided, with the expectation that the base model
+will be re-released with the state containers marked as deprecated.
+It is RECOMMENDED to augment only the "/foo" hierarchy of the base
+model.
