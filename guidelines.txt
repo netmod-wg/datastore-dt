@@ -215,6 +215,10 @@ continuity to their community of developers.  When NMDA-capable
 implementations become available, the base data models can be use
 directly.
 
+Modelers and reviewers can view the simple data model, published in
+the RFCs.  Tools can generate any required derived models, and those
+models can be published into appropriate module repositories.
+
 It is critical to consider the following guidelines, understanding
 that our goal is to make models that will see continued use in the
 long term, balancing short term needs against a desire for consistent,
@@ -241,7 +245,9 @@ access to the operational values.
 
 (d) For models that augment models which have not been structured with
 the NMDA, the modeler will have to consider the structure of the base
-model and the guidelines listed above.  In general, augmenting "state"
+model and the guidelines listed above.  Where possible, such models
+should move to new revisions of the base model that are
+NMDA-compatible.  When that is not possible, augmenting "state"
 containers SHOULD be avoided, with the expectation that the base model
 will be re-released with the state containers marked as deprecated.
 It is RECOMMENDED to augment only the "/foo" hierarchy of the base
