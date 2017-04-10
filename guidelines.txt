@@ -210,9 +210,9 @@ of the "config true" nodes:
 
 By adopting a tools-based solution for supporting existing
 implementations of models that are currently under development, models
-can be quickly restructured to the NMDA-compatible while giving
+can be quickly restructured to be NMDA-compatible while giving
 continuity to their community of developers.  When NMDA-capable
-implementations become available, the base data models can be use
+implementations become available, the base data models can be used
 directly.
 
 Modelers and reviewers can view the simple data model, published in
