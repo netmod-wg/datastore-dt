@@ -59,7 +59,7 @@ This document defines the following terms:
   collected statistics. State data is transient and modified by
   interactions with internal components or other systems.
   State data is modeled in YANG using "config false" nodes.
-- operational state data: The combination of applied configuration
+s- operational state data: The combination of applied configuration
   data, system configuration data, default configuration data, and
   state data.
 - datastore: A conceptual place to store and access information.  A
@@ -421,11 +421,39 @@ identity "dhcp" derived from "dynamic".
 # - no validation in operational
 #
 # Do we need more text than what we already have for the issues above?
-#
-# - notif/rpc/action xpath context to <opertional>
-# - by default, any rpc/notif/action is validated towards operational,
-#   but may affect any datastore (eg edit-config).  descriptions can be
-#   used to modify this behavior.
+
+** XPath Context
+
+If a server implements the architecture defined in this document, the
+accessible trees for some XPath contexts are refined as follows:
+
+- If the XPath expression is defined in a substatement to a data node
+  that represents state data, the accessible tree is all operational
+  state data in the server.  The root node has all top-level data
+  nodes in all modules as children.
+- If the XPath expression is defined in a substatement to a
+  "notification" statement, the accessible tree is the notification
+  instance and all operational state data in the server.  If the
+  notification is defined on the top level in a module, then the root
+  node has the node representing the notification being defined and
+  all top-level data nodes in all modules as children.  Otherwise, the
+  root node has all top-level data nodes in all modules as children.
+- If the XPath expression is defined in a substatement to an "input"
+  statement in an "rpc" or "action" statement, the accessible tree is
+  the RPC or action operation instance and all operational state data
+  in the server.  The root node has top-level data nodes in all modules
+  as children.  Additionally, for an RPC, the root node also has the
+  node representing the RPC operation being defined as a child.  The
+  node representing the operation being defined has the operation's
+  input parameters as children.
+- If the XPath expression is defined in a substatement to an "output"
+  statement in an "rpc" or "action" statement, the accessible tree is
+  the RPC or action operation instance and all operational state data
+  in the server.  The root node has top-level data nodes in all modules
+  as children.  Additionally, for an RPC, the root node also has the
+  node representing the RPC operation being defined as a child.  The
+  node representing the operation being defined has the operation's
+  output parameters as children.
 
 * Guidelines for Defining Datastores @guidelines@
 
