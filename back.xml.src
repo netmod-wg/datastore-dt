@@ -2,8 +2,6 @@
 
 <references title="Normative References">
 
-  ietf-ref:RFC2119
-
   ietf-ref:RFC6241
 
   ietf-ref:RFC7952

@@ -24,11 +24,6 @@ protocols.
 
 * Terminology
 
-The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-"OPTIONAL" in this document are to be interpreted as described in BCP
-14, ^RFC2119^.
-
 This document defines the following terms:
 
 - configuration data: Data that determines how a device behaves.
@@ -322,9 +317,6 @@ information is ephemeral, i.e., lost upon reboot.  The dynamic
 datastores interact with the rest of the system through the
 <operational> datastore.
 
-Note that the ephemeral datastore discussed in I2RS documents maps to
-a dynamic datastore in the datastore model described here.
-
 ** The <operational> Datastore
 
 The <operational> datastore is a read-only datastore that
@@ -457,17 +449,17 @@ accessible trees for some XPath contexts are refined as follows:
 
 * Guidelines for Defining Datastores @guidelines@
 
-The definition of a new datastore in this architecture SHOULD be
+The definition of a new datastore in this architecture should be
 provided in a document (e.g., an RFC) purposed to the definition of
-the datastore.  When it makes sense, more than one datastore MAY be
+the datastore.  When it makes sense, more than one datastore may be
 defined in the same document (e.g., when the datastores are logically
-connected).  Each datastore's definition SHOULD address the points
+connected).  Each datastore's definition should address the points
 specified in the sections below.
 
 ** Define a name for the datastore @def-name@
 
-Each datastore MUST have a name using the character set
-described by Section 6.2 of ^RFC7950^.  The name SHOULD be consistent
+Each datastore must have a name using the character set
+described by Section 6.2 of ^RFC7950^.  The name should be consistent
 in style and length to other datastore names described in this
 document.
 
@@ -517,20 +509,20 @@ filtering, etc.).
 
 ** Define a module for the datastore @def-module@
 
-Each datastore MUST be defined by a YANG module.
+Each datastore must be defined by a YANG module.
 This module is used by servers to indicate (e.g., via YANG Library)
 their support for the datastore.
 
-The YANG module MUST import the "ietf-datastores" and "ietf-origin"
+The YANG module must import the "ietf-datastores" and "ietf-origin"
 modules, defined in this document.  This is necessary in order to
 access the base identities they define.
 
-The YANG module MUST define an identity that uses the "ds:datastore"
+The YANG module must define an identity that uses the "ds:datastore"
 identity or one of its derived identities as its base.  This identity
 is necessary so that the datastore can be referenced in protocol
 operations (e.g., <get-data>).
 
-The YANG module MAY define an identity that uses the "or:origin"
+The YANG module may define an identity that uses the "or:origin"
 identity or one its derived identities as its base.  This identity is
 needed if the datastore interacts with <operational> so that data
 originating from the datastore can be identified as such via the
