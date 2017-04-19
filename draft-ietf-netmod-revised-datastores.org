@@ -59,7 +59,7 @@ This document defines the following terms:
   collected statistics. State data is transient and modified by
   interactions with internal components or other systems.
   State data is modeled in YANG using "config false" nodes.
-s- operational state data: The combination of applied configuration
+- operational state data: The combination of applied configuration
   data, system configuration data, default configuration data, and
   state data.
 - datastore: A conceptual place to store and access information.  A
@@ -397,7 +397,7 @@ marked with a metadata annotation (^RFC7952^) that indicates its
 origin.  The "origin" metadata annotation is defined in ^yang-module^.
 The values are YANG identities.  The following identities are defined:
 
-- origin: abstract base identity from which the other identites are
+- origin: abstract base identity from which the other identities are
   derived.
 - intended: represents data provided by the <intended> datastore.
 - dynamic: represents data provided by a dynamic datastore or a
@@ -512,7 +512,7 @@ By default, it is assumed that both the NETCONF and RESTCONF
 protocols can be used to interact with a datastore.
 However, it may be that only a specific protocol can be used
 (e.g., Forces) or that a subset of all protocol operations or
-capabilities are available (e.g., no locking, no xpath-based
+capabilities are available (e.g., no locking, no XPath-based
 filtering, etc.).
 
 ** Define a module for the datastore @def-module@
@@ -526,7 +526,7 @@ modules, defined in this document.  This is necessary in order to
 access the base identities they define.
 
 The YANG module MUST define an identity that uses the "ds:datastore"
-identity or one of its derived identites as its base.  This identity
+identity or one of its derived identities as its base.  This identity
 is necessary so that the datastore can be referenced in protocol
 operations (e.g., <get-data>).
 
@@ -543,7 +543,7 @@ An example of these guidelines in use is provided in
 
 !! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-03-13.yang"
 
-!! include-figure ietf-origin.yang extract-to="ietf-datastores@2017-03-13.yang"
+!! include-figure ietf-origin.yang extract-to="ietf-origin@2017-03-13.yang"
 
 * IANA Considerations @iana-con@
 
@@ -979,7 +979,7 @@ provide combined config/state trees.
   operational state datastore. The netconf-config-change notification
   does explicitly identify a datastore. I think we generally need to
   have remote procedure calls and notifications be explicit about which
-  datastores they apply to and perhaps change the default xpath context
+  datastores they apply to and perhaps change the default XPath context
   from running plus state to the operational state datastore.
 
 + Should we add an identity "datastore-writable"?  If we do, we would
