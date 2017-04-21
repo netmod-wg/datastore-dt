@@ -8,7 +8,7 @@ examples =
 trees =
 std_yang =
 ex_yang =
-references_src = references.back
+references_src = references.txt
 references_xml = references.xml
 
 # ----------------------------
@@ -64,7 +64,7 @@ idnits: ${output}.txt
 
 clean:
 	-rm -f ${output_base}-[0-9][0-9].* ${references_xml} $(load)
-	-rm -f *.dsrl *.rng *.sch
+	-rm -f *.dsrl *.rng *.sch ${draft_base}.fxml
 
 .INTERMEDIATE: $(load)
 %.load: %.xml
