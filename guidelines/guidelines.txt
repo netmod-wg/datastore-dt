@@ -44,16 +44,17 @@ possible to the NMDA.  The approach to be taken for models being
 developed now and during the NMDA transition period should be based on
 both the expected usage and the maturity of the data model.
 
-1. New models and models which are not concerned with the operational
++ New models and models which are not concerned with the operational
 state of configuration information can immediately be structured for
-NMDA.
+the NMDA.
 
-2. Models that require immediate support for "in use" and "system
-created" information should be structured for NMDA and then use
-tooling or a manual process to create derived "with-state" versions of
-the model.  Both NMDA and derived modules SHOULD be published
-concurrently with NMDA model in a Standards Track RFC and the
-derived modules in an Informational RFC.
++ Models that require immediate support for "in use" and "system
+created" information should be structured for NMDA and then derived
+versions of these model should be created, either by hand or with
+suitable tools, that will mirror the current modeling strategies.
+Both NMDA and derived modules SHOULD be published concurrently with
+NMDA model in a Standards Track RFC and the derived modules in an
+Informational RFC.
 
 There is an understanding that models may be unable to accept the
 recommendations of these guidelines due to the maturity of the model
