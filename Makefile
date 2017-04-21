@@ -57,6 +57,8 @@ output = ${output_base}-${next_ver}
 
 submit: ${output}.txt
 
+html: ${output}.html
+
 latest: ${output}.txt
 
 idnits: ${output}.txt
@@ -101,6 +103,6 @@ ${output}.txt: ${output}.xml
 %.tree: %.yang
 	$(pyang) -f tree --tree-line-length 68 $< > $@
 
-${output}.html: ${draft}
+${output}.html: ${draft} ${references_xml} $(trees) $(load) $(yang)
 	@echo "Generating $@ ..."
 	$(oxtradoc) -m html -n "${output}" $< > $@
