@@ -61,10 +61,11 @@ module ietf-datastores {
      "Abstract base identity for datastore identities.";
   }
 
-  identity static {
+  identity conventional {
     base datastore;
     description
-     "Abstract base identity for static configuration datastores.";
+     "Abstract base identity for "
+     "conventional configuration datastores.";
   }
 
   identity dynamic {
@@ -74,25 +75,25 @@ module ietf-datastores {
   }
 
   identity running {
-    base static;
+    base conventional;
     description
      "The 'running' datastore.";
   }
 
   identity candidate {
-    base static;
+    base conventional;
     description
      "The 'candidate' datastore.";
   }
 
   identity startup {
-    base static;
+    base conventional;
     description
      "The 'startup' datastore.";
   }
 
   identity intended {
-    base static;
+    base conventional;
     description
      "The 'intended' datastore.";
   }
