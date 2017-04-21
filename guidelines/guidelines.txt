@@ -53,8 +53,9 @@ created" information should be structured for NMDA and then derived
 versions of these model should be created, either by hand or with
 suitable tools, that will mirror the current modeling strategies.
 Both NMDA and derived modules SHOULD be published concurrently with
-NMDA model in a Standards Track RFC and the derived modules in an
-Informational RFC.
+NMDA modules in a Standards Track RFC and the derived modules in an
+Informational RFC.  The use of derived models allows temporary
+bridging of the time period until NMDA implementations are available.
 
 There is an understanding that models may be unable to accept the
 recommendations of these guidelines due to the maturity of the model
