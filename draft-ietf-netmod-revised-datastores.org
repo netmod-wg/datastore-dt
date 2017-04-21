@@ -336,17 +336,17 @@ Changes to configuration data may take time to percolate through to
 the <operational> datastore.  During this period, the <operational>
 datastore will return data nodes for both the previous and current
 configuration, as closely as possible tracking the current operation
-of the device.  These "remnants" of the previous configuration persist
+of the device.  Such remnant data from the previous configuration persists
 until the system has released resources used by the newly-deleted
 configuration data (e.g., network connections, memory allocations, file
 handles).
 
-As a result of these remnants, the semantic constraints defined in the
+As a result of remnant data, the semantic constraints defined in the
 data model cannot be relied upon for the <operational> datastore,
-since the system may have remnants whose constraints were valid with
+since the system may have remnant data whose constraints were valid with
 the previous configuration and that are not valid with the current
 configuration.  Since constraints on "config false" nodes may refer to
-"config true" nodes, remnants may force the violation of those
+"config true" nodes, remnant data may force the violation of those
 constraints.  The constraints that may not hold include "when",
 "must", "min-elements", and "max-elements".  Note that syntactic
 constraints cannot be violated, including hierarchical organization,
