@@ -50,8 +50,8 @@ the NMDA.
 
 + Models that require immediate support for "in use" and "system
 created" information should be structured for NMDA and then derived
-versions of these model should be created, either by hand or with
-suitable tools, that will mirror the current modeling strategies.
+versions of these models should be created, either by hand or with
+suitable tools, that  mirror the current modeling strategies.
 Both NMDA and derived modules SHOULD be published concurrently with
 NMDA modules in a Standards Track RFC and the derived modules in an
 Informational RFC.  The use of derived models allows temporary
@@ -60,7 +60,8 @@ bridging of the time period until NMDA implementations are available.
 There is an understanding that models may be unable to accept the
 recommendations of these guidelines due to the maturity of the model
 and its implementations, but wherever possible, these guidelines
-should be followed.
+should be followed, even if only to set the draft's Intended Status
+to Informational.
 
 ** Background
 
@@ -177,12 +178,10 @@ contents can be automatically generated from simpler, more readable
 published models.  An example of such tooling would be the [name needed]
 model-generating back-end to the "pyang" YANG compiler [ref needed].
 
-These derived models will use distinct namespaces, allowing servers to
-announce their support for the base or derived models.  A small suffix
-can be appended to the base model's name and namespace string.
-Alternatively, a YANG extension statement can be created to hold this
-information within the data model, where it can be visible to the
-tools.
+These derived models will use distinct module names and namespaces,
+allowing servers to announce their support for the base or derived
+ models.  To simplify automation, a small suffix can be appended to
+the base model's name and namespace strings.
 
 Tools can take a variety of approaches, tailored to the desired style
 of derived module needed.  For example, consider the following trivial
