@@ -2,58 +2,69 @@
 # https://pypi.python.org/pypi/xml2rfc
 # https://github.com/Juniper/libslax/tree/master/doc/oxtradoc
 
+draft = draft-ietf-netmod-revised-datastores.org
+output_base = draft-ietf-netmod-revised-datastores
+examples =
+trees =
+std_yang =
+ex_yang =
+references_src = references.txt
+references_xml = references.xml
+
+# ----------------------------
+# Shouldn't need to modify anything below this line
+
+ifeq (,$(draft))
+possible_drafts = draft-*.xml draft-*.md draft-*.org
+draft := $(lastword $(sort $(wildcard ${possible_drafts})))
+endif
+
+draft_base = $(basename ${draft})
+draft_type := $(suffix ${draft})
+
+ifeq (,${examples})
+examples = $(wildcard ex-*.xml)
+endif
+load=$(patsubst ex-%.xml,ex-%.load,$(examples))
+
+ifeq (,${std_yang})
+std_yang := $(wildcard ietf*.yang)
+endif
+ifeq (,${ex_yang})
+ex_yang := $(wildcard ex*.yang)
+endif
+yang := $(std_yang) $(ex_yang)
+
 xml2rfc ?= xml2rfc
 oxtradoc ?= oxtradoc
 idnits ?= idnits
 pyang ?= pyang
-
-draft := $(basename $(lastword $(sort $(wildcard draft-*.xml)) $(sort $(wildcard draft-*.md)) $(sort $(wildcard draft-*.org)) ))
-
-examples = $(wildcard ex-*.xml)
-load=$(patsubst ex-%.xml,ex-%.load,$(examples))
-trees =
 
 ifeq (,$(draft))
 $(warning No file named draft-*.md or draft-*.xml or draft-*.org)
 $(error Read README.md for setup instructions)
 endif
 
-draft_type := $(suffix $(firstword $(wildcard $(draft).md $(draft).org $(draft).xml) ))
-
-current_ver := $(shell git tag | grep '$(draft)-[0-9][0-9]' | tail -1 | sed -e"s/.*-//")
+current_ver := $(shell git tag | grep '${output_base}-[0-9][0-9]' | tail -1 | sed -e"s/.*-//")
 ifeq "${current_ver}" ""
 next_ver ?= 00
 else
 next_ver ?= $(shell printf "%.2d" $$((1$(current_ver)-99)))
 endif
-next := $(draft)-$(next_ver)
-
-std-yang := $(wildcard ietf*.yang)
-
-ex-yang := $(wildcard ex*.yang)
-
-yang := $(std-yang) $(ex-yang)
+output = ${output_base}-${next_ver}
 
 .PHONY: latest submit clean validate
 
-submit: $(next).txt
+submit: ${output}.txt
 
-latest: $(draft).txt
+latest: ${output}.txt
 
-idnits: $(next).txt
+idnits: ${output}.txt
 	$(idnits) $<
 
 clean:
-	-rm -f $(draft).txt back.xml $(load)
-	-rm -f *.dsrl *.rng *.sch
-	-rm -f $(next).txt
-	-rm -f $(draft)-[0-9][0-9].xml
-ifeq (.md,$(draft_type))
-	-rm -f $(draft).xml
-endif
-ifeq (.org,$(draft_type))
-	-rm -f $(draft).xml
-endif
+	-rm -f ${output_base}-[0-9][0-9].* ${references_xml} $(load)
+	-rm -f *.dsrl *.rng *.sch ${draft_base}.fxml back.xml
 
 %.load: %.xml
 	 cat $< | awk -f fix-load-xml.awk > $@
@@ -76,26 +87,20 @@ validate-ex-xml: ietf-origin.yang example-system.yang \
 	yang2dsdl -j -t data -v ex-intended.xml $< example-system.yang
 	yang2dsdl -j -t data -v ex-oper.xml $< example-system.oper.yang
 
-back.xml: back.xml.src
-	./mk-back $< > $@
+${references_xml}: ${references_src}
+	$(oxtradoc) -m mkback $< > $@
 
-$(next).xml: $(draft).xml
-	sed -e"s/$(basename $<)-latest/$(basename $@)/" $< > $@
+.INTERMEDIATE: ${output}.xml
 
-$(draft).xml: back.xml $(trees) $(load) $(yang)
+${output}.xml: ${draft} ${references_xml} $(trees) $(load) $(yang)
+	$(oxtradoc) -m outline-to-xml -n "${output}" $< > $@
 
-.INTERMEDIATE: $(draft).xml
-
-%.xml: %.org
-	$(oxtradoc) -m outline-to-xml -n "$(basename $<)-latest" $< > $@
-
-%.txt: %.xml
+${output}.txt: ${output}.xml
 	$(xml2rfc) $< -o $@ --text
 
 %.tree: %.yang
 	$(pyang) -f tree --tree-line-length 68 $< > $@
 
-RFC2629XSLT = xsltproc --path ../bin ../bin/rfc2629-yang.xslt
-%.html: %.xml
+${output}.html: ${draft}
 	@echo "Generating $@ ..."
-	@${RFC2629XSLT}  $< > $@ || (rm $@ ; false)
+	$(oxtradoc) -m html -n "${output}" $< > $@
