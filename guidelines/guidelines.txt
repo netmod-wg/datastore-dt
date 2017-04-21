@@ -51,7 +51,7 @@ the NMDA.
 + Models that require immediate support for "in use" and "system
 created" information should be structured for NMDA and then derived
 versions of these models should be created, either by hand or with
-suitable tools, that  mirror the current modeling strategies.
+suitable tools, that mirror the current modeling strategies.
 Both NMDA and derived modules SHOULD be published concurrently with
 NMDA modules in a Standards Track RFC and the derived modules in an
 Informational RFC.  The use of derived models allows temporary
@@ -180,8 +180,12 @@ model-generating back-end to the "pyang" YANG compiler [ref needed].
 
 These derived models will use distinct module names and namespaces,
 allowing servers to announce their support for the base or derived
- models.  To simplify automation, a small suffix can be appended to
-the base model's name and namespace strings.
+models.  To simplify automation, a small suffix can be appended to
+the base model's name and namespace strings.  Alternatively, a YANG
+extension statement can be created to hold this information within
+the data model, where it will be available for tools to use when
+generating derived modules.
+
 
 Tools can take a variety of approaches, tailored to the desired style
 of derived module needed.  For example, consider the following trivial
@@ -225,6 +229,30 @@ hierarchy, while operational values would be available under another:
                 type int;
             }
         }
+        container thermostat-state {
+            config false;
+            leaf high-temperature {
+                description "High temperature threshold";
+                type int;
+            }
+            leaf low-temperature {
+                description "Low temperature threshold";
+                type int;
+            }
+            leaf current-temperature {
+                description "Current temperature reading";
+                type int;
+            }
+        }
+    }
+
+Another approach would be to have the derived module contain only the
+generated "/foo-state" hierarchy, using the original model's "/foo"
+hierarchy.  This "half step" towards the NMDA might ease the
+transition to the new architecture:
+
+    module ietf-thermostat-only-state {
+        namespace "tag:ietf:thermostat-only-state";
         container thermostat-state {
             config false;
             leaf high-temperature {
