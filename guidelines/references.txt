@@ -1,12 +1,8 @@
 {{references:
-    title "Normative References";
+    title "Informative References";
     ietf-ref RFC6241;
+    ietf-ref RFC7223;
     ietf-ref RFC7950;
     ietf-ref RFC8040;
-}}
-
-{{references:
-    title "Informative References";
-    ietf-ref RFC7223;
     ietf-ref I-D.ietf-netmod-revised-datastores;
 }}
