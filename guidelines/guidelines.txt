@@ -67,8 +67,10 @@ bridging of the time period until NMDA implementations are available.
 There is an understanding that models may be unable to accept the
 recommendations of these guidelines due to the maturity of the model
 and its implementations, but wherever possible, these guidelines
-should be followed, even if only to set the draft's Intended Status
-to Informational.
+should be followed.  In this case, the draft containing the non-NMDA
+model should have the Intended Status value Informational, and an
+NMDA-compatible model should still be published, even if it is not
+used to derive the non-NMDA model.
 
 ** Background
 
@@ -341,7 +343,14 @@ give continuity to early implementations.  These derived models SHOULD
 be concurrently submitted for publication as separate Informational
 RFCs.
 
-(c) For published models, the model should be republished with an
+(c) For models currently under development that cannot follow
+recommendation (b) due to the maturity of the model and its
+implementations, the draft containing the non-NMDA model should have
+the Intended Status value Informational, and an NMDA-compatible model
+should still be published, even if it is not used to derive the
+non-NMDA model.
+
+(d) For published models, the model should be republished with an
 NMDA-compatible structure, deprecating non-NMDA constructs.  For
 example, the "ietf-interfaces" model in ^RFC7223^ will be restructured
 as an NMDA-compatible model.  The "/interfaces-state" hierarchy will
@@ -351,7 +360,7 @@ implementations to avoid the cost of duplicating the state nodes,
 while enabling non-NMDA-capable implementations to provide them for
 access to the operational values.
 
-(d) For models that augment models which have not been structured with
+(e) For models that augment models which have not been structured with
 the NMDA, the modeler will have to consider the structure of the base
 model and the guidelines listed above.  Where possible, such models
 should move to new revisions of the base model that are
