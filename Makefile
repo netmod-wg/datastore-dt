@@ -66,7 +66,7 @@ idnits: ${output}.txt
 
 clean:
 	-rm -f ${output_base}-[0-9][0-9].* ${references_xml} $(load)
-	-rm -f *.dsrl *.rng *.sch ${draft_base}.fxml back.xml
+	-rm -f *.dsrl *.rng *.sch ${draft_base}.fxml
 
 %.load: %.xml
 	 cat $< | awk -f fix-load-xml.awk > $@

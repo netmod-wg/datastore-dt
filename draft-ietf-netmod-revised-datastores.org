@@ -48,7 +48,7 @@ This document defines the following terms:
   configuration datastore. A candidate datastore may not be supported
   by all protocols or implementations.  This datastore is commonly
   referred to as "<candidate>".
-- startup configuration datastore: The configuration datastore holding
+- startup configuration datastore: A configuration datastore holding
   the configuration loaded by the device into the running
   configuration datastore when it boots. A startup datastore may not
   be supported by all protocols or implementations.  This datastore is
@@ -58,20 +58,22 @@ This document defines the following terms:
   inactive configuration data and it includes configuration data
   produced through the expansion of templates.
 - intended configuration datastore: A configuration datastore holding
-  the complete intended configuration of the device.  This datastore
+  the complete intended configuration data of the device.  This datastore
   is commonly referred to as "<intended>".
-- conventional datastore: One of the following set of datastores:
-  <running>, <startup>, <candidate>, and <intended>.  These datastores
-  share a common schema and NETCONF/RESTCONF operations allow copying
-  data between these datastores.  The term "conventional" is chosen
-  as a generic umbrella term for these datastores.
+- conventional configuration datastore: One of the following set of
+  datastores: <running>, <startup>, <candidate>, and <intended>.
+  These datastores share a common schema and NETCONF operations allow
+  copying data between these datastores.  The term "conventional" is
+  chosen as a generic umbrella term for these datastores.  Other
+  conventional datastores may be defined in future documents.
 - conventional configuration data: Configuration data that is stored
-  in any of the conventional datastores.
+  in any of the conventional configuration datastores.
 - operational state data: The combination of applied configuration
   data, system configuration data, default configuration data, and
   state data.
 - operational state datastore: A datastore holding the
-  complete operational state data of the device.
+  complete operational state data of the device.  This datastore
+  is commonly referred to as "<operational>".
 - dynamic data: Data that is obtained dynamically during the operation
   of a device through interaction with other systems.
 - dynamic configuration data: Dynamic data that is also configuration
