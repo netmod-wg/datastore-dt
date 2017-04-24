@@ -1,14 +1,14 @@
 #!/usr/local/bin/oxtradoc -m html
 #
 
-The "Network Management Datastore Architecture" (NMDA)
-^I-D.ietf-netmod-revised-datastores^ adds the ability to inspect the
-current operational values for configuration, allowing clients to use
-identical paths for retrieving the configured values and the
-operational values.  This change will simplify models and help
-modelers, but will create a period of churn as NMDA becomes a standard
-and is widely implemented.  During that interim, the guidelines given
-in this document should help modelers find an optimal path forward.
+The "Network Management Datastore Architecture" (NMDA) adds the
+ability to inspect the current operational values for configuration,
+allowing clients to use identical paths for retrieving the configured
+values and the operational values.  This change will simplify models
+and help modelers, but will create a period of churn as NMDA becomes a
+standard and is widely implemented.  During that interim, the
+guidelines given in this document should help modelers find an optimal
+path forward.
 
 * Introduction
 
@@ -21,6 +21,13 @@ the YANG ^RFC7950^ data modeling language.  Datastores are a
 fundamental concept binding network management data models to network
 management protocols, allowing data models can be written in a network
 management protocol agnostic way.
+
+** Keywords
+
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in BCP
+14, ^RFC2119^.
 
 ** Terminology
 
@@ -355,6 +362,13 @@ It is RECOMMENDED to augment only the "/foo" hierarchy of the base
 model.  Where this recommendation cannot be followed, then any new
 "state" elements SHOULD be included in their own module.
 
+* IANA Considerations
+
+This document has no actions for IANA.
+
+* Security Considerations
+
+This document has no security considerations.
 
 {{document:
     ipr trust200902;
