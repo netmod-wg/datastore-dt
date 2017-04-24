@@ -36,19 +36,19 @@ This document defines the following terms:
 - configuration datastore: A datastore holding configuration
   data.  A configuration datastore maps to an instantiated YANG data
   tree consisting of configuration data nodes.
-- running configuration datastore: A configuration datastore holding
+- running datastore: A configuration datastore holding
   the configuration of the device.  This datastore is commonly
   referred to as "<running>".
   The running configuration datastore always exists. It may include
   inactive configuration or template-mechanism-oriented configuration
   that require further expansion.
-- candidate configuration datastore: A configuration datastore that
+- candidate datastore: A configuration datastore that
   can be manipulated without impacting the device's running
   configuration datastore and that can be committed to the running
   configuration datastore. A candidate datastore may not be supported
   by all protocols or implementations.  This datastore is commonly
   referred to as "<candidate>".
-- startup configuration datastore: A configuration datastore holding
+- startup datastore: A configuration datastore holding
   the configuration loaded by the device into the running
   configuration datastore when it boots. A startup datastore may not
   be supported by all protocols or implementations.  This datastore is
@@ -57,10 +57,10 @@ This document defines the following terms:
   be used by the device.  Intended configuration data excludes any
   inactive configuration data and it includes configuration data
   produced through the expansion of templates.
-- intended configuration datastore: A configuration datastore holding
+- intended datastore: A configuration datastore holding
   the complete intended configuration data of the device.  This datastore
   is commonly referred to as "<intended>".
-- conventional configuration datastore: One of the following set of
+- conventional datastore: One of the following set of configuration
   datastores: <running>, <startup>, <candidate>, and <intended>.
   These datastores share a common schema and NETCONF operations allow
   copying data between these datastores.  The term "conventional" is
@@ -313,6 +313,24 @@ and are thus not taken into account when validating the configuration.
 
 Another example is support for templates.  Templates are expanded
 when copied into <intended>, and the expanded result is validated.
+
+** Conventional Datastores
+
+The conventional datastores are a set of configuration datastores that
+share a common schema, allowing data to be copied between them.  The
+term is meant as a generic umbrella description of these datastores.
+The set of datastores include:
+
+- <running>
+- <candidate>
+- <startup>
+- <intended>
+
+The flow of data between these datastores is depicted in section
+^datastore-model^.
+
+The specific protocols may define explicit operations to copy between
+these datastores, e.g. NETCONF's <copy-config> operation.
 
 ** Dynamic Datastores
 
