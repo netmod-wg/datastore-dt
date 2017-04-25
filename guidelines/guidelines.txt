@@ -51,15 +51,15 @@ possible to the NMDA.  The approach to be taken for models being
 developed now and during the NMDA transition period should be based on
 both the expected usage and the maturity of the data model.
 
-+ New models and models which are not concerned with the operational
-state of configuration information can immediately be structured for
-the NMDA.
++ New models, and models that are not concerned with the operational
+state of configuration information, SHOULD immediately be structured 
+to be NMDA-compatable.
 
 + Models that require immediate support for "in use" and "system
-created" information should be structured for NMDA and then derived
-versions of these models should be created, either by hand or with
+created" information SHOULD be structured for NMDA and then derived
+versions of these models SHOULD be created, either by hand or with
 suitable tools, that mirror the current modeling strategies.
-Both NMDA and derived modules SHOULD be published concurrently with
+Both the NMDA and derived modules SHOULD be published concurrently with
 NMDA modules in a Standards Track RFC and the derived modules in an
 Informational RFC.  The use of derived models allows temporary
 bridging of the time period until NMDA implementations are available.
@@ -68,8 +68,8 @@ There is an understanding that models may be unable to accept the
 recommendations of these guidelines due to the maturity of the model
 and its implementations, but wherever possible, these guidelines
 should be followed.  In this case, the draft containing the non-NMDA
-model should have the Intended Status value Informational, and an
-NMDA-compatible model should still be published, even if it is not
+model SHOULD have the Intended Status value Informational, and an
+NMDA-compatible model SHOULD still be published, even if it is not
 used to derive the non-NMDA model.
 
 ** Background
@@ -189,8 +189,8 @@ model-generating back-end to the "pyang" YANG compiler [ref needed].
 
 These derived models will use distinct module names and namespaces,
 allowing servers to announce their support for the base or derived
-models.  To simplify automation, a small suffix can be appended to
-the base model's name and namespace strings.  Alternatively, a YANG
+models.  For example, a small suffix can be appended to the base 
+model's name and namespace strings.  Alternatively, a YANG
 extension statement can be created to hold this information within
 the data model, where it will be available for tools to use when
 generating derived modules.
