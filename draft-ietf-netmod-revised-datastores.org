@@ -50,7 +50,7 @@ This document defines the following terms:
   the configuration loaded by the device into the running
   configuration datastore when it boots.  This datastore is commonly
   referred to as "<startup>".
-- intended configuration data: Configuration data that is intended to
+- intended configuration: Configuration data that is intended to
   be used by the device.  For example, intended configuration excludes any
   inactive configuration and it would include configuration
   produced through the expansion of templates.
