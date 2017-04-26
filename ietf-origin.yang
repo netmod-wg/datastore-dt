@@ -32,9 +32,7 @@ module ietf-origin {
 
   description
     "This YANG module defines an 'origin' metadata annotation, and a
-     set of identities for the origin value.  The 'origin' metadata
-     annotation is used to mark data in the 'operational'
-     datastore with information on where the data originated.
+     set of identities for the origin value.
 
      Copyright (c) 2017 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
@@ -89,10 +87,10 @@ module ietf-origin {
   identity default {
     base origin;
     description
-      "Denotes data that does not have an explicitly configured
-       value, but has a default value in use.  Covers both simple
-       defaults and defaults defined via an explanation in a
-       description statement.";
+      "Denotes data that does not have an explicitly configured value,
+       but has a default value in use.  Covers both values defined in
+       a 'default' statement, and values defined via an explanation in
+       a 'description' statement.";
   }
 
   /*

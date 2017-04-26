@@ -37,22 +37,19 @@ This document defines the following terms:
   data.  A configuration datastore maps to an instantiated YANG data
   tree consisting of configuration data nodes.
 - running configuration datastore: A configuration datastore holding
-  the configuration of the device.  This datastore is commonly
-  referred to as "<running>".
-  The running configuration datastore always exists. It may include
+  the current configuration of the device.  It may include
   inactive configuration or template-mechanism-oriented configuration
-  that require further expansion.
+  that require further expansion.  This datastore is commonly
+  referred to as "<running>".
 - candidate configuration datastore: A configuration datastore that
   can be manipulated without impacting the device's running
   configuration datastore and that can be committed to the running
-  configuration datastore.  The candidate configuration datastore may
-  not be supported by all protocols or implementations.  This
-  datastore is commonly referred to as "<candidate>".
+  configuration datastore.  This datastore is commonly referred to as
+  "<candidate>".
 - startup configuration datastore: A configuration datastore holding
   the configuration loaded by the device into the running
-  configuration datastore when it boots.  The startup configuration
-  datastore may not be supported by all protocols or implementations.
-  This datastore is commonly referred to as "<startup>".
+  configuration datastore when it boots.  This datastore is commonly
+  referred to as "<startup>".
 - intended configuration: Configuration data that is intended to
   be used by the device.  For example, intended configuration excludes any
   inactive configuration and it would include configuration
@@ -62,7 +59,7 @@ This document defines the following terms:
   is commonly referred to as "<intended>".
 - conventional configuration datastore: One of the following set of
   configuration datastores: <running>, <startup>, <candidate>, and
-  <intended>.  These datastores share a common schema and NETCONF
+  <intended>.  These datastores share a common schema and protocol
   operations allow copying data between these datastores.  The term
   "conventional" is chosen as a generic umbrella term for these
   datastores.
@@ -258,6 +255,8 @@ model.
                          |   +------ dynamic configuration protocols
                          |   +------ control-plane protocols
                          |   +------ dynamic datastores
+                         |   +------ system configuration data
+                         |   +------ default configuration data
                          |   |
                          v   v
                  +---------------+
@@ -278,19 +277,24 @@ configuration datastore holding the configuration loaded by the device
 when it boots.  <startup> is only present on devices that separate the
 startup configuration from the running configuration datastore.
 
+The startup configuration datastore may not be supported by all
+protocols or implementations.
+
 ** The Candidate Configuration Datastore
 
 The candidate configuration datastore (<candidate>) is an optional
 configuration datastore that can be manipulated without impacting the
 device's current configuration and that can be committed to <running>.
 
+The candidate configuration datastore may not be supported by all
+protocols or implementations.
+
 ** The Running Configuration Datastore (<running>)
 
-The running configuration (<running>) datastore holds the complete
-configuration currently active on the device.  <running> always
-exists. It may include inactive configuration or
-template-mechanism-oriented configuration that require further
-expansion.
+The running configuration datastore (<running>) holds the complete
+current configuration on the device.  It may include inactive
+configuration or template-mechanism-oriented configuration that
+require further expansion.
 
 ** The Intended Configuration Datastore (<intended>)
 
@@ -420,7 +424,7 @@ The values are YANG identities.  The following identities are defined:
 - dynamic: represents data provided by a dynamic datastore or a
   dynamic configuration protocol.
 - default: represents data values specified in the data model, using
-  either simple values in the "default" statement or any values
+  either values in the "default" statement or any values
   described in the "description" statement.
 - system: represents data learned from the normal operations of the
   system, including control-plane protocols.
@@ -764,10 +768,10 @@ one or both of the nodes may not appear, since the system may not yet
 have their values.
 
   <bgp origin="or:intended" xmlns="urn:example:bgp">
-    <local-as>64642</local-as>
-    <peer-as>65000</peer-as>
-    <peer>
-      <name>10.1.2.3</name>
+    <local-as origin="or:intended">64642</local-as>
+    <peer-as origin="or:intended">65000</peer-as>
+    <peer origin="or:intended">
+      <name origin="or:intended">10.1.2.3</name>
       <local-as origin="or:default">64642</local-as>
       <peer-as origin="or:default">65000</peer-as>
       <local-port origin="or:system">60794</local-port>
@@ -793,14 +797,14 @@ with the "origin" attribute set to indicate the
 origin of the original data.
 
   <bgp origin="or:intended">
-    <local-as>64642</local-as>
-    <peer-as>65000</peer-as>
-    <peer>
-      <name>10.1.2.3</name>
+    <local-as origin="or:intended">64642</local-as>
+    <peer-as origin="or:intended">65000</peer-as>
+    <peer origin="or:intended">
+      <name origin="or:intended">10.1.2.3</name>
       <local-as origin="or:default">64642</local-as>
       <peer-as origin="or:default">65000</peer-as>
-      <local-port>60794</local-port>
-      <remote-port>179</remote-port>
+      <local-port origin="or:intended">60794</local-port>
+      <remote-port origin="or:intended">179</remote-port>
     </peer>
   </bgp>
 
@@ -857,9 +861,9 @@ will contain the data from <intended>, as well as the "config false"
 nodes, such as the current value of the interface's MTU.
 
   <interfaces origin="or:intended">
-    <interface>
-      <name>et-0/0/0</name>
-      <description>Test interface</description>
+    <interface origin="or:intended">
+      <name origin="or:intended">et-0/0/0</name>
+      <description origin="or:intended">Test interface</description>
       <mtu origin="or:system">1500</mtu>
     </interface>
   </interfaces>
@@ -916,91 +920,11 @@ group.
 
 !! include-figure example-ds-ephemeral.yang
 
-* Implications on Data Models
-
-[NOTE: This section will be removed before publication as an RFC.]
-
-Since the NETCONF <get/> operation returns the contents of <running>
-along with the operational state together in one tree, data models
-were often forced to branch at the top-level into a config true branch
-and a structurally similar config false branch that replicated some of
-the config true nodes and added state nodes.  With the datastore
-architecture described here, this is not needed anymore since the
-different datastores handle the different lifetimes of data objects.
-Introducing this architecture makes it possible to write simpler models.
-
-** Proposed migration of existing YANG Data Models
-
-For standards based YANG modules that have already been published,
-that are using split config and state trees, it is planned that these
-modules are updated with new revisions containing the following
-changes:
-
-- The top level module description is updated to indicate that the
-  module conforms to the revised datastore architecture with a
-  combined config and state tree, and that the existing state tree
-  nodes are deprecated, to be obsoleted over time.
-- All status "current" data nodes under the existing "state" trees are
-  copied to the equivalent place under the "config" tree:
- - If a node with the same name and type already exists under the
-   equivalent path in the config tree then the nodes are merged
-   and the description updated.
- - If a node with the same name but different type exists under the
-   equivalent path in the config tree, then the module authors must
-   choose the appropriate mechanism to combine the config and state
-   nodes in a backwards compatible way based on the data model design
-   guidelines below.  This may require the state node to be added to
-   the config tree with a modified name.  This scenario is expected
-   to be relatively uncommon.
- - If no node with the same name and path already exists under the
-   config tree then the state node schema is copied verbatim into the
-   config tree.
- - As the state nodes are copied into the config trees, any
-   leafrefs that reference other nodes in the state tree are adjusted
-   to reference the equivalent path in the config tree.
- - All status "current" nodes under the existing "state" trees are
-   marked as "status" deprecated.
-
-- Augmentations are similarly handled to data nodes as described
-  above.
-
-** Standardization of new YANG Data Models
-
-New standards based YANG modules, or those in active development,
-should be designed to conform to the revised datastore architecture,
-following the design guidelines described below, and only need to
-provide combined config/state trees.
-
-* Open Issues @issues@
-
-+ NETCONF needs to be able to filter data based on the origin
-  metadata.  Possibly this could be done as part of the <get-data>
-  operation.
-
-+ We need a means of inheriting @origin values, so whole hierarchies
-  can avoid the noise of repeating parent values.  This should
-  probably be a representation issue - logically all nodes have the
-  property, but in XML/JSON it makes sense to avoid repeating it for a
-  node if it is the same as its parent.
-
-+ We need to discuss somewhere how remote procedure calls
-  and notifications/actions tie into datastores. RFC 7950 shows as an
-  example a ping action tied to an interface.  Does this refer to an
-  interface defined in a configuration datastore? Or an interface
-  defined in the operational state datastore? Or the applied
-  configuration datastore? Similarly, RFC 7950 shows an example of a
-  link-failure notification; this likely applies implicitly to the
-  operational state datastore. The netconf-config-change notification
-  does explicitly identify a datastore. I think we generally need to
-  have remote procedure calls and notifications be explicit about which
-  datastores they apply to and perhaps change the default XPath context
-  from running plus state to the operational state datastore.
-
-+ Should we add an identity "datastore-writable"?  If we do, we would
-  let "running" and "candidate" (and future i2rs) derive from it, and
-  then also define "edit-data" to take a parameter "target" that is
-  derived from "datastore-writable".
-
+# * Open Issues @issues@
+#
+# + NETCONF needs to be able to filter data based on the origin
+#  metadata.  Possibly this could be done as part of the <get-data>
+#  operation.
 
 
 {{document:
