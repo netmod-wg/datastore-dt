@@ -19,7 +19,7 @@ architectural framework for datastores as they are used by network
 management protocols such as NETCONF ^RFC6241^, RESTCONF ^RFC8040^ and
 the YANG ^RFC7950^ data modeling language.  Datastores are a
 fundamental concept binding network management data models to network
-management protocols, allowing data models can be written in a network
+management protocols, enabling data models to be written in a network
 management protocol agnostic way.
 
 ** Keywords
