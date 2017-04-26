@@ -143,8 +143,8 @@ but note that NETCONF was defined before YANG did exist):
 Section 4.3.3 of ^RFC6244^ discusses operational state and among other
 things mentions the option to consider operational state as being
 stored in another datastore.  Section 4.4 of this document then
-concludes that at the time of the writing, modeling state as a
-separate data tree is the recommended approach.
+concludes that at the time of the writing, modeling state as distinct
+leafs and distinct branches is the recommended approach.
 
 Implementation experience and requests from operators
 ^I-D.ietf-netmod-opstate-reqs^, ^I-D.openconfig-netmod-opstate^
@@ -529,8 +529,8 @@ By default, it is assumed that both the NETCONF and RESTCONF
 protocols can be used to interact with a datastore.
 However, it may be that only a specific protocol can be used
 (e.g., Forces) or that a subset of all protocol operations or
-capabilities are available (e.g., no locking, no XPath-based
-filtering, etc.).
+capabilities are available (e.g., no locking or no XPath-based
+filtering).
 
 ** Define a module for the datastore @def-module@
 
@@ -595,7 +595,7 @@ are requested:
 
 * Security Considerations @sec-con@
 
-This document discusses a conceptual model of datastores for network
+This document discusses an architectural model of datastores for network
 management using NETCONF/RESTCONF and YANG.  It has no security impact
 on the Internet.
 
