@@ -36,48 +36,41 @@ This document defines the following terms:
 - configuration datastore: A datastore holding configuration
   data.  A configuration datastore maps to an instantiated YANG data
   tree consisting of configuration data nodes.
-- running datastore: A configuration datastore holding
+- running configuration datastore: A configuration datastore holding
   the configuration of the device.  This datastore is commonly
   referred to as "<running>".
   The running configuration datastore always exists. It may include
   inactive configuration or template-mechanism-oriented configuration
   that require further expansion.
-- candidate datastore: A configuration datastore that
+- candidate configuration datastore: A configuration datastore that
   can be manipulated without impacting the device's running
   configuration datastore and that can be committed to the running
-  configuration datastore. A candidate datastore may not be supported
-  by all protocols or implementations.  This datastore is commonly
-  referred to as "<candidate>".
-- startup datastore: A configuration datastore holding
+  configuration datastore.  The candidate configuration datastore may
+  not be supported by all protocols or implementations.  This
+  datastore is commonly referred to as "<candidate>".
+- startup configuration datastore: A configuration datastore holding
   the configuration loaded by the device into the running
-  configuration datastore when it boots. A startup datastore may not
-  be supported by all protocols or implementations.  This datastore is
-  commonly referred to as "<startup>".
-- intended configuration data: configuration data that is intended to
-  be used by the device.  Intended configuration data excludes any
-  inactive configuration data and it includes configuration data
+  configuration datastore when it boots.  The startup configuration
+  datastore may not be supported by all protocols or implementations.
+  This datastore is commonly referred to as "<startup>".
+- intended configuration: Configuration data that is intended to
+  be used by the device.  For example, intended configuration excludes any
+  inactive configuration and it would include configuration
   produced through the expansion of templates.
-- intended datastore: A configuration datastore holding
-  the complete intended configuration data of the device.  This datastore
+- intended configuration datastore: A configuration datastore holding
+  the complete intended configuration of the device.  This datastore
   is commonly referred to as "<intended>".
-- conventional datastore: One of the following set of configuration
-  datastores: <running>, <startup>, <candidate>, and <intended>.
-  These datastores share a common schema and NETCONF operations allow
-  copying data between these datastores.  The term "conventional" is
-  chosen as a generic umbrella term for these datastores.  Other
-  conventional datastores may be defined in future documents.
-- conventional configuration data: Configuration data that is stored
+- conventional configuration datastore: One of the following set of
+  configuration datastores: <running>, <startup>, <candidate>, and
+  <intended>.  These datastores share a common schema and NETCONF
+  operations allow copying data between these datastores.  The term
+  "conventional" is chosen as a generic umbrella term for these
+  datastores.
+- conventional configuration: Configuration that is stored
   in any of the conventional configuration datastores.
-- operational state data: The combination of applied configuration
-  data, system configuration data, default configuration data, and
-  state data.
-- operational state datastore: A datastore holding the
-  complete operational state data of the device.  This datastore
-  is commonly referred to as "<operational>".
 - dynamic data: Data that is obtained dynamically during the operation
   of a device through interaction with other systems.
-- dynamic configuration data: Dynamic data that is also configuration
-  data.
+- dynamic configuration data: Dynamic data that is also configuration data.
 - dynamic datastore: A datastore holding dynamic data.
 - applied configuration data: Configuration data that is currently
   used by a device. Applied configuration data consists of conventional
@@ -92,6 +85,12 @@ This document defines the following terms:
 - default configuration data: Configuration data that is not
   explicitly provided but for which a value defined in the data model
   is used.
+- operational state: The combination of applied configuration
+  system configuration data, default configuration data, and
+  state data.
+- operational state datastore: A datastore holding the
+  complete operational state of the device.  This datastore
+  is commonly referred to as "<operational>".
 - origin: A metadata annotation indicating the origin of a data item.
 - remnant data: Configuration data that remains in the system for a
   period of time after it has be removed from a configuration
@@ -272,20 +271,20 @@ model.
 
 #+END_EXAMPLE
 
-** The Startup Datastore (<startup>)
+** The Startup Configuration Datastore (<startup>)
 
-The startup datastore (<startup>) is an optional configuration
-datastore holding the configuration loaded by the device when it
-boots.  <startup> is only present on devices that separate the startup
-configuration from the running configuration datastore.
+The startup configuration datastore (<startup>) is an optional
+configuration datastore holding the configuration loaded by the device
+when it boots.  <startup> is only present on devices that separate the
+startup configuration from the running configuration datastore.
 
-** The Candidate Datastore
+** The Candidate Configuration Datastore
 
-The candidate datastore (<candidate>) is an optional configuration
-datastore that can be manipulated without impacting the device's
-current configuration and that can be committed to <running>.
+The candidate configuration datastore (<candidate>) is an optional
+configuration datastore that can be manipulated without impacting the
+device's current configuration and that can be committed to <running>.
 
-** The Running Datastore (<running>)
+** The Running Configuration Datastore (<running>)
 
 The running configuration (<running>) datastore holds the complete
 configuration currently active on the device.  <running> always
@@ -293,13 +292,13 @@ exists. It may include inactive configuration or
 template-mechanism-oriented configuration that require further
 expansion.
 
-** The Intended Datastore (<intended>)
+** The Intended Configuration Datastore (<intended>)
 
-The intended datastore (<intended>) is a read-only configuration
-datastore.  It is tightly coupled to <running>.  When data is written
-to <running>, the data that is to be validated is also conceptually
-written to <intended>.  Validation is performed on the contents of
-<intended>.
+The intended configuration datastore (<intended>) is a read-only
+configuration datastore.  It is tightly coupled to <running>.  When
+data is written to <running>, the data that is to be validated is also
+conceptually written to <intended>.  Validation is performed on the
+contents of <intended>.
 
 For simple implementations, <running> and <intended> are identical.
 
@@ -314,17 +313,20 @@ and are thus not taken into account when validating the configuration.
 Another example is support for templates.  Templates are expanded
 when copied into <intended>, and the expanded result is validated.
 
-** Conventional Datastores
+** Conventional Configuration Datastores
 
-The conventional datastores are a set of configuration datastores that
-share a common schema, allowing data to be copied between them.  The
-term is meant as a generic umbrella description of these datastores.
-The set of datastores include:
+The conventional configuration datastores are a set of configuration
+datastores that share a common schema, allowing data to be copied
+between them.  The term is meant as a generic umbrella description of
+these datastores.  The set of datastores include:
 
 - <running>
 - <candidate>
 - <startup>
 - <intended>
+
+Other conventional configuration datastores may be defined in future
+documents.
 
 The flow of data between these datastores is depicted in section
 ^datastore-model^.
@@ -340,13 +342,13 @@ some contexts, these have been termed ephemeral datastores since the
 information is ephemeral, i.e., lost upon reboot.  The dynamic
 datastores interact with the rest of the system through <operational>.
 
-** The Operational Datastore (<operational>)
+** The Operational State Datastore (<operational>)
 
-The operational datastore (<operational>) is a read-only datastore that
-consists of config true and config false nodes.  In the original
-NETCONF model the operational state only had config false nodes.  The
-reason for incorporating config true nodes here is to be able to
-expose all operational settings without having to replicate
+The operational state datastore (<operational>) is a read-only
+datastore that consists of config true and config false nodes.  In the
+original NETCONF model the operational state only had config false
+nodes.  The reason for incorporating config true nodes here is to be
+able to expose all operational settings without having to replicate
 definitions in the data models.
 
 <operational> contains state data and all configuration data actually
