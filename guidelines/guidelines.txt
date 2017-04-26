@@ -53,8 +53,8 @@ both the expected usage and the maturity of the data model.
 
 + New models, and models that are not concerned with the operational
 state of configuration information, SHOULD immediately be structured 
-to be NMDA-compatable, such as is described in ^rfc6087bis^, Section
-5.23. [Ed. Note: 6087bis needs to be updated].
+to be NMDA-compatable, such as is described in Section 5.23 of 
+^I-D.ietf-netmod-rfc6087bis^.
 
 + Models that require immediate support for "in use" and "system
 created" information SHOULD be structured for NMDA and then derived
@@ -67,8 +67,7 @@ bridging of the time period until NMDA implementations are available.
 
 There is an understanding that models may be unable to accept the
 recommendations of these guidelines due to the maturity of the model
-and its implementations, but wherever possible, these guidelines
-should be followed.  In this case, the draft containing the non-NMDA
+and its implementations.  In this case, the draft containing the non-NMDA
 model SHOULD have the Intended Status value Informational, and an
 NMDA-compatible model SHOULD still be published, even if it is not
 used to derive the non-NMDA model.
@@ -383,7 +382,7 @@ This document has no security considerations.
 
 {{document:
     ipr trust200902;
-    category informational;
+    category info;
     references references.xml;
     title "Guidelines for Authors (NMDA)";
     contributor "author:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
