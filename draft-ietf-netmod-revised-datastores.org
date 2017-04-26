@@ -50,7 +50,7 @@ This document defines the following terms:
   the configuration loaded by the device into the running
   configuration datastore when it boots.  This datastore is commonly
   referred to as "<startup>".
-- intended configuration: Configuration data that is intended to
+- intended configuration data: Configuration data that is intended to
   be used by the device.  For example, intended configuration excludes any
   inactive configuration and it would include configuration
   produced through the expansion of templates.
@@ -89,11 +89,12 @@ This document defines the following terms:
   complete operational state of the device.  This datastore
   is commonly referred to as "<operational>".
 - origin: A metadata annotation indicating the origin of a data item.
-- remnant data: Configuration data that remains in the system for a
-  period of time after it has be removed from a configuration
-  datastore.  The time period may be minimal, or may last until all
-  resources used by the newly-deleted configuration data (e.g., network
-  connections, memory allocations, file handles) have been
+- remnant configuration data: Configuration data that remains in the
+  applied configuration datastore for a period of time after it has be
+  removed from intended configuration data or dynamic configuration
+  data.  The time period may be minimal, or may last until all
+  resources used by the newly-deleted configuration data (e.g.,
+  network connections, memory allocations, file handles) have been
   deallocated.
 
 The following additional terms are not datastore specific but commonly
@@ -280,7 +281,7 @@ startup configuration from the running configuration datastore.
 The startup configuration datastore may not be supported by all
 protocols or implementations.
 
-** The Candidate Configuration Datastore
+** The Candidate Configuration Datastore (<candidate>)
 
 The candidate configuration datastore (<candidate>) is an optional
 configuration datastore that can be manipulated without impacting the
@@ -560,9 +561,9 @@ An example of these guidelines in use is provided in
 
 * YANG Modules @yang-module@
 
-!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-03-13.yang"
+!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-04-26.yang"
 
-!! include-figure ietf-origin.yang extract-to="ietf-origin@2017-03-13.yang"
+!! include-figure ietf-origin.yang extract-to="ietf-origin@2017-04-26.yang"
 
 * IANA Considerations @iana-con@
 

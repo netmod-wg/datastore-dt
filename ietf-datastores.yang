@@ -45,7 +45,7 @@ module ietf-datastores {
      (http://www.rfc-editor.org/info/rfcxxxx); see the RFC itself
      for full legal notices.";
 
-  revision 2017-03-13 {
+  revision 2017-04-26 {
     description
       "Initial revision.";
     reference
