@@ -121,7 +121,7 @@ NETCONF ^RFC6241^ provides the following definitions:
 
 YANG 1.1 ^RFC7950^ provides the following
 refinements when NETCONF is used with YANG (which is the usual case
-but note that NETCONF was defined before YANG did exist):
+but note that NETCONF was defined before YANG existed):
 
 - datastore: When modeled with YANG, a datastore is realized as an
   instantiated data tree.
@@ -340,8 +340,8 @@ these datastores, e.g. NETCONF's <copy-config> operation.
 
 ** Dynamic Datastores
 
-The model recognizes the need for dynamic datastores that are by
-definition not part of the persistent configuration of a device.  In
+The model recognizes the need for dynamic datastores that are, by
+definition, not part of the persistent configuration of a device.  In
 some contexts, these have been termed ephemeral datastores since the
 information is ephemeral, i.e., lost upon reboot.  The dynamic
 datastores interact with the rest of the system through <operational>.
@@ -349,26 +349,25 @@ datastores interact with the rest of the system through <operational>.
 ** The Operational State Datastore (<operational>)
 
 The operational state datastore (<operational>) is a read-only
-datastore that consists of config true and config false nodes.  In the
-original NETCONF model the operational state only had config false
-nodes.  The reason for incorporating config true nodes here is to be
-able to expose all operational settings without having to replicate
-definitions in the data models.
+datastore that consists of all config true and config false nodes
+defined in the schema.  In the original NETCONF model the operational
+state only had config false nodes.  The reason for incorporating
+config true nodes here is to be able to expose all operational
+settings without having to replicate definitions in the data models.
 
 <operational> contains state data and all configuration data actually
 used by the system.  This includes all applied data from <intended>,
 system-provided configuration, and default values defined by any
-supported data models.  In addition, <operational> also contains data
-from dynamic datastores.
+supported data models.  In addition, <operational> also contains
+applied data from dynamic datastores.
 
 Changes to configuration data may take time to percolate through to
-<operational>.  During this period, <operational>
-will return data nodes for both the previous and current
-configuration, as closely as possible tracking the current operation
-of the device.  Such remnant data from the previous configuration persists
-until the system has released resources used by the newly-deleted
-configuration data (e.g., network connections, memory allocations, file
-handles).
+<operational>.  During this period, <operational> may contain data
+nodes for both the previous and current configuration, as closely as
+possible tracking the current operation of the device.  Such remnant
+data from the previous configuration persists until the system has
+released resources used by the newly-deleted configuration data (e.g.,
+network connections, memory allocations, file handles).
 
 As a result of remnant data, the semantic constraints defined in the
 data model cannot be relied upon for <operational>, since the system
@@ -429,7 +428,7 @@ The values are YANG identities.  The following identities are defined:
 - system: represents data learned from the normal operations of the
   system, including control-plane protocols.
 
-These identities can be further refined, e.g., there might be an
+These identities can be further refined, e.g., there could be an
 identity "dhcp" derived from "dynamic".
 
 * Implications on YANG
@@ -508,13 +507,12 @@ then the documentation defining the datastore must indicate this.
 
 ** Define which subset of YANG-modeled data applies
 
-By default, the data in a datastore is modeled by all
-YANG statements in the available YANG modules.  However, it is
-possible to specify criteria YANG statements must satisfy in order to
-be present in a datastore.  For instance, maybe only
-config true nodes are present, or config false nodes that also have a
-specific YANG extension (e.g., i2rs:ephemeral true) are present in the
-datastore.
+By default, the data in a datastore is modeled by all YANG statements
+in the available YANG modules.  However, it is possible to specify
+criteria that YANG statements must satisfy in order to be present in a
+datastore.  For instance, maybe only config true nodes are present, or
+config false nodes that also have a specific YANG extension (e.g.,
+i2rs:ephemeral true) are present in the datastore.
 
 ** Define how data is actualized
 
@@ -532,7 +530,7 @@ datastore's data.
 By default, it is assumed that both the NETCONF and RESTCONF
 protocols can be used to interact with a datastore.
 However, it may be that only a specific protocol can be used
-(e.g., Forces) or that a subset of all protocol operations or
+(e.g., ForCES) or that a subset of all protocol operations or
 capabilities are available (e.g., no locking or no XPath-based
 filtering).
 
