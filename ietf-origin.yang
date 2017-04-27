@@ -87,10 +87,10 @@ module ietf-origin {
   identity default {
     base origin;
     description
-      "Denotes data that does not have an explicitly configured value,
-       but has a default value in use.  Covers both values defined in
-       a 'default' statement, and values defined via an explanation in
-       a 'description' statement.";
+      "Denotes data that does not have an explicitly configured
+       value, but has a default value in use.  Covers both values
+       defined in a 'default' statement, and values defined via an
+       explanation in a 'description' statement.";
   }
 
   /*

@@ -79,10 +79,10 @@ example-system.oper.yang: example-system.yang
 validate: validate-std-yang validate-ex-yang validate-ex-xml
 
 validate-std-yang:
-	pyang --ietf $(std-yang)
+	pyang --ietf --max-line-length 69 $(std_yang)
 
 validate-ex-yang:
-	pyang --canonical --max-line-length 69 $(ex-yang)
+	pyang --canonical --max-line-length 69 $(ex_yang)
 
 validate-ex-xml: ietf-origin.yang example-system.yang \
 	example-system.oper.yang
