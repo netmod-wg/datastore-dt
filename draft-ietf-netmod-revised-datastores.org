@@ -33,9 +33,7 @@ This document defines the following terms:
 - configuration: Data that determines how a device behaves.
   This data is modeled in YANG using "config true" nodes.
   Configuration can originate from different sources.
-- configuration datastore: A datastore holding configuration.  A
-  configuration datastore maps to an instantiated YANG data tree
-  consisting of configuration nodes.
+- configuration datastore: A datastore holding configuration.
 - running configuration datastore: A configuration datastore holding
   the current configuration of the device.  It may include
   inactive configuration or template-mechanism-oriented configuration
@@ -84,7 +82,7 @@ This document defines the following terms:
 - default configuration: Configuration that is not
   explicitly provided but for which a value defined in the data model
   is used.
-- operational state: The combination of applied configuration, 
+- operational state: The combination of applied configuration,
   system configuration, default configuration, and system state.
 - operational state datastore: A datastore holding the
   complete operational state of the device.  This datastore
@@ -92,7 +90,7 @@ This document defines the following terms:
 - origin: A metadata annotation indicating the origin of a data item.
 - remnant configuration: Configuration that remains in the
   applied configuration datastore for a period of time after it has be
-  removed from intended configuration or dynamic configuration.  
+  removed from intended configuration or dynamic configuration.
   The time period may be minimal, or may last until all
   resources used by the newly-deleted configuration (e.g.,
   network connections, memory allocations, file handles) have been

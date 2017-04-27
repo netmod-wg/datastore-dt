@@ -101,6 +101,9 @@ module ietf-origin {
     type identityref {
       base origin;
     }
+    description
+      "The 'origin' annotation can be present on any node in a datastore.
+       It specifies from where the node originated.";
   }
 
 }
