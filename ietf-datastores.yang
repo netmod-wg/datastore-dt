@@ -71,8 +71,7 @@ module ietf-datastores {
   identity dynamic {
     base datastore;
     description
-     "Abstract base identity for dynamic configuration
-      datastores.";
+     "Abstract base identity for dynamic datastores.";
   }
 
   identity running {

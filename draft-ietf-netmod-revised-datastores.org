@@ -30,12 +30,12 @@ This document defines the following terms:
   datastore might be implemented, for example, using files, a
   database, flash memory locations, or combinations thereof.
   A datastore maps to an instantiated YANG data tree.
-- configuration data: Data that determines how a device behaves.
+- configuration: Data that determines how a device behaves.
   This data is modeled in YANG using "config true" nodes.
-  Configuration data can originate from different sources.
-- configuration datastore: A datastore holding configuration
-  data.  A configuration datastore maps to an instantiated YANG data
-  tree consisting of configuration data nodes.
+  Configuration can originate from different sources.
+- configuration datastore: A datastore holding configuration.  A
+  configuration datastore maps to an instantiated YANG data tree
+  consisting of configuration nodes.
 - running configuration datastore: A configuration datastore holding
   the current configuration of the device.  It may include
   inactive configuration or template-mechanism-oriented configuration
@@ -50,7 +50,7 @@ This document defines the following terms:
   the configuration loaded by the device into the running
   configuration datastore when it boots.  This datastore is commonly
   referred to as "<startup>".
-- intended configuration: Configuration data that is intended to
+- intended configuration: Configuration that is intended to
   be used by the device.  For example, intended configuration excludes any
   inactive configuration and it would include configuration
   produced through the expansion of templates.
@@ -65,35 +65,36 @@ This document defines the following terms:
   datastores.
 - conventional configuration: Configuration that is stored
   in any of the conventional configuration datastores.
-- dynamic data: Data that is obtained dynamically during the operation
-  of a device through interaction with other systems.
-- dynamic configuration data: Dynamic data that is also configuration data.
-- dynamic datastore: A datastore holding dynamic data.
-- applied configuration data: Configuration data that is currently
-  used by a device. Applied configuration data consists of conventional
-  configuration data and dynamic configuration data.
-- state data: The additional data on a system that is not
-  configuration data such as read-only status information and
-  collected statistics. State data is transient and modified by
+- dynamic configuration: Configuration obtained dynamically during the
+  operation of a device through interaction with other systems and
+  which is not conventional configuration.
+- dynamic datastore: A datastore holding data obtained dynamically
+  during the operation of a device through interaction with other
+  systems. A dynamic datastore may hold dynamic configuration.
+- applied configuration: Configuration that is currently
+  used by a device. Applied configuration consists of conventional
+  configuration and dynamic configuration.
+- system state: The additional data on a system that is not
+  configuration, such as read-only status information and
+  collected statistics. System state is transient and modified by
   interactions with internal components or other systems.
-  State data is modeled in YANG using "config false" nodes.
-- system configuration data: Configuration data that is supplied by
+  System state is modeled in YANG using "config false" nodes.
+- system configuration: Configuration that is supplied by
   the device itself.
-- default configuration data: Configuration data that is not
+- default configuration: Configuration that is not
   explicitly provided but for which a value defined in the data model
   is used.
-- operational state: The combination of applied configuration
-  system configuration data, default configuration data, and
-  state data.
+- operational state: The combination of applied configuration, 
+  system configuration, default configuration, and system state.
 - operational state datastore: A datastore holding the
   complete operational state of the device.  This datastore
   is commonly referred to as "<operational>".
 - origin: A metadata annotation indicating the origin of a data item.
-- remnant configuration data: Configuration data that remains in the
+- remnant configuration: Configuration that remains in the
   applied configuration datastore for a period of time after it has be
-  removed from intended configuration data or dynamic configuration
-  data.  The time period may be minimal, or may last until all
-  resources used by the newly-deleted configuration data (e.g.,
+  removed from intended configuration or dynamic configuration.  
+  The time period may be minimal, or may last until all
+  resources used by the newly-deleted configuration (e.g.,
   network connections, memory allocations, file handles) have been
   deallocated.
 
@@ -117,7 +118,7 @@ NETCONF ^RFC6241^ provides the following definitions:
   datastore might be implemented, for example, using files, a
   database, flash memory locations, or combinations thereof.
 - configuration datastore: The datastore holding the complete set of
-  configuration data that is required to get a device from its initial
+  configuration that is required to get a device from its initial
   default state into a desired operational state.
 
 YANG 1.1 ^RFC7950^ provides the following
@@ -128,7 +129,7 @@ but note that NETCONF was defined before YANG existed):
   instantiated data tree.
 - configuration datastore: When modeled with YANG, a configuration
   datastore is realized as an instantiated data tree with
-  configuration data.
+  configuration.
 
 ^RFC6244^ defined operational state data as follows:
 
@@ -150,12 +151,12 @@ indicate that the datastore model initially designed for NETCONF and
 refined by YANG needs to be extended.  In particular, the notion of
 intended configuration and applied configuration has developed.
 
-Furthermore, separating operational state data from configuration data
+Furthermore, separating operational state from configuration
 in a separate branch in the data model has been found operationally
 complicated, and typically impacts the readability of module
 definitions due to overuse of groupings.  The relationship between the
 branches is not machine readable and filter expressions operating on
-configuration data and on related operational state data are
+configuration and on related operational state are
 different.
 
 ** Original Model of Datastores
@@ -206,9 +207,9 @@ Some observations:
 - The NETCONF <get/> operation returns the content of the <running>
   configuration datastore together with the operational state.  It is
   therefore necessary that config false data is in a different branch
-  than the config true data if the operational state data can have a
-  different lifetime compared to configuration data or if
-  configuration data is not immediately or successfully applied.
+  than the config true data if the operational state can have a
+  different lifetime compared to configuration or if
+  configuration is not immediately or successfully applied.
 - Several implementations have proprietary mechanisms that allow
   clients to store inactive data in <running>; this
   inactive data is only exposed to clients that indicate that they
@@ -256,8 +257,8 @@ model.
                          |   +------ dynamic configuration protocols
                          |   +------ control-plane protocols
                          |   +------ dynamic datastores
-                         |   +------ system configuration data
-                         |   +------ default configuration data
+                         |   +------ system configuration
+                         |   +------ default configuration
                          |   |
                          v   v
                  +---------------+
@@ -356,30 +357,30 @@ state only had config false nodes.  The reason for incorporating
 config true nodes here is to be able to expose all operational
 settings without having to replicate definitions in the data models.
 
-<operational> contains state data and all configuration data actually
-used by the system.  This includes all applied data from <intended>,
-system-provided configuration, and default values defined by any
-supported data models.  In addition, <operational> also contains
-applied data from dynamic datastores.
+<operational> contains system state and all configuration actually
+used by the system.  This includes all applied configuration from
+<intended>, system-provided configuration, and default values defined
+by any supported data models.  In addition, <operational> also
+contains applied data from dynamic datastores.
 
-Changes to configuration data may take time to percolate through to
+Changes to configuration may take time to percolate through to
 <operational>.  During this period, <operational> may contain data
 nodes for both the previous and current configuration, as closely as
 possible tracking the current operation of the device.  Such remnant
-data from the previous configuration persists until the system has
-released resources used by the newly-deleted configuration data (e.g.,
-network connections, memory allocations, file handles).
+configuration from the previous configuration persists until the
+system has released resources used by the newly-deleted configuration
+(e.g., network connections, memory allocations, file handles).
 
-As a result of remnant data, the semantic constraints defined in the
-data model cannot be relied upon for <operational>, since the system
-may have remnant data whose constraints were valid with the previous
-configuration and that are not valid with the current configuration.
-Since constraints on "config false" nodes may refer to "config true"
-nodes, remnant data may force the violation of those constraints.  The
-constraints that may not hold include "when", "must", "min-elements",
-and "max-elements".  Note that syntactic constraints cannot be
-violated, including hierarchical organization, identifiers, and
-type-based constraints.
+As a result of remnant configuration, the semantic constraints defined
+in the data model cannot be relied upon for <operational>, since the
+system may have remnant configuration whose constraints were valid
+with the previous configuration and that are not valid with the
+current configuration.  Since constraints on "config false" nodes may
+refer to "config true" nodes, remnant configuration may force the
+violation of those constraints.  The constraints that may not hold
+include "when", "must", "min-elements", and "max-elements".  Note that
+syntactic constraints cannot be violated, including hierarchical
+organization, identifiers, and type-based constraints.
 
 *** Missing Resources
 
@@ -449,19 +450,19 @@ If a server implements the architecture defined in this document, the
 accessible trees for some XPath contexts are refined as follows:
 
 - If the XPath expression is defined in a substatement to a data node
-  that represents state data, the accessible tree is all operational
-  state data in the server.  The root node has all top-level data
+  that represents system state, the accessible tree is all operational
+  state in the server.  The root node has all top-level data
   nodes in all modules as children.
 - If the XPath expression is defined in a substatement to a
   "notification" statement, the accessible tree is the notification
-  instance and all operational state data in the server.  If the
+  instance and all operational state in the server.  If the
   notification is defined on the top level in a module, then the root
   node has the node representing the notification being defined and
   all top-level data nodes in all modules as children.  Otherwise, the
   root node has all top-level data nodes in all modules as children.
 - If the XPath expression is defined in a substatement to an "input"
   statement in an "rpc" or "action" statement, the accessible tree is
-  the RPC or action operation instance and all operational state data
+  the RPC or action operation instance and all operational state
   in the server.  The root node has top-level data nodes in all modules
   as children.  Additionally, for an RPC, the root node also has the
   node representing the RPC operation being defined as a child.  The
@@ -469,7 +470,7 @@ accessible trees for some XPath contexts are refined as follows:
   input parameters as children.
 - If the XPath expression is defined in a substatement to an "output"
   statement in an "rpc" or "action" statement, the accessible tree is
-  the RPC or action operation instance and all operational state data
+  the RPC or action operation instance and all operational state
   in the server.  The root node has top-level data nodes in all modules
   as children.  Additionally, for an RPC, the root node also has the
   node representing the RPC operation being defined as a child.  The
@@ -714,7 +715,7 @@ readable.
 *** Datastores
 
 Each datastore represents differing views of these data nodes.
-<running> will hold the configuration data provided by the user, for
+<running> will hold the configuration provided by the user, for
 example a single BGP peer.  <intended> will conceptually hold the data
 as validated, after the removal of data not intended for validation
 and after any local template mechanisms are performed.  <operational>
@@ -780,7 +781,7 @@ have their values.
 
 *** Removing a Peer
 
-Changes to configuration data may take time to percolate through the
+Changes to configuration may take time to percolate through the
 various software components involved.  During this period, it is
 imperative to continue to give an accurate view of the working of the
 device.  <operational> will contain data nodes for both
