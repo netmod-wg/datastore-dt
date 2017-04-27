@@ -204,8 +204,8 @@ Some observations:
   datastore.
 - The NETCONF <get/> operation returns the content of the <running>
   configuration datastore together with the operational state.  It is
-  therefore necessary that config false data is in a different branch
-  than the config true data if the operational state can have a
+  therefore necessary that "config false" data is in a different branch
+  than the "config true" data if the operational state can have a
   different lifetime compared to configuration or if
   configuration is not immediately or successfully applied.
 - Several implementations have proprietary mechanisms that allow
@@ -349,10 +349,10 @@ datastores interact with the rest of the system through <operational>.
 ** The Operational State Datastore (<operational>)
 
 The operational state datastore (<operational>) is a read-only
-datastore that consists of all config true and config false nodes
+datastore that consists of all "config true" and "config false" nodes
 defined in the schema.  In the original NETCONF model the operational
-state only had config false nodes.  The reason for incorporating
-config true nodes here is to be able to expose all operational
+state only had "config false" nodes.  The reason for incorporating
+"config true" nodes here is to be able to expose all operational
 settings without having to replicate definitions in the data models.
 
 <operational> contains system state and all configuration actually
@@ -362,7 +362,7 @@ by any supported data models.  In addition, <operational> also
 contains applied data from dynamic datastores.
 
 Changes to configuration may take time to percolate through to
-<operational>.  During this period, <operational> may contain data
+<operational>.  During this period, <operational> may contain
 nodes for both the previous and current configuration, as closely as
 possible tracking the current operation of the device.  Such remnant
 configuration from the previous configuration persists until the
@@ -510,9 +510,9 @@ then the documentation defining the datastore must indicate this.
 By default, the data in a datastore is modeled by all YANG statements
 in the available YANG modules.  However, it is possible to specify
 criteria that YANG statements must satisfy in order to be present in a
-datastore.  For instance, maybe only config true nodes are present, or
-config false nodes that also have a specific YANG extension (e.g.,
-i2rs:ephemeral true) are present in the datastore.
+datastore.  For instance, maybe only "config true" nodes are present, or
+"config false nodes" that also have a specific YANG extension (e.g.,
+"i2rs:ephemeral true") are present in the datastore.
 
 ** Define how data is actualized
 
@@ -712,7 +712,7 @@ readable.
 
 *** Datastores
 
-Each datastore represents differing views of these data nodes.
+Each datastore represents differing views of these nodes.
 <running> will hold the configuration provided by the user, for
 example a single BGP peer.  <intended> will conceptually hold the data
 as validated, after the removal of data not intended for validation
@@ -782,7 +782,7 @@ have their values.
 Changes to configuration may take time to percolate through the
 various software components involved.  During this period, it is
 imperative to continue to give an accurate view of the working of the
-device.  <operational> will contain data nodes for both
+device.  <operational> will contain nodes for both
 the previous and current configuration, as closely as possible
 tracking the current operation of the device.
 
