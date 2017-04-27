@@ -53,7 +53,7 @@ both the expected usage and the maturity of the data model.
 
 + New models, and models that are not concerned with the operational
 state of configuration information, SHOULD immediately be structured 
-to be NMDA-compatable, such as is described in Section 5.23 of 
+to be NMDA-compatible, such as is described in Section 5.23 of 
 ^I-D.ietf-netmod-rfc6087bis^.
 
 + Models that require immediate support for "in use" and "system
