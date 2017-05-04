@@ -73,24 +73,45 @@ module ietf-origin {
   identity dynamic {
     base origin;
     description
-      "Denotes data from dynamic datastores or dynamic configuration
-       protocols (e.g., DHCP).";
+      "Denotes data from a dynamic datastore.";
   }
 
   identity system {
     base origin;
     description
-      "Denotes data learned from the normal operations of the system,
-       including control-plane protocols.";
+      "Denotes data learned by the system itself, including
+       both system configuration and system state.
+
+       Examples of system configuration include applied configuration
+       for an always existing loopback interface, or interface
+       configuration that is auto-created due to the hardware
+       currently present in the device.";
+  }
+
+  identity learned {
+    base origin;
+    description
+      "Denotes configuration learned from control-plane
+       protocol interactions with peer devices.
+
+       Examples of control-plane protocols that provide learned
+       configuration include DHCP and BGP.";
   }
 
   identity default {
     base origin;
     description
-      "Denotes data that does not have an explicitly configured
+      "Denotes data that does not have an configured or learned
        value, but has a default value in use.  Covers both values
        defined in a 'default' statement, and values defined via an
        explanation in a 'description' statement.";
+  }
+
+  identity unknown {
+    base origin;
+    description
+      "Denotes data for which the system cannot identify the
+       origin.";
   }
 
   /*
@@ -102,8 +123,8 @@ module ietf-origin {
       base origin;
     }
     description
-      "The 'origin' annotation can be present on any node in a datastore.
-       It specifies from where the node originated.";
+      "The 'origin' annotation can be present on any node in a
+       datastore.  It specifies from where the node originated.";
   }
 
 }

@@ -63,38 +63,37 @@ This document defines the following terms:
   datastores.
 - conventional configuration: Configuration that is stored
   in any of the conventional configuration datastores.
-- dynamic configuration: Configuration obtained dynamically during the
-  operation of a device through interaction with other systems and
-  which is not conventional configuration.
 - dynamic datastore: A datastore holding data obtained dynamically
   during the operation of a device through interaction with other
-  systems. A dynamic datastore may hold dynamic configuration.
-- applied configuration: Configuration that is currently
-  used by a device. Applied configuration consists of conventional
-  configuration and dynamic configuration.
+  systems, rather than through one of the conventional configuration
+  datatstores.
+- dynamic configuration: Configuration obtained via a dynamic datastore.
+- learned configuration: Configuration that has been learned via
+  control-plane protocol interactions with peer systems.
+- system configuration: Configuration that is supplied by
+  the device itself.
+- default configuration: Configuration that is not explicitly provided
+  but for which a value defined in the data model is used.
+- applied configuration: Configuration that is actively in use by a
+  device.  Applies configuration consists of conventional, dynamic,
+  learned, system and default configuration.
 - system state: The additional data on a system that is not
   configuration, such as read-only status information and
   collected statistics. System state is transient and modified by
   interactions with internal components or other systems.
   System state is modeled in YANG using "config false" nodes.
-- system configuration: Configuration that is supplied by
-  the device itself.
-- default configuration: Configuration that is not
-  explicitly provided but for which a value defined in the data model
-  is used.
-- operational state: The combination of applied configuration,
-  system configuration, default configuration, and system state.
+- operational state: The combination of applied configuration and
+  system state.
 - operational state datastore: A datastore holding the
   complete operational state of the device.  This datastore
   is commonly referred to as "<operational>".
 - origin: A metadata annotation indicating the origin of a data item.
-- remnant configuration: Configuration that remains in the
-  applied configuration datastore for a period of time after it has be
-  removed from intended configuration or dynamic configuration.
-  The time period may be minimal, or may last until all
-  resources used by the newly-deleted configuration (e.g.,
-  network connections, memory allocations, file handles) have been
-  deallocated.
+- remnant configuration: Configuration that remains part of the
+  applied configuration for a period of time after it has be removed
+  from the intended configuration or dynamic configuration.
+  The time period may be minimal, or may last until all resources used
+  by the newly-deleted configuration (e.g., network connections,
+  memory allocations, file handles) have been deallocated.
 
 The following additional terms are not datastore specific but commonly
 used and thus defined here as well:
@@ -251,12 +250,10 @@ model.
                          |
                          |        // e.g., missing resources, delays
                          |
-                         |   +------ auto-discovery
-                         |   +------ dynamic configuration protocols
-                         |   +------ control-plane protocols
-                         |   +------ dynamic datastores
-                         |   +------ system configuration
+                         |   +------ learned configuration
+                         |   +------ system configuration and state
                          |   +------ default configuration
+                         |   +------ dynamic datastores
                          |   |
                          v   v
                  +---------------+
@@ -412,24 +409,51 @@ successful).
 
 *** Origin Metadata Annotation
 
-As data flows into <operational>, it is conceptually
-marked with a metadata annotation (^RFC7952^) that indicates its
-origin.  The "origin" metadata annotation is defined in ^yang-module^.
-The values are YANG identities.  The following identities are defined:
+As data flows into <operational>, it is conceptually marked with a
+metadata annotation (^RFC7952^) that indicates its origin.  The origin
+applies to all data nodes except non-presence containers.  The
+"origin" metadata annotation is defined in ^yang-module^.  The values
+are YANG identities.  The following identities are defined:
 
-- origin: abstract base identity from which the other identities are
-  derived.
+- origin: abstract base identity from which the other origin
+  identities are derived.
 - intended: represents data provided by <intended>.
-- dynamic: represents data provided by a dynamic datastore or a
-  dynamic configuration protocol.
-- default: represents data values specified in the data model, using
-  either values in the "default" statement or any values
-  described in the "description" statement.
-- system: represents data learned from the normal operations of the
-  system, including control-plane protocols.
+- dynamic: represents data provided by a dynamic datastore.
+- system: represents data provided by the system itself, including
+  both system configuration and system state.  Examples of system
+  configuration include applied configuration for an always existing
+  loopback interface, or interface configuration that is auto-created
+  due to the hardware currently present in the device.
+- learned: represents configuration learned from control-plane
+  protocol interactions with peer devices.  Examples of control-plane
+  protocols that provide learned configuration include DHCP and BGP.
+- default: represents data using a default value specified in the data
+  model, using either values in the "default" statement or any values
+  described in the "description" statement.  The default origin is
+  only used when the data has not been provided by any other source.
+- unknown: represents data for which the system cannot identify the
+  origin.
 
-These identities can be further refined, e.g., there could be an
-identity "dhcp" derived from "dynamic".
+These identities can be further refined, e.g., there could be separate
+identities for particular types or instances of dynamic datastore
+derived from "dynamic".
+
+In all cases, the device should report the origin that most accurately
+reflects the source of the data that is actively being used by the
+system.  For example:
+
+If for a particular configuration node, a protocol negotiated value
+may override a configured value, then the origin should be reported as
+'learned', even if the learned value is the same as a configured value.
+
+Conversely, if for a particular configuration node, the protocol
+negotiated value would not override an explicitly configured value,
+then the origin should be reported as 'intended' even if a learned
+value is the same as the configured value.
+
+In the case that a device cannot provide an accurate origin for a
+particular data node then it should use the origin 'unknown'.
+
 
 * Implications on YANG
 
