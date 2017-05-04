@@ -73,7 +73,7 @@ This document defines the following terms:
 - system configuration: Configuration that is supplied by
   the device itself.
 - default configuration: Configuration that is not explicitly provided
-  but for which a value defined in the data model is used.
+  but for which a value is defined in the data model used.
 - applied configuration: Configuration that is actively in use by a
   device.  Applies configuration consists of conventional, dynamic,
   learned, system and default configuration.
