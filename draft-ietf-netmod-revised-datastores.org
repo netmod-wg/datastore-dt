@@ -69,14 +69,15 @@ This document defines the following terms:
   datatstores.
 - dynamic configuration: Configuration obtained via a dynamic datastore.
 - learned configuration: Configuration that has been learned via
-  control-plane protocol interactions with peer systems.
+  protocol interactions with other systems that is not conventional or
+  dynamic configuration.
 - system configuration: Configuration that is supplied by
   the device itself.
 - default configuration: Configuration that is not explicitly provided
   but for which a value defined in the data model is used.
 - applied configuration: Configuration that is actively in use by a
-  device.  Applies configuration consists of conventional, dynamic,
-  learned, system and default configuration.
+  device.  Applied configuration is derived from conventional,
+  dynamic, learned, system and default configuration.
 - system state: The additional data on a system that is not
   configuration, such as read-only status information and
   collected statistics. System state is transient and modified by
@@ -250,14 +251,13 @@ model.
                          |
                          |        // e.g., missing resources, delays
                          |
-                         |   +------ learned configuration
-                         |   +------ system configuration and state
-                         |   +------ default configuration
-                         |   +------ dynamic datastores
-                         |   |
-                         v   v
+                         |   +-------- learned configuration
+   dynamic               |   +-------- system configuration
+   datatstore(s) ----+   |   +-------- default configuration
+                     |   |   |
+                     v   v   v
                  +---------------+
-                 | <operational> |
+                 | <operational> | <-- system state
                  | (ct + cf, ro) |
                  +---------------+
 
@@ -424,9 +424,9 @@ are YANG identities.  The following identities are defined:
   configuration include applied configuration for an always existing
   loopback interface, or interface configuration that is auto-created
   due to the hardware currently present in the device.
-- learned: represents configuration learned from control-plane
-  protocol interactions with peer devices.  Examples of control-plane
-  protocols that provide learned configuration include DHCP and BGP.
+- learned: represents configuration learned from protocol interactions
+  with other devices.  Examples of control-plane protocols that
+  provide learned configuration include DHCP and BGP.
 - default: represents data using a default value specified in the data
   model, using either values in the "default" statement or any values
   described in the "description" statement.  The default origin is

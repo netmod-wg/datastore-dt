@@ -67,7 +67,7 @@ module ietf-origin {
   identity intended {
     base origin;
     description
-      "Denotes data from the intended configuration.";
+      "Denotes data from the intended configuration datastore";
   }
 
   identity dynamic {
@@ -91,8 +91,9 @@ module ietf-origin {
   identity learned {
     base origin;
     description
-      "Denotes configuration learned from control-plane
-       protocol interactions with peer devices.
+      "Denotes configuration learned from protocol interactions with
+       other devices, instead of via the intended configuration
+       datastore or any dynamic datastore.
 
        Examples of control-plane protocols that provide learned
        configuration include DHCP and BGP.";
