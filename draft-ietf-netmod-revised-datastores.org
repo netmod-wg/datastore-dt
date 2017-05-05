@@ -546,8 +546,7 @@ datastores feeding into <operational>.  How this
 interaction occurs must be defined by any dynamic datastore.  In some
 cases, it may occur implicitly, as soon as the data is put into the
 dynamic datastore while, in other cases, an explicit action (e.g., an
-RPC) may be required to trigger the application of the dynamic
-datastore's data.
+RPC) may be required to trigger the application of the datastore's data.
 
 ** Define which protocols can be used
 
