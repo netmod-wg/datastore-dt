@@ -252,8 +252,8 @@ model.
                          |        // e.g., missing resources, delays
                          |
                          |   +-------- learned configuration
-   dynamic               |   +-------- system configuration
-   datatstore(s) ----+   |   +-------- default configuration
+    dynamic              |   +-------- system configuration
+    datastore(s) ----+   |   +-------- default configuration
                      |   |   |
                      v   v   v
                  +---------------+
