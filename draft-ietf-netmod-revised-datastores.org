@@ -90,11 +90,11 @@ This document defines the following terms:
   is commonly referred to as "<operational>".
 - origin: A metadata annotation indicating the origin of a data item.
 - remnant configuration: Configuration that remains part of the
-  applied configuration for a period of time after it has be removed
-  from the intended configuration or dynamic configuration.
-  The time period may be minimal, or may last until all resources used
-  by the newly-deleted configuration (e.g., network connections,
-  memory allocations, file handles) have been deallocated.
+  applied configuration for a period of time after it has been removed
+  from the intended configuration or dynamic configuration.  The time
+  period may be minimal, or may last until all resources used by the
+  newly-deleted configuration (e.g., network connections, memory
+  allocations, file handles) have been deallocated.
 
 The following additional terms are not datastore specific but commonly
 used and thus defined here as well:
