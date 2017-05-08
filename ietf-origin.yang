@@ -79,7 +79,7 @@ module ietf-origin {
   identity system {
     base origin;
     description
-      "Denotes data learned by the system itself, including
+      "Denotes data originated by the system itself, including
        both system configuration and system state.
 
        Examples of system configuration include applied configuration
