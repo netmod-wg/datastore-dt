@@ -76,7 +76,7 @@ This document defines the following terms:
 - default configuration: Configuration that is not explicitly provided
   but for which a value defined in the data model is used.
 - applied configuration: Configuration that is actively in use by a
-  device.  Applied configuration is derived from conventional,
+  device.  Applied configuration originates from conventional,
   dynamic, learned, system and default configuration.
 - system state: The additional data on a system that is not
   configuration, such as read-only status information and
@@ -241,6 +241,7 @@ model.
                    | (ct, rw)  |
                    +-----------+
                          |
+                         |        // configuration transformations,
                          |        // e.g., removal of "inactive"
                          |        // nodes, expansion of templates
                          v
@@ -248,14 +249,15 @@ model.
                    | <intended> | // subject to validation
                    | (ct, ro)   |
                    +------------+
-                         |
-                         |        // e.g., missing resources, delays
-                         |
-                         |   +-------- learned configuration
-    dynamic              |   +-------- system configuration
-    datastore(s) ----+   |   +-------- default configuration
-                     |   |   |
-                     v   v   v
+                         |        // changes applied, subject to local
+                         |        // factors, e.g., missing resources,
+  +----------------+     |        // delays
+  | dynamic        |-+   |
+  | datastore(s)   | |   |   +-------- learned configuration
+  +----------------+ |   |   +-------- system configuration
+    +-------------|--+   |   +-------- default configuration
+                  | |    |   |
+                  v v    v   v
                  +---------------+
                  | <operational> | <-- system state
                  | (ct + cf, ro) |
@@ -424,9 +426,9 @@ are YANG identities.  The following identities are defined:
   configuration include applied configuration for an always existing
   loopback interface, or interface configuration that is auto-created
   due to the hardware currently present in the device.
-- learned: represents configuration learned from protocol interactions
-  with other devices.  Examples of control-plane protocols that
-  provide learned configuration include DHCP and BGP.
+- learned: represents configuration that has been learned via protocol
+  interactions with other systems, including protocols such as
+  link-layer negotiations, routing protocols, DHCP, etc.
 - default: represents data using a default value specified in the data
   model, using either values in the "default" statement or any values
   described in the "description" statement.  The default origin is
@@ -443,7 +445,7 @@ reflects the source of the data that is actively being used by the
 system.  For example:
 
 If for a particular configuration node, a protocol negotiated value
-may override a configured value, then the origin should be reported as
+overrides any configured value, then the origin should be reported as
 'learned', even if the learned value is the same as a configured value.
 
 Conversely, if for a particular configuration node, the protocol

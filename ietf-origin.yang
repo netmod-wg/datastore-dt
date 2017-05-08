@@ -95,8 +95,9 @@ module ietf-origin {
        other devices, instead of via the intended configuration
        datastore or any dynamic datastore.
 
-       Examples of control-plane protocols that provide learned
-       configuration include DHCP and BGP.";
+       Examples of protocols that provide learned configuration
+       include link-layer negotiations, routing protocols, and
+       DHCP.";
   }
 
   identity default {
