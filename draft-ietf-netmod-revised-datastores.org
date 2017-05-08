@@ -249,9 +249,9 @@ model.
                    | <intended> | // subject to validation
                    | (ct, ro)   |
                    +------------+
-                         |        // changes applied, subject to local
-                         |        // factors, e.g., missing resources,
-  +----------------+     |        // delays
+                         |        // changes applied, subject to
+                         |        // local factors, e.g., missing
+  +----------------+     |        // resources, delays
   | dynamic        |-+   |
   | datastore(s)   | |   |   +-------- learned configuration
   +----------------+ |   |   +-------- system configuration
