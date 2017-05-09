@@ -196,7 +196,7 @@ models.
 
 Consider the following trivial model:
 
-    module ietf-thermostat {
+    module example-thermostat {
         namespace "tag:ietf:example:thermostat";
         prefix "thermo";
 
@@ -221,7 +221,7 @@ In the derived model, the contents mirror the NMDA data model, but are
 marked as "config false", and the module name and namespace values
 have a "-state" suffix:
 
-    module ietf-thermostat-state {
+    module example-thermostat-state {
         namespace "tag:ietf:example:thermostat-state";
         prefix "thermo-state";
 
