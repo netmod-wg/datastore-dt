@@ -335,7 +335,7 @@ The flow of data between these datastores is depicted in section
 ^datastore-model^.
 
 The specific protocols may define explicit operations to copy between
-these datastores, e.g. NETCONF's <copy-config> operation.
+these datastores, e.g., NETCONF's <copy-config> operation.
 
 ** Dynamic Datastores
 
@@ -446,27 +446,17 @@ system.  For example:
 
 If for a particular configuration node, a protocol negotiated value
 overrides any configured value, then the origin should be reported as
-'learned', even if the learned value is the same as a configured value.
+"learned", even if the learned value is the same as a configured value.
 
 Conversely, if for a particular configuration node, the protocol
 negotiated value would not override an explicitly configured value,
-then the origin should be reported as 'intended' even if a learned
+then the origin should be reported as "intended" even if a learned
 value is the same as the configured value.
 
 In the case that a device cannot provide an accurate origin for a
-particular data node then it should use the origin 'unknown'.
-
+particular data node then it should use the origin "unknown".
 
 * Implications on YANG
-
-# TODO:
-#
-# if this arch is supported:
-# - running doesn't have to be valid
-# - intended is valid
-# - no validation in operational
-#
-# Do we need more text than what we already have for the issues above?
 
 ** XPath Context
 
