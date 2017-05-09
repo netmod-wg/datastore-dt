@@ -6,5 +6,4 @@
     ietf-ref RFC7950;
     ietf-ref RFC8040;
     ietf-ref I-D.ietf-netmod-revised-datastores;
-    ietf-ref I-D.ietf-netmod-rfc6087bis;
 }}
