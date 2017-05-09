@@ -197,7 +197,9 @@ models.
 Consider the following trivial model:
 
     module ietf-thermostat {
-        namespace "tag:ietf:thermostat";
+        namespace "tag:ietf:example:thermostat";
+        prefix "thermo";
+
         container thermostat {
             leaf high-temperature {
                 description "High temperature threshold";
@@ -220,7 +222,9 @@ marked as "config false", and the module name and namespace values
 have a "-state" suffix:
 
     module ietf-thermostat-state {
-        namespace "tag:ietf:thermostat-state";
+        namespace "tag:ietf:example:thermostat-state";
+        prefix "thermo-state";
+
         container thermostat {
             config false;
             leaf high-temperature {
@@ -301,7 +305,7 @@ This document has no security considerations.
     ipr trust200902;
     category info;
     references references.xml;
-    title "Guidelines for Authors (NMDA)";
+    title "Guidelines for YANG Module Authors (NMDA)";
     contributor "author:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
     contributor "author:Juergen Schoenwaelder:Jacobs University:j.schoenwaelder@jacobs-university.de";
     contributor "author:Phil Shafer:Juniper Networks:phil@juniper.net";
