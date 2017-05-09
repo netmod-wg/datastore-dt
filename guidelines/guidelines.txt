@@ -5,10 +5,10 @@ The "Network Management Datastore Architecture" (NMDA) adds the
 ability to inspect the current operational values for configuration,
 allowing clients to use identical paths for retrieving the configured
 values and the operational values.  This change will simplify models
-and help modelers, but will create a period of churn as NMDA becomes a
-standard and is widely implemented.  During that interim, the
-guidelines given in this document should help modelers find an optimal
-path forward.
+and help modelers, but will create a period of transition as NMDA
+becomes a standard and is widely implemented.  During that interim,
+the guidelines given in this document should help modelers find an
+optimal path forward.
 
 * Introduction
 
@@ -36,10 +36,10 @@ This document uses the terminology defined by the NMDA
 
 ** Executive Summary
 
-The Network Management Datastore Architecture (NMDA) addresses
-the so called OpState problems that have been the subject of much
-discussion in the IETF.  NMDA is still in development and there
-will be a transition period for NMDA solutions to be available.
+The Network Management Datastore Architecture (NMDA) addresses the so
+called "OpState problem" that has been the subject of much discussion
+in the IETF.  NMDA is still in development and there will be a
+transition period before NMDA solutions are universally available.
 
 These guidelines are aimed to enable the creation of models that can
 take advantage of the NMDA, while pragmatically allowing those models
@@ -47,30 +47,27 @@ to be used with the existing network configuration protocol
 implementations.
 
 It is the strong recommendation that models SHOULD move as quickly as
-possible to the NMDA.  The approach to be taken for models being
-developed now and during the NMDA transition period should be based on
-both the expected usage and the maturity of the data model.
+possible to the NMDA.  The specific approach to be taken for models
+being developed now and during the NMDA transition period should be
+based on both the expected usage and the maturity of the data model.
 
-+ New models, and models that are not concerned with the operational
-state of configuration information, SHOULD immediately be structured 
-to be NMDA-compatible, such as is described in Section 5.23 of 
-^I-D.ietf-netmod-rfc6087bis^.
++ New models and models that are not concerned with the operational
+state of configuration information SHOULD immediately be structured 
+to be NMDA-compatible.
 
 + Models that require immediate support for "in use" and "system
-created" information SHOULD be structured for NMDA and then derived
-versions of these models SHOULD be created, either by hand or with
-suitable tools, that mirror the current modeling strategies.
-Both the NMDA and derived modules SHOULD be published concurrently with
-NMDA modules in a Standards Track RFC and the derived modules in an
-Informational RFC.  The use of derived models allows temporary
-bridging of the time period until NMDA implementations are available.
+created" information SHOULD be structured for NMDA.  A non-NMDA
+version of these models SHOULD also be published, using either an
+existing model or a model created either by hand or with suitable
+tools that support current modeling strategies.  Both the NMDA and the
+non-NMDA modules SHOULD be published in the same document, with NMDA
+modules in the document main body and the non-NMDA modules in a
+non-normative appendix.  The use of the non-NMDA model will allow
+temporary bridging of the time period until NMDA implementations are
+available.
 
-There is an understanding that models may be unable to accept the
-recommendations of these guidelines due to the maturity of the model
-and its implementations.  In this case, the draft containing the non-NMDA
-model SHOULD have the Intended Status value Informational, and an
-NMDA-compatible model SHOULD still be published, even if it is not
-used to derive the non-NMDA model.
+Additional details on these guidelines can be found below, notably in
+^guidelines^.
 
 ** Background
 
@@ -156,7 +153,7 @@ the source of these issues.  The new operations <get-data> and
 <edit-data> will support a parameter indicating the target datastore.
 Similar changes are planned for RESTCONF (^RFC8040^).
 
-* Guidelines for YANG Modelers
+* Guidelines for YANG Modelers @guidelines@
 
 The following guidelines are meant to help modelers develop YANG
 models that will maximize the utility of the model with both current
@@ -171,8 +168,8 @@ allowing those models to be used with the existing network
 configuration protocol implementations.
 
 It is the strong recommendation that models SHOULD move as quickly as
-possible to the NMDA.  This is key to the future of these models, and
-the NETMOD WG will rework existing models to this architecture.  Given
+possible to the NMDA.  This is key to the future of these models.
+The NETMOD WG will rework existing models to this architecture.  Given
 the permanence and gravity of work published by the IETF, creating
 future-proof data models is vital.
 
@@ -183,23 +180,21 @@ maintain these details inside the data model, models can be
 post-processed to add this derivative information, either manually or
 using tools.
 
-Both the "/foo-state" contents and the "config"/"state" containers'
-contents can be automatically generated from simpler, more readable
-published models.  An example of such tooling would be the [name needed]
-model-generating back-end to the "pyang" YANG compiler [ref needed].
+Tools can automatically produce the required derived modules.  The
+suggested approach is to produce a "state" version of the module with
+a distinct namespace, rather than using the "/foo-state" top-level
+container.  Since the contents are identical, constraints in the data
+model such as "must" statements should not need to change.  Only the
+model name, namespace, and prefix should need to change.  This
+simplifies the tooling needed to generate the derived model, as well
+as reducing changes needed in client applications when transitioning
+to the NMDA model.
 
-These derived models will use distinct module names and namespaces,
+These derived models use distinct module names and namespaces,
 allowing servers to announce their support for the base or derived
-models.  For example, a small suffix can be appended to the base 
-model's name and namespace strings.  Alternatively, a YANG
-extension statement can be created to hold this information within
-the data model, where it will be available for tools to use when
-generating derived modules.
+models.
 
-
-Tools can take a variety of approaches, tailored to the desired style
-of derived module needed.  For example, consider the following trivial
-model:
+Consider the following trivial model:
 
     module ietf-thermostat {
         namespace "tag:ietf:thermostat";
@@ -220,26 +215,13 @@ model:
         }
     }
 
-A "/foo-state" style model can be derived from the model by mirroring
-the entire tree under a top-level "config false" container, while
-"config false" nodes are removed from the "config true" hierarchy.
-Such a model would be compatible with existing implementations of
-"/foo-state" models.  Configuration would be available under one
-hierarchy, while operational values would be available under another:
+In the derived model, the contents mirror the NMDA data model, but are
+marked as "config false", and the module name and namespace values
+have a "-state" suffix:
 
-    module ietf-thermostat-top-state {
-        namespace "tag:ietf:thermostat-top-state";
+    module ietf-thermostat-state {
+        namespace "tag:ietf:thermostat-state";
         container thermostat {
-            leaf high-temperature {
-                description "High temperature threshold";
-                type int;
-            }
-            leaf low-temperature {
-                description "Low temperature threshold";
-                type int;
-            }
-        }
-        container thermostat-state {
             config false;
             leaf high-temperature {
                 description "High temperature threshold";
@@ -256,76 +238,15 @@ hierarchy, while operational values would be available under another:
         }
     }
 
-Another approach would be to have the derived module contain only the
-generated "/foo-state" hierarchy, using the original model's "/foo"
-hierarchy.  This "half step" towards the NMDA might ease the
-transition to the new architecture:
-
-    module ietf-thermostat-only-state {
-        namespace "tag:ietf:thermostat-only-state";
-        container thermostat-state {
-            config false;
-            leaf high-temperature {
-                description "High temperature threshold";
-                type int;
-            }
-            leaf low-temperature {
-                description "Low temperature threshold";
-                type int;
-            }
-            leaf current-temperature {
-                description "Current temperature reading";
-                type int;
-            }
-        }
-    }
-
-Similarly, a "config"/"state"-style model can also be derived by
-creating "config" containers with only "config true" nodes and "state"
-containers with both "config false" nodes and "config false" versions
-of "config true" nodes:
-
-    module ietf-thermostat-dual-containers {
-        namespace "tag:ietf:thermostat-dual-containers";
-        container thermostat {
-            container config {
-                leaf high-temperature {
-                    description "High temperature threshold";
-                    type int;
-                }
-                leaf low-temperature {
-                    description "Low temperature threshold";
-                    type int;
-                }
-            }
-            container state {
-                config false;
-                leaf high-temperature {
-                    description "High temperature threshold";
-                    type int;
-                }
-                leaf low-temperature {
-                    description "Low temperature threshold";
-                    type int;
-                }
-                leaf current-temperature {
-                    description "Current temperature reading";
-                    type int;
-                }
-            }
-        }
-    }
-
-By adopting a tools-based solution for supporting existing
-implementations of models that are currently under development, models
-can be quickly restructured to be NMDA-compatible while giving
-continuity to their community of developers.  When NMDA-capable
-implementations become available, the base data models can be used
-directly.
+By adopting a tools-based solution for supporting models that are
+currently under development, models can be quickly restructured to be
+NMDA-compatible while giving continuity to their community of
+developers.  When NMDA-capable implementations become available, the
+base data models can be used directly.
 
 Modelers and reviewers can view the simple data model, published in
-the RFCs.  Tools can generate any required derived models, and those
-models can be published along with the base models to allow
+the body of document.  Tools can generate any required derived models,
+and those models can be published in a non-normative appendix to allow
 interoperability.
 
 It is critical to consider the following guidelines, understanding
@@ -333,35 +254,31 @@ that our goal is to make models that will see continued use in the
 long term, balancing short term needs against a desire for consistent,
 usable models in the future:
 
-(a) For new models, the model SHOULD target the NMDA, with the
-expectation that these models will be used by NMDA-capable
-implementations and their operational data will be available via
-<operational>.
+(a) New models and models that are not concerned with the operational
+state of configuration information SHOULD immediately be structured 
+to be NMDA-compatible.
 
-(b) For models currently under development, the model SHOULD target
-the NMDA, using the "derived models"-based approach outlined above to
-give continuity to early implementations.  These derived models SHOULD
-be concurrently submitted for publication as separate Informational
-RFCs.
+(b) Models that require immediate support for "in use" and "system
+created" information SHOULD be structured for NMDA.  A non-NMDA
+version of these models SHOULD exist, either an existing model or a
+model created either by hand or with suitable tools that mirror the
+current modeling strategies.  Both the NMDA and the non-NMDA modules
+SHOULD be published in the same document, with NMDA modules in the
+document main body and the non-NMDA modules in a non-normative
+appendix.  The use of the non-NMDA model will allow temporary bridging
+of the time period until NMDA implementations are available.
 
-(c) For models currently under development that cannot follow
-recommendation (b) due to the maturity of the model and its
-implementations, the draft containing the non-NMDA model should have
-the Intended Status value Informational, and an NMDA-compatible model
-should still be published, even if it is not used to derive the
-non-NMDA model.
-
-(d) For published models, the model should be republished with an
+(c) For published models, the model should be republished with an
 NMDA-compatible structure, deprecating non-NMDA constructs.  For
 example, the "ietf-interfaces" model in ^RFC7223^ will be restructured
 as an NMDA-compatible model.  The "/interfaces-state" hierarchy will
 be marked "status deprecated".  Models that mark their "/foo-state"
 hierarchy with "status deprecated" will allow NMDA-capable
 implementations to avoid the cost of duplicating the state nodes,
-while enabling non-NMDA-capable implementations to provide them for
+while enabling non-NMDA-capable implementations to utilize them for
 access to the operational values.
 
-(e) For models that augment models which have not been structured with
+(d) For models that augment models which have not been structured with
 the NMDA, the modeler will have to consider the structure of the base
 model and the guidelines listed above.  Where possible, such models
 should move to new revisions of the base model that are
