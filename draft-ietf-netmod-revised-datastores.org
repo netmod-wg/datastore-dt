@@ -442,16 +442,24 @@ derived from "dynamic".
 
 In all cases, the device should report the origin that most accurately
 reflects the source of the data that is actively being used by the
-system.  For example:
+system.
 
-If for a particular configuration node, a protocol negotiated value
-overrides any configured value, then the origin should be reported as
-"learned", even if the learned value is the same as a configured value.
+In cases where it could be ambiguous as to which origin should be
+used, i.e. where the same data node value has originated from multiple
+sources, then the description statement in the YANG moodule should be
+used as guidance for choosing the appropriate origin.  For example:
 
-Conversely, if for a particular configuration node, the protocol
-negotiated value would not override an explicitly configured value,
-then the origin should be reported as "intended" even if a learned
-value is the same as the configured value.
+If for a particular configuration node, the associated YANG
+description statement indicates that a protocol negotiated value
+overrides any configured value, then the origin would be reported as
+"learned", even if the learned value is the same as a configured
+value.
+
+Conversely, if for a particular configuration node, the associated
+YANG description statement indicates that a protocol negotiated value
+does not override an explicitly configured value, then the origin
+would be reported as "intended" even if a learned value is the same as
+the configured value.
 
 In the case that a device cannot provide an accurate origin for a
 particular data node then it should use the origin "unknown".
