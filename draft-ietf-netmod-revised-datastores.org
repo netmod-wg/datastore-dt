@@ -452,13 +452,13 @@ used as guidance for choosing the appropriate origin.  For example:
 If for a particular configuration node, the associated YANG
 description statement indicates that a protocol negotiated value
 overrides any configured value, then the origin would be reported as
-"learned", even if the learned value is the same as a configured
+"learned", even when a learned value is the same as the configured
 value.
 
 Conversely, if for a particular configuration node, the associated
 YANG description statement indicates that a protocol negotiated value
 does not override an explicitly configured value, then the origin
-would be reported as "intended" even if a learned value is the same as
+would be reported as "intended" even when a learned value is the same as
 the configured value.
 
 In the case that a device cannot provide an accurate origin for a
