@@ -251,13 +251,13 @@ model.
                    +------------+
                          |        // changes applied, subject to
                          |        // local factors, e.g., missing
-  +----------------+     |        // resources, delays
-  | dynamic        |-+   |
-  | datastore(s)   | |   |   +-------- learned configuration
-  +----------------+ |   |   +-------- system configuration
-    +-------------|--+   |   +-------- default configuration
-                  | |    |   |
-                  v v    v   v
+                         |        // resources, delays
+                         |
+                         |   +-------- learned configuration
+    dynamic              |   +-------- system configuration
+    dastores -------+    |   +-------- default configuration
+                    |    |   |
+                    v    v   v
                  +---------------+
                  | <operational> | <-- system state
                  | (ct + cf, ro) |
@@ -265,7 +265,7 @@ model.
 
   ct = config true; cf = config false
   rw = read-write; ro = read-only
-  boxes denote datastores
+  boxes denote named datastores
 
 #+END_EXAMPLE
 
@@ -499,88 +499,6 @@ accessible trees for some XPath contexts are refined as follows:
   node representing the operation being defined has the operation's
   output parameters as children.
 
-* Guidelines for Defining Datastores @guidelines@
-
-The definition of a new datastore in this architecture should be
-provided in a document (e.g., an RFC) purposed to the definition of
-the datastore.  When it makes sense, more than one datastore may be
-defined in the same document (e.g., when the datastores are logically
-connected).  Each datastore's definition should address the points
-specified in the sections below.
-
-** Define a name for the datastore @def-name@
-
-Each datastore must have a name using the character set
-described by Section 6.2 of ^RFC7950^.  The name should be consistent
-in style and length to other datastore names described in this
-document.
-
-The datastore's name does not need to be globally unique, as it will
-be uniquely qualified by the namespace of the module in which it is
-defined (^def-module^).  This means that names such as "running" and
-"operational" are valid datastore names. However, it is usually
-desirable to avoid using the same name for multiple different
-datastores.
-
-** Define which YANG modules can be used in the datastore
-
-Not all YANG modules may be used in all datastores.  Some datastores may
-constrain which data models can be used in them.  If it is desirable that
-a subset of all modules can be targeted to the datastore,
-then the documentation defining the datastore must indicate this.
-
-** Define which subset of YANG-modeled data applies
-
-By default, the data in a datastore is modeled by all YANG statements
-in the available YANG modules.  However, it is possible to specify
-criteria that YANG statements must satisfy in order to be present in a
-datastore.  For instance, maybe only "config true" nodes are present, or
-"config false nodes" that also have a specific YANG extension (e.g.,
-"i2rs:ephemeral true") are present in the datastore.
-
-** Define how data is actualized
-
-The new datastore must specify how it interacts with other datastores.
-For example, the diagram in ^datastore-model^ depicts dynamic
-datastores feeding into <operational>.  How this
-interaction occurs must be defined by any dynamic datastore.  In some
-cases, it may occur implicitly, as soon as the data is put into the
-dynamic datastore while, in other cases, an explicit action (e.g., an
-RPC) may be required to trigger the application of the datastore's data.
-
-** Define which protocols can be used
-
-By default, it is assumed that both the NETCONF and RESTCONF
-protocols can be used to interact with a datastore.
-However, it may be that only a specific protocol can be used
-(e.g., ForCES) or that a subset of all protocol operations or
-capabilities are available (e.g., no locking or no XPath-based
-filtering).
-
-** Define a module for the datastore @def-module@
-
-Each datastore must be defined by a YANG module.
-This module is used by servers to indicate (e.g., via YANG Library)
-their support for the datastore.
-
-The YANG module must import the "ietf-datastores" and "ietf-origin"
-modules, defined in this document.  This is necessary in order to
-access the base identities they define.
-
-The YANG module must define an identity that uses the "ds:datastore"
-identity or one of its derived identities as its base.  This identity
-is necessary so that the datastore can be referenced in protocol
-operations (e.g., <get-data>).
-
-The YANG module may define an identity that uses the "or:origin"
-identity or one its derived identities as its base.  This identity is
-needed if the datastore interacts with <operational> so that data
-originating from the datastore can be identified as such via the
-"origin" metadata attribute defined in ^yang-module^.
-
-An example of these guidelines in use is provided in
-^ephemeral-ds-example^.
-
 * YANG Modules @yang-module@
 
 !! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-04-26.yang"
@@ -650,6 +568,66 @@ Excellence project (ICT-318488) supported by the European Commission
 under its Seventh Framework Programme.
 
 *! start-appendix
+
+* Guidelines for Defining Datastores @guidelines@
+
+The definition of a new datastore in this architecture should be
+provided in a document (e.g., an RFC) purposed to the definition of
+the datastore.  When it makes sense, more than one datastore may be
+defined in the same document (e.g., when the datastores are logically
+connected).  Each datastore's definition should address the points
+specified in the sections below.
+
+** Define which YANG modules can be used in the datastore
+
+Not all YANG modules may be used in all datastores.  Some datastores may
+constrain which data models can be used in them.  If it is desirable that
+a subset of all modules can be targeted to the datastore,
+then the documentation defining the datastore must indicate this.
+
+** Define which subset of YANG-modeled data applies
+
+By default, the data in a datastore is modeled by all YANG statements
+in the available YANG modules.  However, it is possible to specify
+criteria that YANG statements must satisfy in order to be present in a
+datastore.  For instance, maybe only "config true" nodes are present, or
+"config false nodes" that also have a specific YANG extension (e.g.,
+"i2rs:ephemeral true") are present in the datastore.
+
+** Define how data is actualized
+
+The new datastore must specify how it interacts with other datastores.
+For example, the diagram in ^datastore-model^ depicts dynamic
+datastores feeding into <operational>.  How this
+interaction occurs must be defined by any dynamic datastore.  In some
+cases, it may occur implicitly, as soon as the data is put into the
+dynamic datastore while, in other cases, an explicit action (e.g., an
+RPC) may be required to trigger the application of the datastore's data.
+
+** Define which protocols can be used
+
+By default, it is assumed that both the NETCONF and RESTCONF
+protocols can be used to interact with a datastore.
+However, it may be that only a specific protocol can be used
+(e.g., ForCES) or that a subset of all protocol operations or
+capabilities are available (e.g., no locking or no XPath-based
+filtering).
+
+** Define YANG identities for the datastore @def-module@
+
+The datastore must defined with a YANG identity that uses the
+"ds:datastore" identity or one of its derived identities as its base.
+This identity is necessary so that the datastore can be referenced in
+protocol operations (e.g., <get-data>).
+
+The datastore may also define an identity that uses the "or:origin"
+identity or one its derived identities as its base.  This identity is
+needed if the datastore interacts with <operational> so that data
+originating from the datastore can be identified as such via the
+"origin" metadata attribute defined in ^yang-module^.
+
+An example of these guidelines in use is provided in
+^ephemeral-ds-example^.
 
 * Example Data
 
