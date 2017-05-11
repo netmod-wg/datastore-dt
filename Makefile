@@ -92,8 +92,6 @@ validate-ex-xml: ietf-origin.yang example-system.yang \
 ${references_xml}: ${references_src}
 	$(oxtradoc) -m mkback $< > $@
 
-.INTERMEDIATE: ${output}.xml
-
 ${output}.xml: ${draft} ${references_xml} $(trees) $(load) $(yang)
 	$(oxtradoc) -m outline-to-xml -n "${output}" $< > $@
 
