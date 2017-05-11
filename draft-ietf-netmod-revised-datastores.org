@@ -615,12 +615,12 @@ filtering).
 
 ** Define YANG identities for the datastore @def-module@
 
-The datastore must defined with a YANG identity that uses the
+The datastore must be defined with a YANG identity that uses the
 "ds:datastore" identity or one of its derived identities as its base.
 This identity is necessary so that the datastore can be referenced in
 protocol operations (e.g., <get-data>).
 
-The datastore may also define an identity that uses the "or:origin"
+The datastore may also be defined with an identity that uses the "or:origin"
 identity or one its derived identities as its base.  This identity is
 needed if the datastore interacts with <operational> so that data
 originating from the datastore can be identified as such via the
@@ -628,6 +628,26 @@ originating from the datastore can be identified as such via the
 
 An example of these guidelines in use is provided in
 ^ephemeral-ds-example^.
+
+* Ephemeral Dynamic Datastore Example @ephemeral-ds-example@
+
+The section defines documentation for an example dynamic
+datastore using the guidelines provided in ^guidelines^.
+While this example is very terse, it is expected to be that a
+standalone RFC would be needed when fully expanded.
+
+This example defines a dynamic datastore called "ephemeral",
+which is loosely modeled after the work done in the I2RS working
+group.
+
+  1. Name            : ephemeral
+  2. YANG modules    : all (default)
+  3. YANG statements : config false + ephemeral true
+  4. How applied     : automatic
+  5. Protocols       : NC/RC (default)
+  6. YANG Module     : (see below)
+
+!! include-figure example-ds-ephemeral.yang
 
 * Example Data
 
@@ -899,25 +919,6 @@ will appear as follows:
     </interface>
   </interfaces>
 
-* Ephemeral Dynamic Datastore Example @ephemeral-ds-example@
-
-The section defines documentation for an example dynamic
-datastore using the guidelines provided in ^guidelines^.
-While this example is very terse, it is expected to be that a
-standalone RFC would be needed when fully expanded.
-
-This example defines a dynamic datastore called "ephemeral",
-which is loosely modeled after the work done in the I2RS working
-group.
-
-  1. Name            : ephemeral
-  2. YANG modules    : all (default)
-  3. YANG statements : config false + ephemeral true
-  4. How applied     : automatic
-  5. Protocols       : NC/RC (default)
-  6. YANG Module     : (see below)
-
-!! include-figure example-ds-ephemeral.yang
 
 # * Open Issues @issues@
 #
