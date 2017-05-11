@@ -31,7 +31,7 @@ module example-ds-ephemeral {
       "This extension is mixed into config false YANG nodes to
        indicate that they are writable nodes in the 'ephemeral'
        datastore.  This statement takes a single argument
-       representing a boolean having the values 'true' and 'false'.
-       The default value is 'false'.";
+       representing a boolean having the values 'true' and
+       'false'.  The default value is 'false'.";
   }
 }
