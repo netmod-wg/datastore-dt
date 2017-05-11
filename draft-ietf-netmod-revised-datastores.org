@@ -66,7 +66,7 @@ This document defines the following terms:
 - dynamic datastore: A datastore holding data obtained dynamically
   during the operation of a device through interaction with other
   systems, rather than through one of the conventional configuration
-  datatstores.
+  datastores.
 - dynamic configuration: Configuration obtained via a dynamic datastore.
 - learned configuration: Configuration that has been learned via
   protocol interactions with other systems that is not conventional or
@@ -255,7 +255,7 @@ model.
                          |
                          |   +-------- learned configuration
     dynamic              |   +-------- system configuration
-    dastores -------+    |   +-------- default configuration
+    datastores -----+    |   +-------- default configuration
                     |    |   |
                     v    v   v
                  +---------------+
