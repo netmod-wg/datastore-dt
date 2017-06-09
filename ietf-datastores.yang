@@ -27,9 +27,9 @@ module ietf-datastores {
                <rwilton@cisco.com>";
 
   description
-    "This YANG module defines a set of identities for datastores.
-     These identities can be used to identify datastores in protocol
-     operations.
+    "This YANG module defines two sets of identities for datastores.
+     The first identifies the datastores themselves, the second
+     identifies are for datastore protperties.
 
      Copyright (c) 2017 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
@@ -104,4 +104,55 @@ module ietf-datastores {
      "The operational state datastore.";
   }
 
+
+
+  identity property {
+    description
+     "Abstract base identity for datastore identities.";
+  }
+
+  identity writable {
+    base property;
+    description
+      "Used on the 'running' datastore to indicate that it can be
+       written to.";
+  }
+
+  identity auto-persist {
+    base property;
+    description
+      "Used on the 'running' datastore to indicate that writes to
+       it will be automatically persisted.
+
+       If the 'startup' datastore is also supported, clients may
+       query its contents to ensure its synchronization.
+
+       If the 'startup' datastore is not supported, and this
+       property is not set, then clients must use a mechanism
+       provided by the protocol to explicitly persist the
+       'running' datastore's contents.";
+  }
+
+  identity rollback-on-error {
+    base property;
+    description
+      "Used on either the 'running' or 'candidate' datastores to
+       indicate that clients may request atomic update behavior.";
+  }
+
+  identity confirmed-commit {
+    base property;
+    description
+      "Used on the 'candidate' datastore to indicate that
+       clients may request confirmed-commit update behavior.";
+  }
+
+  identity validate {
+    base property;
+    description
+      "Used on the 'candidate' datastore to indicate that
+       clients may request datastore validation.";
+  }
+
 }
+
