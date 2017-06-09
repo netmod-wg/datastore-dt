@@ -937,5 +937,5 @@ will appear as follows:
     contributor "author:Juergen Schoenwaelder:Jacobs University:j.schoenwaelder@jacobs-university.de";
     contributor "author:Phil Shafer:Juniper Networks:phil@juniper.net";
     contributor "author:Kent Watsen:Juniper Networks:kwatsen@juniper.net";
-    contributor "author:Rob Wilton:Cisco Systems:rwilton@cisco.com";
+    contributor "author:Robert Wilton:Cisco Systems:rwilton@cisco.com";
 }}
