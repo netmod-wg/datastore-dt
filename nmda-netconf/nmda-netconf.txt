@@ -1,0 +1,152 @@
+#
+# NMDA Changes for NETCONF
+#
+
+The "Network Management Datastore Architecture" (NMDA) improves on
+NETCONF by adding new features to give more accurate handling of
+configuration and operational data.  These include ability to inspect
+the current operational values of configuration data, allowing clients
+to use identical paths for retrieving the configured values and the
+operational values.  These new features require additional operations
+in network management applications such as NETCONF.  This draft
+details those new operations.
+
+* Introduction
+
+This document provides a YANG model that adds NETCONF (^RFC6241^)
+support for the emerging "Network Management Datastore Architecture"
+(NMDA) ^I-D.ietf-netmod-revised-datastores^.  The architecture defines
+an architectural framework for datastores, a fundamental concept
+binding network management data models to network management
+protocols, enabling data models to be written in a network management
+protocol agnostic way.  NETCONF operations currently refer to the
+datastores defined in the original model, so new operations are
+required to allow references to the new datastores.
+
+Operations like <copy-config>, <lock> and <unlock> are augmented to
+allow them to target additional datastores.
+
+In addition the original <get> operation is deprecated, since the
+information it returns is no longer needed.  <get>'s deficiencies were
+a major motivation for the NMDA.
+
+** Keywords
+
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in BCP
+14, ^RFC2119^.
+
+** Terminology
+
+This document uses the terminology defined by the NMDA
+^I-D.ietf-netmod-revised-datastores^.
+
+* The NMDA Model for NETCONF
+
+This section describes the changes needed for NMDA support.  These
+changes are contained in a new YANG (^RFC7950^) model
+"ietf-netconf-datastores".
+
+These changes include the use of source and target parameters based on
+the "datastore" identity defined in the "ietf-datastores" from
+^I-D.ietf-netmod-revised-datastores^.  The use of identities allows
+future expansion in a way that the choice-based strategy from the
+original operations (e.g. <get-config>, <edit-config>) do not.
+
+** Operations
+
+Support for the NMDA includes two new operations defined in this
+document.
+
+*** The <get-data> Operation
+
+The <get-data> operation retrieves data from a specific NMDA
+datastore.  This operation is similar to NETCONF's "get-config"
+operation. 
+
+The "source" parameter indicates the datastore which is the source of
+the data to be retrieved.  This is a datastore identity.
+
+The "get-data" operation mirrors the "filter" parameter of the
+"get-config" operation, but is modified to allow "anydata" for
+configuration content, rather than the current "anyxml".
+
+**** Origin Attribute
+
+The "get-data" operation adds a new boolean parameter named "origin",
+which requests that the server return the "origin" information as
+detailed in the NMDA.  This parameter is only valid for
+<operational> and any datastores with identities derived from
+the "operational" identity.
+
+Data from <operational> can come from multiple sources.  The server
+should return the most accurate value for the "origin" attribute as
+possible, indicating the source of the operational value.
+
+When encoding the origin attribute for a hierarchy of returned nodes,
+the origin attribute may be omitted when the value matches that of the
+parent node.
+
+*** The <edit-data> Operation
+
+The <edit-data> operation changes the contents of a specific
+datastore, similar to the <edit-config> operation.
+
+The "target" parameter is a datastore identity that indicates the
+desired target datastore where changes should be made.
+
+The "edit-content" parameter from "edit-config" is modified to allow
+"anydata" for configuration content, rather than the current
+"anyxml".
+
+The "default-operation", "test-option", and "error-option" parameters
+are mirror the parameters of the "edit-config" operation.
+
+** Augmentations to the Base NETCONF Model
+
+Several of the operations defined in the base NETCONF data model
+(ietf-netconf@2011-06-01.yang) will continue to be used under the
+NMDA.  The <lock> and <unlock> operations are examples.  The
+ietf-netconf-nmda module augments the "config-target" choice to add a
+"datastore" leaf that can contain an NMDA datastore identity.
+
+Only writable datastores can be locked.
+
+? Do we need copy-data?  We will if we want to copy between, say,
+<intended> and <candidate>.
+
+** RPCs and Actions
+
+RPC operations and actions can be defined in YANG modules.  The
+evaluation context for constraints and references in operation and
+actions is <operational>.
+
+* YANG Model
+
+!! include-figure ietf-netconf-datastores.yang
+
+* IANA Considerations
+
+This document has no actions for IANA.
+
+* Security Considerations
+
+This document has no security considerations.
+
+*! start-appendix
+
+* Examples
+
+{{document:
+    name ;
+    ipr trust200902;
+    category std;
+    references references.xml;
+    title "NETCONF Model for NMDA";
+    contributor "author:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
+    contributor "author:Juergen Schoenwaelder:Jacobs University:j.schoenwaelder@jacobs-university.de";
+    contributor "author:Phil Shafer:Juniper Networks:phil@juniper.net";
+    contributor "author:Kent Watsen:Juniper Networks:kwatsen@juniper.net";
+    contributor "author:Robert Wilton:Cisco Systems:rwilton@cisco.com";
+}}
