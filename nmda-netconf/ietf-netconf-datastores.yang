@@ -188,13 +188,13 @@ module ietf-netconf-datastores {
    * We augment the lock and unlock operations with a
    * "datastore" parameter.
    */
-  augment /nc:lock/input/nc:target/nc:config-target {
+  augment /nc:lock/nc:input/nc:target/nc:config-target {
     leaf datastore {
       type ncds:datastore;
       description "Datastore to lock";
     }
   }
-  augment /nc:unlock/input/nc:target/nc:config-target {
+  augment /nc:unlock/nc:input/nc:target/nc:config-target {
     leaf datastore {
       type ncds:datastore;
       description "Datastore to unlock";
