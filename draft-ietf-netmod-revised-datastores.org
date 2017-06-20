@@ -782,7 +782,7 @@ those values are not supplied, the system will select values.  When
 the connection is established, <operational> will contain the current
 values for the local-port and remote-port nodes regardless of the
 origin.  If the system has chosen the values, the "origin" attribute
-will be set to "operational".  Before the connection is established,
+will be set to "system".  Before the connection is established,
 one or both of the nodes may not appear, since the system may not yet
 have their values.
 
@@ -822,8 +822,8 @@ origin of the original data.
       <name origin="or:intended">10.1.2.3</name>
       <local-as origin="or:default">64642</local-as>
       <peer-as origin="or:default">65000</peer-as>
-      <local-port origin="or:intended">60794</local-port>
-      <remote-port origin="or:intended">179</remote-port>
+      <local-port origin="or:system">60794</local-port>
+      <remote-port origin="or:default">179</remote-port>
     </peer>
   </bgp>
 
