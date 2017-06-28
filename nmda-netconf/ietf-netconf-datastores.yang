@@ -120,51 +120,6 @@ module ietf-netconf-datastores {
           "The default operation to use.";
       }
 
-      leaf test-option {
-        description
-          "The test option to use.";
-        if-feature nc:validate;
-        type enumeration {
-          enum test-then-set {
-            description
-              "The server will test and then set if no errors.";
-          }
-          enum set {
-            description
-              "The server will set without a test first.";
-          }
-          enum test-only {
-            description
-              "The server will only test and not set, even 
-               if there are no errors.";
-          }
-        }
-        default "test-then-set";
-      }
-
-      leaf error-option {
-        description
-          "The error option to use.";
-        type enumeration { 
-          enum stop-on-error {
-            description
-              "The server will stop on errors.";
-          }
-          enum continue-on-error {
-            description
-              "The server may continue on errors.";
-          }
-          enum rollback-on-error {
-            description
-              "The server will rollback on errors.
-               This value can only be used if
-               the 'rollback-on-error'
-               feature is supported.";
-          }
-        }
-        default "stop-on-error";
-      }
-
       choice edit-content {
         description
           "The content for the edit operation";
@@ -198,6 +153,16 @@ module ietf-netconf-datastores {
     leaf datastore {
       type ncds:datastore;
       description "Datastore to unlock";
+    }
+  }
+
+  /*
+   * We also augment nc:validate
+   */
+  augment /nc:validate/nc:input/nc:source/nc:config-source {
+    leaf datastore {
+      type ncds:datastore;
+      description "Datastore to validate";
     }
   }
 }
