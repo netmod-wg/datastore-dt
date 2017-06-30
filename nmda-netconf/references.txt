@@ -2,6 +2,7 @@
     title "Informative References";
     ietf-ref RFC2119;
     ietf-ref RFC6241;
+    ietf-ref RFC6243;
     ietf-ref RFC7950;
     ietf-ref I-D.ietf-netmod-revised-datastores;
 }}
