@@ -127,7 +127,7 @@ actions is <operational>.
 
 * YANG Model
 
-!! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-05-01.yang"
+!! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-06-30.yang"
 
 * IANA Considerations
 
