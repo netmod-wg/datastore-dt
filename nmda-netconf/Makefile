@@ -35,10 +35,10 @@ ex_yang := $(wildcard ex*.yang)
 endif
 yang := $(std_yang) $(ex_yang)
 
-xml2rfc ?= xml2rfc
-oxtradoc ?= oxtradoc
-idnits ?= idnits
-pyang ?= pyang
+XML2RFC ?= xml2rfc
+OXTRADOC ?= oxtradoc
+IDNITS ?= idnits
+PYANG ?= pyang
 
 ifeq (,$(draft))
 $(warning No file named draft-*.md or draft-*.xml or draft-*.org)
@@ -60,10 +60,10 @@ submit: ${output}.txt
 html: ${output}.html
 
 idnits: ${output}.txt
-	$(idnits) $<
+	${IDNITS} $<
 
 clean:
-	-rm -f ${output_base}-[0-9][0-9].* ${references_xml} $(load)
+	-rm -f ${output_base}-[0-9][0-9].* ${references_xml} ${load}
 	-rm -f *.dsrl *.rng *.sch ${draft_base}.fxml
 
 .INTERMEDIATE: $(load)
@@ -77,13 +77,15 @@ example-system.oper.yang: example-system.yang
 validate: validate-std-yang validate-ex-yang
 
 validate-std-yang:
-	pyang --ietf $(std_yang)
+	${PYANG} ${PYANGFLAGS} --ietf ${std_yang}
 
 validate-ex-yang:
-	pyang --canonical --max-line-length 69 $(ex_yang)
+ifneq (,${ex_yang})
+	${PYANG} ${PYANGFLAGS} --canonical --max-line-length 69 ${ex_yang}
+endif
 
 ${references_xml}: ${references_src}
-	$(oxtradoc) -m mkback $< > $@
+	${OXTRADOC} -m mkback $< > $@
 
 ifeq (.xml,$(draft_type))
 ${output}.xml: ${draft}.xml
@@ -93,14 +95,14 @@ ${output}.xml: back.xml $(trees) $(load) $(yang)
 endif
 
 ${output}.xml : ${draft} ${references_xml} ${yang}
-	$(oxtradoc) -m outline-to-xml -n "${output}" $< > $@
+	${OXTRADOC} -m outline-to-xml -n "${output}" $< > $@
 
 ${output}.txt: ${output}.xml
-	$(xml2rfc) $< -o $@ --text
+	${XML2RFC} $< -o $@ --text
 
 %.tree: %.yang
-	$(pyang) -f tree --tree-line-length 68 $< > $@
+	${PYANG} ${PYANGFLAGS} -f tree --tree-line-length 68 $< > $@
 
 ${output}.html: ${draft}
 	@echo "Generating $@ ..."
-	$(oxtradoc) -m html -n "${output}" $< > $@
+	${OXTRADOC} -m html -n "${output}" $< > $@
