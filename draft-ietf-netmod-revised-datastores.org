@@ -378,6 +378,11 @@ used by the system.  This includes all applied configuration from
 by any supported data models.  In addition, <operational> also
 contains applied data from dynamic datastores.
 
+Requests to retrieve nodes from <operational> always return the value
+in use if the node exists, regardless of any default value specified
+in the YANG module.  If no value is returned for a given node, then
+this implies that the node is not used by the device.
+
 <operational> does not persist across reboots.
 
 Changes to configuration may take time to percolate through to
