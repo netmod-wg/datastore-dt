@@ -30,7 +30,8 @@ This document defines the following terms:
   datastore might be implemented, for example, using files, a
   database, flash memory locations, or combinations thereof.
   A datastore maps to an instantiated YANG data tree.
-- configuration: Data that determines how a device behaves.
+- configuration: Data that is required to get a device from its
+  initial default state into a desired operational state.
   This data is modeled in YANG using "config true" nodes.
   Configuration can originate from different sources.
 - configuration datastore: A datastore holding configuration.
