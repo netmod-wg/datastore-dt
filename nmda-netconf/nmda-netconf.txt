@@ -73,6 +73,10 @@ The "get-data" operation mirrors the "filter" parameter of the
 configuration content, rather than the "get-config"'s use of "type
 anyxml".
 
+The "get-data" operation also supports the "with-defaults" parameter
+as defined in ^RFC6243^.  The supported values follow the constraints
+given by the "with-defaults" capability.
+
 **** Origin Attribute
 
 The "get-data" operation adds a new boolean parameter named "origin",
@@ -123,7 +127,7 @@ actions is <operational>.
 
 * YANG Model
 
-!! include-figure ietf-netconf-datastores.yang
+!! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-05-01.yang"
 
 * IANA Considerations
 
