@@ -1,6 +1,6 @@
 module ietf-netconf-datastores {
   yang-version 1.1;
-  namespace "urn:ietf:params:xml:ns:yang:ietf-ds-netconf";
+  namespace "urn:ietf:params:xml:ns:yang:ietf-netconf-datastores";
   prefix ncds;
 
   import ietf-inet-types {
@@ -11,6 +11,9 @@ module ietf-netconf-datastores {
   }
   import ietf-netconf {
     prefix nc;
+  }
+  import ietf-netconf-with-defaults {
+    prefix ncwd;
   }
 
   organization
@@ -62,16 +65,16 @@ module ietf-netconf-datastores {
   }
 
   typedef datastore {
-    description "An NMDA datastore";
     type identityref {
       base ds:datastore;
     }
+    description "An NMDA datastore";
     reference
       "RFC XXXX: Network Management Datastore Architecture";
   }
 
   rpc get-data {
-    description "Get data from a datastore";
+    description "Get data from an NMDA datastore";
     input {
       leaf source {
         type ncds:datastore;
@@ -94,6 +97,7 @@ module ietf-netconf-datastores {
     }
   }
   rpc edit-data {
+    description "Edit data from an NMDA datastore";
     input {
       leaf target {
         type ncds:datastore;
@@ -120,10 +124,12 @@ module ietf-netconf-datastores {
           "The default operation to use.";
       }
 
+      uses ncwd:with-defaults-parameters;
+
       choice edit-content {
+        mandatory true;
         description
           "The content for the edit operation";
-        mandatory true;
 
         anydata config {
           description 
@@ -144,12 +150,14 @@ module ietf-netconf-datastores {
    * "datastore" parameter.
    */
   augment /nc:lock/nc:input/nc:target/nc:config-target {
+    description "Add NMDA Datastore as target";
     leaf datastore {
       type ncds:datastore;
       description "Datastore to lock";
     }
   }
   augment /nc:unlock/nc:input/nc:target/nc:config-target {
+    description "Add NMDA Datastore as target";
     leaf datastore {
       type ncds:datastore;
       description "Datastore to unlock";
@@ -160,6 +168,7 @@ module ietf-netconf-datastores {
    * We also augment nc:validate
    */
   augment /nc:validate/nc:input/nc:source/nc:config-source {
+    description "Add NMDA Datastore as source";
     leaf datastore {
       type ncds:datastore;
       description "Datastore to validate";
