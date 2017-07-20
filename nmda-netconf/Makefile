@@ -2,7 +2,7 @@
 # https://pypi.python.org/pypi/xml2rfc
 # https://github.com/Juniper/libslax/tree/master/doc/oxtradoc
 
-draft = nmda-netconf.txt
+draft = nmda-netconf.org
 output_base = draft-dsdt-nmda-netconf
 examples =
 trees =
