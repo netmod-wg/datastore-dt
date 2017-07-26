@@ -843,6 +843,7 @@ have their values.
       <peer-as or:origin="or:default">64502</peer-as>
       <local-port or:origin="or:system">60794</local-port>
       <remote-port or:origin="or:default">179</remote-port>
+      <state>established</state>
     </peer>
   </bgp>
 
@@ -872,6 +873,7 @@ origin of the original data.
       <peer-as or:origin="or:default">64502</peer-as>
       <local-port or:origin="or:system">60794</local-port>
       <remote-port or:origin="or:default">179</remote-port>
+      <state>closing</state>
     </peer>
   </bgp>
 
