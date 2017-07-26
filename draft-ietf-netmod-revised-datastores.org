@@ -70,8 +70,8 @@ This document defines the following terms:
   datastores.
 - dynamic configuration: Configuration obtained via a dynamic datastore.
 - learned configuration: Configuration that has been learned via
-  protocol interactions with other systems that is not conventional or
-  dynamic configuration.
+  protocol interactions with other systems and that is neither
+  conventional nor dynamic configuration.
 - system configuration: Configuration that is supplied by
   the device itself.
 - default configuration: Configuration that is not explicitly provided
@@ -375,14 +375,22 @@ settings without having to replicate definitions in the data models.
 
 <operational> contains system state and all configuration actually
 used by the system.  This includes all applied configuration from
-<intended>, system-provided configuration, and default values defined
-by any supported data models.  In addition, <operational> also
-contains applied data from dynamic datastores.
+<intended>, learned configuration, system-provided configuration, and
+default values defined by any supported data models.  In addition,
+<operational> also contains applied data from dynamic datastores.
 
 Requests to retrieve nodes from <operational> always return the value
 in use if the node exists, regardless of any default value specified
 in the YANG module.  If no value is returned for a given node, then
 this implies that the node is not used by the device.
+
+The interpretation of what constitutes as being "in use" by the system
+is dependent on both the schema definition and the device
+implementation.  Generally, functionality that is enabled and
+operational on the system would be considered as being 'in use'.
+Conversely, functionality that is neither enabled nor operational on
+the system could be considered as not being 'in use', and hence may be
+omitted from <operational>.
 
 <operational> does not persist across reboots.
 
@@ -437,38 +445,40 @@ successful).
 
 *** Origin Metadata Annotation
 
-As data flows into <operational>, it is conceptually marked with a
-metadata annotation (^RFC7952^) that indicates its origin.  The origin
-applies to all data nodes except non-presence containers.  The
-"origin" metadata annotation is defined in ^yang-module^.  The values
-are YANG identities.  The following identities are defined:
+As configuration flows into <operational>, it is conceptually marked
+with a metadata annotation (^RFC7952^) that indicates its origin.  The
+origin applies to all configuration nodes except non-presence
+containers.  The "origin" metadata annotation is defined in
+^yang-module^.  The values are YANG identities.  The following
+identities are defined:
 
 - origin: abstract base identity from which the other origin
   identities are derived.
-- intended: represents data provided by <intended>.
-- dynamic: represents data provided by a dynamic datastore.
-- system: represents data provided by the system itself, including
-  both system configuration and system state.  Examples of system
-  configuration include applied configuration for an always existing
-  loopback interface, or interface configuration that is auto-created
-  due to the hardware currently present in the device.
+- intended: represents configuration provided by <intended>.
+- dynamic: represents configuration provided by a dynamic datastore.
+- system: represents configuration provided by the system itself.
+  Examples of system configuration include applied configuration for
+  an always existing loopback interface, or interface configuration
+  that is auto-created due to the hardware currently present in the
+  device.
 - learned: represents configuration that has been learned via protocol
   interactions with other systems, including protocols such as
   link-layer negotiations, routing protocols, DHCP, etc.
-- default: represents data using a default value specified in the data
-  model, using either values in the "default" statement or any values
-  described in the "description" statement.  The default origin is
-  only used when the data has not been provided by any other source.
-- unknown: represents data for which the system cannot identify the
-  origin.
+- default: represents configuration using a default value specified in
+  the data model, using either values in the "default" statement or
+  any values described in the "description" statement.  The default
+  origin is only used when the configuration has not been provided by
+  any other source.
+- unknown: represents configuration for which the system cannot
+  identify the origin.
 
 These identities can be further refined, e.g., there could be separate
 identities for particular types or instances of dynamic datastore
 derived from "dynamic".
 
-In all cases, the device should report the origin that most accurately
-reflects the source of the data that is actively being used by the
-system.
+For all configuration data nodes in <operational>, the device should
+report the origin that most accurately reflects the source of the data
+that is actively being used by the system.
 
 In cases where it could be ambiguous as to which origin should be
 used, i.e. where the same data node value has originated from multiple
@@ -567,6 +577,10 @@ are requested:
 This document discusses an architectural model of datastores for network
 management using NETCONF/RESTCONF and YANG.  It has no security impact
 on the Internet.
+
+Although this document specifies several YANG modules, these modules
+have no configuration or state leaves, only identities and meta-data.
+Hence the "YANG module security guidelines" do not apply.
 
 * Acknowledgments
 

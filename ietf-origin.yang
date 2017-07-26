@@ -67,20 +67,20 @@ module ietf-origin {
   identity intended {
     base origin;
     description
-      "Denotes data from the intended configuration datastore";
+      "Denotes configuration from the intended configuration
+       datastore";
   }
 
   identity dynamic {
     base origin;
     description
-      "Denotes data from a dynamic datastore.";
+      "Denotes configuration from a dynamic datastore.";
   }
 
   identity system {
     base origin;
     description
-      "Denotes data originated by the system itself, including
-       both system configuration and system state.
+      "Denotes configuration originated by the system itself.
 
        Examples of system configuration include applied configuration
        for an always existing loopback interface, or interface
@@ -92,8 +92,8 @@ module ietf-origin {
     base origin;
     description
       "Denotes configuration learned from protocol interactions with
-       other devices, instead of via the intended configuration
-       datastore or any dynamic datastore.
+       other devices, instead of via either the intended
+       configuration datastore or any dynamic datastore.
 
        Examples of protocols that provide learned configuration
        include link-layer negotiations, routing protocols, and
@@ -103,16 +103,16 @@ module ietf-origin {
   identity default {
     base origin;
     description
-      "Denotes data that does not have an configured or learned
-       value, but has a default value in use.  Covers both values
-       defined in a 'default' statement, and values defined via an
-       explanation in a 'description' statement.";
+      "Denotes configuration that does not have an configured or
+       learned value, but has a default value in use.  Covers both
+       values defined in a 'default' statement, and values defined
+       via an explanation in a 'description' statement.";
   }
 
   identity unknown {
     base origin;
     description
-      "Denotes data for which the system cannot identify the
+      "Denotes configuration for which the system cannot identify the
        origin.";
   }
 
@@ -125,8 +125,9 @@ module ietf-origin {
       base origin;
     }
     description
-      "The 'origin' annotation can be present on any node in a
-       datastore.  It specifies from where the node originated.";
+      "The 'origin' annotation can be present on any configuration
+       node in the operational datastore.  It specifies from where
+       the node originated.";
   }
 
 }
