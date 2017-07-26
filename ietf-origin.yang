@@ -126,8 +126,10 @@ module ietf-origin {
     }
     description
       "The 'origin' annotation can be present on any configuration
-       node in the operational datastore.  It specifies from where
-       the node originated.";
+       data node in the operational datastore.  It specifies from
+       where the node originated.  If not specified for a given data
+       node then the origin is the same as the origin of its parent
+       node in the data tree.  The origin for any top level
+       configuration data nodes must be specified.";
   }
-
 }

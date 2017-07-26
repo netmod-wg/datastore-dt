@@ -477,8 +477,8 @@ identities for particular types or instances of dynamic datastore
 derived from "dynamic".
 
 For all configuration data nodes in <operational>, the device should
-report the origin that most accurately reflects the source of the data
-that is actively being used by the system.
+report the origin that most accurately reflects the source of the
+configuration that is actively being used by the system.
 
 In cases where it could be ambiguous as to which origin should be
 used, i.e. where the same data node value has originated from multiple
@@ -498,7 +498,8 @@ would be reported as "intended" even when a learned value is the same as
 the configured value.
 
 In the case that a device cannot provide an accurate origin for a
-particular data node then it should use the origin "unknown".
+particular configuration data node then it should use the origin
+"unknown".
 
 * Implications on YANG
 
@@ -579,8 +580,8 @@ management using NETCONF/RESTCONF and YANG.  It has no security impact
 on the Internet.
 
 Although this document specifies several YANG modules, these modules
-have no configuration or state leaves, only identities and meta-data.
-Hence the "YANG module security guidelines" do not apply.
+only define identities and meta-data, hence the "YANG module security
+guidelines" do not apply.
 
 * Acknowledgments
 
