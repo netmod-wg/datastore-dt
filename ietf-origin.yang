@@ -74,7 +74,8 @@ module ietf-origin {
   identity dynamic {
     base origin;
     description
-      "Denotes configuration from a dynamic datastore.";
+      "Denotes configuration from a dynamic configuration
+       datastore.";
   }
 
   identity system {
@@ -92,8 +93,8 @@ module ietf-origin {
     base origin;
     description
       "Denotes configuration learned from protocol interactions with
-       other devices, instead of via either the intended
-       configuration datastore or any dynamic datastore.
+       other devices, instead of via either the intended configuration
+       datastore or any dynamic configuration datastore.
 
        Examples of protocols that provide learned configuration
        include link-layer negotiations, routing protocols, and

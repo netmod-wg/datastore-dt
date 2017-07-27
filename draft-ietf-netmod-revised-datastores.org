@@ -64,11 +64,12 @@ This document defines the following terms:
   datastores.
 - conventional configuration: Configuration that is stored
   in any of the conventional configuration datastores.
-- dynamic datastore: A datastore holding data obtained dynamically
-  during the operation of a device through interaction with other
-  systems, rather than through one of the conventional configuration
-  datastores.
-- dynamic configuration: Configuration obtained via a dynamic datastore.
+- dynamic configuration datastore: A configuration datastore holding
+  configuration obtained dynamically during the operation of a device
+  through interaction with other systems, rather than through one of
+  the conventional configuration datastores.
+- dynamic configuration: Configuration obtained via a dynamic
+  configuration datastore.
 - learned configuration: Configuration that has been learned via
   protocol interactions with other systems and that is neither
   conventional nor dynamic configuration.
@@ -254,8 +255,8 @@ model.
                          |        // local factors, e.g., missing
                          |        // resources, delays
                          |
-                         |   +-------- learned configuration
-    dynamic              |   +-------- system configuration
+    dynamic              |   +-------- learned configuration
+    configuration        |   +-------- system configuration
     datastores -----+    |   +-------- default configuration
                     |    |   |
                     v    v   v
@@ -356,13 +357,14 @@ The flow of data between these datastores is depicted in section
 The specific protocols may define explicit operations to copy between
 these datastores, e.g., NETCONF's <copy-config> operation.
 
-** Dynamic Datastores
+** Dynamic Configuration Datastores
 
-The model recognizes the need for dynamic datastores that are, by
-definition, not part of the persistent configuration of a device.  In
-some contexts, these have been termed ephemeral datastores since the
-information is ephemeral, i.e., lost upon reboot.  The dynamic
-datastores interact with the rest of the system through <operational>.
+The model recognizes the need for dynamic configuration datastores
+that are, by definition, not part of the persistent configuration of a
+device.  In some contexts, these have been termed ephemeral datastores
+since the information is ephemeral, i.e., lost upon reboot.  The
+dynamic configuration datastores interact with the rest of the system
+through <operational>.
 
 ** The Operational State Datastore (<operational>)
 
@@ -377,7 +379,8 @@ settings without having to replicate definitions in the data models.
 used by the system.  This includes all applied configuration from
 <intended>, learned configuration, system-provided configuration, and
 default values defined by any supported data models.  In addition,
-<operational> also contains applied data from dynamic datastores.
+<operational> also contains applied configuration from dynamic
+configuration datastores.
 
 Requests to retrieve nodes from <operational> always return the value
 in use if the node exists, regardless of any default value specified
@@ -455,7 +458,8 @@ identities are defined:
 - origin: abstract base identity from which the other origin
   identities are derived.
 - intended: represents configuration provided by <intended>.
-- dynamic: represents configuration provided by a dynamic datastore.
+- dynamic: represents configuration provided by a dynamic
+  configuration datastore.
 - system: represents configuration provided by the system itself.
   Examples of system configuration include applied configuration for
   an always existing loopback interface, or interface configuration
@@ -473,8 +477,8 @@ identities are defined:
   identify the origin.
 
 These identities can be further refined, e.g., there could be separate
-identities for particular types or instances of dynamic datastore
-derived from "dynamic".
+identities for particular types or instances of dynamic configuration
+datastores derived from "dynamic".
 
 For all configuration data nodes in <operational>, the device should
 report the origin that most accurately reflects the source of the
@@ -631,19 +635,21 @@ then the documentation defining the datastore must indicate this.
 By default, the data in a datastore is modeled by all YANG statements
 in the available YANG modules.  However, it is possible to specify
 criteria that YANG statements must satisfy in order to be present in a
-datastore.  For instance, maybe only "config true" nodes are present, or
-"config false nodes" that also have a specific YANG extension (e.g.,
-"i2rs:ephemeral true") are present in the datastore.
+datastore.  For instance, maybe only "config true" nodes are present,
+or "config false nodes" that also have a specific YANG extension are
+present in the datastore.
 
 ** Define how data is actualized
 
 The new datastore must specify how it interacts with other datastores.
+
 For example, the diagram in ^datastore-model^ depicts dynamic
-datastores feeding into <operational>.  How this
-interaction occurs must be defined by any dynamic datastore.  In some
-cases, it may occur implicitly, as soon as the data is put into the
-dynamic datastore while, in other cases, an explicit action (e.g., an
-RPC) may be required to trigger the application of the datastore's data.
+configuration datastores feeding into <operational>.  How this
+interaction occurs must be defined by the particular dynamic
+configuration datastores.  In some cases, it may occur implicitly, as
+soon as the data is put into the dynamic configuration datastore
+while, in other cases, an explicit action (e.g., an RPC) may be
+required to trigger the application of the datastore's data.
 
 ** Define which protocols can be used
 
@@ -670,23 +676,22 @@ originating from the datastore can be identified as such via the
 An example of these guidelines in use is provided in
 ^ephemeral-ds-example^.
 
-* Ephemeral Dynamic Datastore Example @ephemeral-ds-example@
+* Ephemeral Dynamic Configuration Datastore Example @ephemeral-ds-example@
 
-The section defines documentation for an example dynamic
-datastore using the guidelines provided in ^guidelines^.
-While this example is very terse, it is expected to be that a
-standalone RFC would be needed when fully expanded.
+The section defines documentation for an example dynamic configuration
+datastore using the guidelines provided in ^guidelines^.  While this
+example is very terse, it is expected to be that a standalone RFC
+would be needed when fully expanded.
 
-This example defines a dynamic datastore called "ephemeral",
-which is loosely modeled after the work done in the I2RS working
-group.
+This example defines a dynamic configuration datastore called
+"ephemeral", which is loosely modeled after the work done in the I2RS
+working group.
 
   1. Name            : ephemeral
   2. YANG modules    : all (default)
-  3. YANG statements : config false + ephemeral true
-  4. How applied     : automatic
-  5. Protocols       : NC/RC (default)
-  6. YANG Module     : (see below)
+  3. How applied     : automatic
+  4. Protocols       : NC/RC (default)
+  5. YANG Module     : (see below)
 
 !! include-figure example-ds-ephemeral.yang
 
