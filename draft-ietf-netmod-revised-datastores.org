@@ -24,7 +24,13 @@ protocols.
 
 * Terminology
 
-This document defines the following terms:
+This document defines the following terminology. Some of the terms are
+revised definitions of terms originally defined in ^RFC6241^ and
+^RFC7950^ (see also section ^background^). The revised definitions are
+semantically equivalent with the definitions found in ^RFC6241^ and
+^RFC7950^. It is expected that the revised definitions provided in
+this section will replace the definitions in ^RFC6241^ and ^RFC7950^
+when these documents are revised.
 
 - datastore: A conceptual place to store and access information.  A
   datastore might be implemented, for example, using files, a
@@ -110,7 +116,7 @@ used and thus defined here as well:
 - remote procedure call: An operation that can be invoked by a client
   on a server.
 
-* Background
+* Background @background@
 
 NETCONF ^RFC6241^ provides the following definitions:
 
@@ -719,13 +725,14 @@ interface is not applied.  Further, the system has received a host name
 and an additional IP address for "eth0" over DHCP.  In addition to a
 default value, a loopback interface is automatically added by the system,
 and the result of the "speed" auto-negotiation.  All of this is reflected
-in <operational>:
+in <operational>. Note how the origin metadata attribute for several 
+config true data nodes is inherited from their parent data nodes.
 
 !! include-figure ex-oper.load
 
 ** BGP Example
 
-Consider the following piece of a ersatz BGP module:
+Consider the following fragment of a fictional BGP module:
 
     container bgp {
       leaf local-as {
@@ -772,27 +779,27 @@ have complex hierarchical values, allowing the user to specify default
 values for all peers in a single location.
 
 The model also follows the pattern of fully integrating state ("config
-false") nodes with configuration ("config true") nodes.  There is not
+false") nodes with configuration ("config true") nodes.  There is no
 separate "bgp-state" hierarchy, with the accompanying repetition of
 containment and naming nodes.  This makes the model simpler and more
 readable.
 
 *** Datastores
 
-Each datastore represents differing views of these nodes.
-<running> will hold the configuration provided by the user, for
-example a single BGP peer.  <intended> will conceptually hold the data
-as validated, after the removal of data not intended for validation
-and after any local template mechanisms are performed.  <operational>
-will show data from <intended> as well as any "config false" nodes.
+Each datastore represents differing views of these nodes.  The
+<running> datastore will hold the configuration provided by the
+operator, for example a single BGP peer.  The <intended> datastore
+will conceptually hold the data as validated, after the removal of
+data not intended for validation and after any local template
+mechanisms are performed. The <operational> datastore will show data
+from <intended> as well as any "config false" nodes.
 
 *** Adding a Peer
 
 If the user configures a single BGP peer, then that peer will be
-visible in both <running> and <intended>.  It may also
-appear in <candidate>, if the server supports the
-"candidate" feature.  Retrieving the peer will return only the
-user-specified values.
+visible in both <running> and <intended>.  It may also appear in
+<candidate>, if the server supports the <candidate> datastore.
+Retrieving the peer will return only the user-specified values.
 
 No time delay should exist between the appearance of the peer in
 <running> and <intended>.
@@ -800,8 +807,8 @@ No time delay should exist between the appearance of the peer in
 In this scenario, we've added the following to <running>:
 
   <bgp>
-    <local-as>64642</local-as>
-    <peer-as>65000</peer-as>
+    <local-as>64501</local-as>
+    <peer-as>64502</peer-as>
     <peer>
       <name>10.1.2.3</name>
     </peer>
@@ -809,7 +816,7 @@ In this scenario, we've added the following to <running>:
 
 **** <operational>
 
-<operational> will contain the fully expanded peer data,
+The <operational> datastore will contain the fully expanded peer data,
 including "config false" nodes.  In our example, this means the
 "state" node will appear.
 
@@ -832,15 +839,16 @@ will be set to "system".  Before the connection is established,
 one or both of the nodes may not appear, since the system may not yet
 have their values.
 
-  <bgp origin="or:intended" xmlns="urn:example:bgp">
-    <local-as origin="or:intended">64642</local-as>
-    <peer-as origin="or:intended">65000</peer-as>
-    <peer origin="or:intended">
-      <name origin="or:intended">10.1.2.3</name>
-      <local-as origin="or:default">64642</local-as>
-      <peer-as origin="or:default">65000</peer-as>
-      <local-port origin="or:system">60794</local-port>
-      <remote-port origin="or:default">179</remote-port>
+  <bgp or:origin="or:intended" xmlns="urn:example:bgp">
+    <local-as>64501</local-as>
+    <peer-as>64502</peer-as>
+    <peer>
+      <name>10.1.2.3</name>
+      <local-as or:origin="or:default">64501</local-as>
+      <peer-as or:origin="or:default">64502</peer-as>
+      <local-port or:origin="or:system">60794</local-port>
+      <remote-port or:origin="or:default">179</remote-port>
+      <state>established</state>
     </peer>
   </bgp>
 
@@ -849,7 +857,7 @@ have their values.
 Changes to configuration may take time to percolate through the
 various software components involved.  During this period, it is
 imperative to continue to give an accurate view of the working of the
-device.  <operational> will contain nodes for both
+device.  The <operational> datastore will contain nodes for both
 the previous and current configuration, as closely as possible
 tracking the current operation of the device.
 
@@ -861,15 +869,16 @@ current data values will continue to be visible in <operational>,
 with the "origin" attribute set to indicate the
 origin of the original data.
 
-  <bgp origin="or:intended">
-    <local-as origin="or:intended">64642</local-as>
-    <peer-as origin="or:intended">65000</peer-as>
-    <peer origin="or:intended">
-      <name origin="or:intended">10.1.2.3</name>
-      <local-as origin="or:default">64642</local-as>
-      <peer-as origin="or:default">65000</peer-as>
-      <local-port origin="or:system">60794</local-port>
-      <remote-port origin="or:default">179</remote-port>
+  <bgp or:origin="or:intended" xmlns="urn:example:bgp">
+    <local-as>64501</local-as>
+    <peer-as>64502</peer-as>
+    <peer>
+      <name>10.1.2.3</name>
+      <local-as or:origin="or:default">64501</local-as>
+      <peer-as or:origin="or:default">64502</peer-as>
+      <local-port or:origin="or:system">60794</local-port>
+      <remote-port or:origin="or:default">179</remote-port>
+      <state>closing</state>
     </peer>
   </bgp>
 
@@ -878,7 +887,7 @@ peer's data is removed from <operational>.
 
 ** Interface Example
 
-In this section, we'll use this simple interface data model:
+In this section, we will use this simple interface data model:
 
   container interfaces {
     list interface {
@@ -890,10 +899,10 @@ In this section, we'll use this simple interface data model:
         type string;
       }
       leaf mtu {
-        type uint;
+        type uint16;
       }
-      leaf ipv4-address {
-        type inet:ipv4-address;
+      leaf-list ip-address {
+        type inet:ip-address;
       }
     }
   }
@@ -922,14 +931,15 @@ Since the interface does not exist, this data does not appear in
 
 When a FRU containing this interface is inserted, the system will
 detect it and process the associated configuration.  The <operational>
-will contain the data from <intended>, as well as the "config false"
-nodes, such as the current value of the interface's MTU.
+datastore will contain the data from <intended>, as well as nodes
+added by the system, such as the current value of the interface's
+MTU.
 
-  <interfaces origin="or:intended">
-    <interface origin="or:intended">
-      <name origin="or:intended">et-0/0/0</name>
-      <description origin="or:intended">Test interface</description>
-      <mtu origin="or:system">1500</mtu>
+  <interfaces or:origin="or:intended">
+    <interface>
+      <name>et-0/0/0</name>
+      <description>Test interface</description>
+      <mtu or:origin="or:system">1500</mtu>
     </interface>
   </interfaces>
 
@@ -939,29 +949,32 @@ If the FRU is removed, the interface data is removed from
 *** System-provided Interface
 
 Imagine if the system provides a loopback interface (named "lo0") with
-a default ipv4-address of "127.0.0.1".  The system will only provide
-configuration for this interface if there is no data for it in <intended>.
+a default ip-address of "127.0.0.1" and a default ip-address of "::1".
+The system will only provide configuration for this interface if there
+is no data for it in <intended>.
 
 When no configuration for "lo0" appears in <intended>, then
 <operational> will show the system-provided data:
 
-  <interfaces origin="or:intended">
-    <interface origin="or:system">
-      <name origin="or:system">lo0</name>
-      <ipv4-address origin="or:system">127.0.0.1</ipv4-address>
+  <interfaces or:origin="or:intended">
+    <interface or:origin="or:system">
+      <name>lo0</name>
+      <ip-address>127.0.0.1</ip-address>
+      <ip-address>::1</ip-address>
     </interface>
   </interfaces>
 
 When configuration for "lo0" does appear in <intended>, then
 <operational> will show that data with the origin set to "intended".
-If the "ipv4-address" is not provided, then the system-provided value
+If the "ip-address" is not provided, then the system-provided value
 will appear as follows:
 
-  <interfaces origin="or:intended">
-    <interface origin="or:intended">
-      <name origin="or:intended">lo0</name>
-      <description origin="or:intended">loopback</description>
-      <ipv4-address origin="or:system">127.0.0.1</ipv4-address>
+  <interfaces or:origin="or:intended">
+    <interface>
+      <name>lo0</name>
+      <description>loopback</description>
+      <ip-address or:origin="or:system">127.0.0.1</ip-address>
+      <ip-address>::1</ip-address>
     </interface>
   </interfaces>
 

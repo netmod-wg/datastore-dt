@@ -4,7 +4,7 @@ module ietf-datastores {
   prefix ds;
 
   organization
-    "IETF NETMOD (NETCONF Data Modeling Language) Working Group";
+    "IETF Network Modeling (NETMOD) Working Group";
 
   contact
     "WG Web:   <https://datatracker.ietf.org/wg/netmod/>
@@ -29,7 +29,7 @@ module ietf-datastores {
   description
     "This YANG module defines two sets of identities for datastores.
      The first identifies the datastores themselves, the second
-     identifies are for datastore protperties.
+     identifies are for datastore properties.
 
      Copyright (c) 2017 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
@@ -154,5 +154,24 @@ module ietf-datastores {
        clients may request datastore validation.";
   }
 
-}
+  /*
+   * Type definitions
+   */
 
+  typedef datastore-ref {
+    type identifyref {
+      base datastore;
+    }
+    description
+      "A datastore identity reference.";
+  }
+
+  typedef property-ref {
+    type identifyref {
+      base property;
+    }
+    description
+      "A datastore property identity reference.";
+  }
+
+}

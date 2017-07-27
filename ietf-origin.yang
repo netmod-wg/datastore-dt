@@ -8,7 +8,7 @@ module ietf-origin {
   }
 
   organization
-    "IETF NETMOD (NETCONF Data Modeling Language) Working Group";
+    "IETF Network Modeling (NETMOD) Working Group";
 
   contact
     "WG Web:   <https://datatracker.ietf.org/wg/netmod/>
@@ -118,13 +118,23 @@ module ietf-origin {
   }
 
   /*
+   * Type definitions
+   */
+
+  typedef origin-ref {
+    type identifyref {
+      base origin;
+    }
+    description
+      "An origin identity reference.";
+  }
+
+  /*
    * Metadata annotations
    */
 
   md:annotation origin {
-    type identityref {
-      base origin;
-    }
+    type origin-ref;
     description
       "The 'origin' annotation can be present on any configuration
        data node in the operational datastore.  It specifies from
