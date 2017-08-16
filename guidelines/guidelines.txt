@@ -293,6 +293,19 @@ It is RECOMMENDED to augment only the "/foo" hierarchy of the base
 model.  Where this recommendation cannot be followed, then any new
 "state" elements SHOULD be included in their own module.
 
+To create the temporary non-NMDA model from an NMDA model, the following
+steps can be taken:
+- Rename the module name by postpending "-state" to the original module's name
+- Change the namespace by postpending "-state" to the original namespace value
+- Change the prefix by postpending "-s" to the original prefix value
+- Set all top-level nodes to have a "config" statement of value "false"
+- add an import to the original module (e.g., for typedef definitions)
+- modify any imports, used for leafrefs or identityrefs, to import the -state version of the module
+- remove any 'typedef' or 'identity' definitions
+- prefix any uses of the typedefs and identities accordingly
+- update leafref and augment paths to use the new "-s" prefix
+
+
 * IANA Considerations
 
 This document has no actions for IANA.
