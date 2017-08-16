@@ -642,7 +642,7 @@ By default, the data in a datastore is modeled by all YANG statements
 in the available YANG modules.  However, it is possible to specify
 criteria that YANG statements must satisfy in order to be present in a
 datastore.  For instance, maybe only "config true" nodes are present,
-or "config false nodes" that also have a specific YANG extension are
+or "config false" nodes that also have a specific YANG extension are
 present in the datastore.
 
 ** Define how data is actualized
@@ -725,8 +725,8 @@ interface is not applied.  Further, the system has received a host name
 and an additional IP address for "eth0" over DHCP.  In addition to a
 default value, a loopback interface is automatically added by the system,
 and the result of the "speed" auto-negotiation.  All of this is reflected
-in <operational>. Note how the origin metadata attribute for several 
-config true data nodes is inherited from their parent data nodes.
+in <operational>. Note how the origin metadata attribute for several
+"config true" data nodes is inherited from their parent data nodes.
 
 !! include-figure ex-oper.load
 
@@ -786,20 +786,20 @@ readable.
 
 *** Datastores
 
-Each datastore represents differing views of these nodes.  The
-<running> datastore will hold the configuration provided by the
-operator, for example a single BGP peer.  The <intended> datastore
-will conceptually hold the data as validated, after the removal of
-data not intended for validation and after any local template
-mechanisms are performed. The <operational> datastore will show data
-from <intended> as well as any "config false" nodes.
+Each datastore represents differing views of these nodes.  <running>
+will hold the configuration provided by the operator, for example a
+single BGP peer.  <intended> will conceptually hold the data as
+validated, after the removal of data not intended for validation and
+after any local template mechanisms are performed. <operational> will
+show data from <intended> as well as any "config false" nodes.
 
 *** Adding a Peer
 
 If the user configures a single BGP peer, then that peer will be
 visible in both <running> and <intended>.  It may also appear in
-<candidate>, if the server supports the <candidate> datastore.
-Retrieving the peer will return only the user-specified values.
+<candidate>, if the server supports the candidate configuration
+datastore.  Retrieving the peer will return only the user-specified
+values.
 
 No time delay should exist between the appearance of the peer in
 <running> and <intended>.
@@ -816,7 +816,7 @@ In this scenario, we've added the following to <running>:
 
 **** <operational>
 
-The <operational> datastore will contain the fully expanded peer data,
+The operational datastore will contain the fully expanded peer data,
 including "config false" nodes.  In our example, this means the
 "state" node will appear.
 
@@ -839,7 +839,7 @@ will be set to "system".  Before the connection is established,
 one or both of the nodes may not appear, since the system may not yet
 have their values.
 
-  <bgp or:origin="or:intended" xmlns="urn:example:bgp">
+  <bgp or:origin="or:intended">
     <local-as>64501</local-as>
     <peer-as>64502</peer-as>
     <peer>
@@ -857,7 +857,7 @@ have their values.
 Changes to configuration may take time to percolate through the
 various software components involved.  During this period, it is
 imperative to continue to give an accurate view of the working of the
-device.  The <operational> datastore will contain nodes for both
+device.  <operational> will contain nodes for both
 the previous and current configuration, as closely as possible
 tracking the current operation of the device.
 
@@ -869,7 +869,7 @@ current data values will continue to be visible in <operational>,
 with the "origin" attribute set to indicate the
 origin of the original data.
 
-  <bgp or:origin="or:intended" xmlns="urn:example:bgp">
+  <bgp or:origin="or:intended">
     <local-as>64501</local-as>
     <peer-as>64502</peer-as>
     <peer>
@@ -930,8 +930,8 @@ Since the interface does not exist, this data does not appear in
 <operational>.
 
 When a FRU containing this interface is inserted, the system will
-detect it and process the associated configuration.  The <operational>
-datastore will contain the data from <intended>, as well as nodes
+detect it and process the associated configuration.  <operational>
+will contain the data from <intended>, as well as nodes
 added by the system, such as the current value of the interface's
 MTU.
 

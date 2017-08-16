@@ -29,7 +29,7 @@ module ietf-datastores {
   description
     "This YANG module defines two sets of identities for datastores.
      The first identifies the datastores themselves, the second
-     identifies are for datastore properties.
+     identifies datastore properties.
 
      Copyright (c) 2017 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
