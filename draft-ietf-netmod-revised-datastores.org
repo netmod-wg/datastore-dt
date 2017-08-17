@@ -695,9 +695,10 @@ working group.
 
   1. Name            : ephemeral
   2. YANG modules    : all (default)
-  3. How applied     : automatic
-  4. Protocols       : NC/RC (default)
-  5. YANG Module     : (see below)
+  3. YANG data nodes : all "config true" data nodes
+  4. How applied     : automatic
+  5. Protocols       : NC/RC (default)
+  6. YANG Module     : (see below)
 
 !! include-figure example-ds-ephemeral.yang
 
