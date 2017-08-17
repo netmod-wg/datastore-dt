@@ -45,7 +45,7 @@ module ietf-datastores {
      (http://www.rfc-editor.org/info/rfcxxxx); see the RFC itself
      for full legal notices.";
 
-  revision 2017-04-26 {
+  revision 2017-08-17 {
     description
       "Initial revision.";
     reference
@@ -104,74 +104,16 @@ module ietf-datastores {
      "The operational state datastore.";
   }
 
-
-
-  identity property {
-    description
-     "Abstract base identity for datastore identities.";
-  }
-
-  identity writable {
-    base property;
-    description
-      "Used on the 'running' datastore to indicate that it can be
-       written to.";
-  }
-
-  identity auto-persist {
-    base property;
-    description
-      "Used on the 'running' datastore to indicate that writes to
-       it will be automatically persisted.
-
-       If the 'startup' datastore is also supported, clients may
-       query its contents to ensure its synchronization.
-
-       If the 'startup' datastore is not supported, and this
-       property is not set, then clients must use a mechanism
-       provided by the protocol to explicitly persist the
-       'running' datastore's contents.";
-  }
-
-  identity rollback-on-error {
-    base property;
-    description
-      "Used on either the 'running' or 'candidate' datastores to
-       indicate that clients may request atomic update behavior.";
-  }
-
-  identity confirmed-commit {
-    base property;
-    description
-      "Used on the 'candidate' datastore to indicate that
-       clients may request confirmed-commit update behavior.";
-  }
-
-  identity validate {
-    base property;
-    description
-      "Used on the 'candidate' datastore to indicate that
-       clients may request datastore validation.";
-  }
-
   /*
    * Type definitions
    */
 
   typedef datastore-ref {
-    type identifyref {
+    type identityref {
       base datastore;
     }
     description
       "A datastore identity reference.";
-  }
-
-  typedef property-ref {
-    type identifyref {
-      base property;
-    }
-    description
-      "A datastore property identity reference.";
   }
 
 }

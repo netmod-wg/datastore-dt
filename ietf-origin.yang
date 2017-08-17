@@ -48,7 +48,7 @@ module ietf-origin {
      (http://www.rfc-editor.org/info/rfcxxxx); see the RFC itself
      for full legal notices.";
 
-  revision 2017-04-26 {
+  revision 2017-08-17 {
     description
       "Initial revision.";
     reference
@@ -93,8 +93,9 @@ module ietf-origin {
     base origin;
     description
       "Denotes configuration learned from protocol interactions with
-       other devices, instead of via either the intended configuration
-       datastore or any dynamic configuration datastore.
+       other devices, instead of via either the intended
+       configuration datastore or any dynamic configuration
+       datastore.
 
        Examples of protocols that provide learned configuration
        include link-layer negotiations, routing protocols, and
@@ -122,7 +123,7 @@ module ietf-origin {
    */
 
   typedef origin-ref {
-    type identifyref {
+    type identityref {
       base origin;
     }
     description
@@ -138,9 +139,9 @@ module ietf-origin {
     description
       "The 'origin' annotation can be present on any configuration
        data node in the operational datastore.  It specifies from
-       where the node originated.  If not specified for a given data
-       node then the origin is the same as the origin of its parent
-       node in the data tree.  The origin for any top level
-       configuration data nodes must be specified.";
+       where the node originated.  If not specified for a given
+       configuration data node then the origin is the same as the
+       origin of its parent node in the data tree.  The origin for
+       any top level configuration data nodes must be specified.";
   }
 }

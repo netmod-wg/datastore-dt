@@ -210,7 +210,7 @@ Some observations:
 - Operational state has not been defined as a datastore although there
   were proposals in the past to introduce an operational state
   datastore.
-- The NETCONF <get/> operation returns the content of the <running>
+- The NETCONF <get/> operation returns the content of the running
   configuration datastore together with the operational state.  It is
   therefore necessary that "config false" data is in a different branch
   than the "config true" data if the operational state can have a
@@ -426,7 +426,7 @@ organization, identifiers, and type-based constraints.
 
 Configuration in <intended> can refer to resources that are not
 available or otherwise not physically present.  In these situations,
-these parts of the <intended> configuration are not applied.  The data
+these parts of <intended> are not applied.  The data
 appears in <intended> but does not appear in <operational>.
 
 A typical example is an interface configuration that refers to an
@@ -548,9 +548,9 @@ accessible trees for some XPath contexts are refined as follows:
 
 * YANG Modules @yang-module@
 
-!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-04-26.yang"
+!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-08-17.yang"
 
-!! include-figure ietf-origin.yang extract-to="ietf-origin@2017-04-26.yang"
+!! include-figure ietf-origin.yang extract-to="ietf-origin@2017-08-17.yang"
 
 * IANA Considerations @iana-con@
 

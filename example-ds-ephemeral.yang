@@ -10,14 +10,14 @@ module example-ds-ephemeral {
     prefix or;
   }
 
-  // add datastore identity
+  // datastore identity
   identity ds-ephemeral {
-    base ds:datastore;
+    base ds:dynamic;
     description
-      "The 'ephemeral' datastore.";
+      "The ephemeral dynamic configuration datastore.";
   }
 
-  // add origin identity
+  // origin identity
   identity or-ephemeral {
     base or:dynamic;
     description
