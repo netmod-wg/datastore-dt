@@ -401,8 +401,26 @@ Conversely, functionality that is neither enabled nor operational on
 the system could be considered as not being 'in use', and hence may be
 omitted from <operational>.
 
+<operational> should conform to any constraints specified in the data
+model, but given the principal aim of returning "in use" values, it is
+possible that constraints may be violated under some circumstances,
+e.g., an abnormal value is 'in use', or due to remnant configuration
+(described below).  Note, that deviations are still used when it is
+known in advance that a device does not fully conform to the
+<operational> schema.
+
+Only semantic constraints may be violated, these are the YANG "when",
+"must", "min-elements", and "max-elements" statements.
+
+Syntactic constraints cannot be violated, including hierarchical
+organization, identifiers, and type-based constraints.  If a node in
+<operational> does not meet the syntactic constraints then it cannot
+be returned, and some other mechanism should be used to flag the
+error.
+
 <operational> does not persist across reboots.
 
+*** Remnant Configuration
 Changes to configuration may take time to percolate through to
 <operational>.  During this period, <operational> may contain
 nodes for both the previous and current configuration, as closely as
@@ -411,16 +429,13 @@ configuration from the previous configuration persists until the
 system has released resources used by the newly-deleted configuration
 (e.g., network connections, memory allocations, file handles).
 
-As a result of remnant configuration, the semantic constraints defined
-in the data model cannot be relied upon for <operational>, since the
-system may have remnant configuration whose constraints were valid
-with the previous configuration and that are not valid with the
-current configuration.  Since constraints on "config false" nodes may
-refer to "config true" nodes, remnant configuration may force the
-violation of those constraints.  The constraints that may not hold
-include "when", "must", "min-elements", and "max-elements".  Note that
-syntactic constraints cannot be violated, including hierarchical
-organization, identifiers, and type-based constraints.
+Remant configuration is a common example of where the semantic
+constraints defined in the data model cannot be relied upon for
+<operational>, since the system may have remnant configuration whose
+constraints were valid with the previous configuration and that are
+not valid with the current configuration.  Since constraints on
+"config false" nodes may refer to "config true" nodes, remnant
+configuration may force the violation of those constraints.
 
 *** Missing Resources
 
