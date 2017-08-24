@@ -14,7 +14,7 @@ details those new operations.
 * Introduction
 
 This document provides a YANG model that adds NETCONF (^RFC6241^)
-support for the emerging "Network Management Datastore Architecture"
+support for the "Network Management Datastore Architecture"
 (NMDA) ^I-D.ietf-netmod-revised-datastores^.  NMDA defines a framework
 for datastores, a fundamental concept binding network management data
 models to network management protocols, enabling data models to be
@@ -80,11 +80,11 @@ given by the "with-defaults" capability.
 
 **** Origin Attribute
 
-The "get-data" operation adds a new boolean parameter named "origin",
-which requests that the server return the "origin" information as
-detailed in the NMDA.  This parameter is only valid for
-<operational> and any datastores with identities derived from
-the "operational" identity.
+The "get-data" operation adds a new boolean parameter named
+"with-origin", which requests that the server return the "origin"
+information as detailed in the NMDA.  This parameter is only valid for
+<operational> and any datastores with identities derived from the
+"operational" identity.
 
 Data from <operational> can come from multiple sources.  The server
 should return the most accurate value for the "origin" attribute as
@@ -128,10 +128,13 @@ actions is <operational>.
 
 ** YANG Library Capability
 
-Support for NMDA requires the server to implement the module
-"ietf-yang-library" defined in ^I-D.nmdsdt-netconf-rfc7895bis^.  The
-server MUST advertise the following capability in the <hello> message
-(line breaks and whitespaces are used for formatting reasons only):
+RFC Ed.: Update 201X-XX-XX below with correct date.
+
+Support for NMDA requires the server to implement at least revision
+201X-XX-XX of the "ietf-yang-library" module defined in
+^I-D.nmdsdt-netconf-rfc7895bis^.  The server MUST advertise the
+following capability in the <hello> message (line breaks and
+whitespaces are used for formatting reasons only):
 
   urn:ietf:params:netconf:capability:yang-library:1.1?
     revision=<date>&checksum=<checksum-value>
@@ -155,7 +158,7 @@ advertise the capability :yang-library:1.1 instead of
 
 * YANG Model
 
-!! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-06-30.yang"
+!! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-08-24.yang"
 
 * IANA Considerations
 

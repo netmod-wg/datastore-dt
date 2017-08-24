@@ -9,6 +9,9 @@ module ietf-netconf-datastores {
   import ietf-datastores {
     prefix ds;
   }
+  import ietf-origin {
+    prefix or;
+  }
   import ietf-netconf {
     prefix nc;
   }
@@ -55,7 +58,7 @@ module ietf-netconf-datastores {
      (http://www.rfc-editor.org/info/rfcxxxx); see the RFC itself
      for full legal notices.";
 
-  revision 2017-06-30 {
+  revision 2017-08-24 {
     description
       "Initial revision.";
     reference "RFC XXXX: NETCONF Support for NMDA";
@@ -76,6 +79,7 @@ module ietf-netconf-datastores {
     input {
       leaf source {
         type ncds:datastore;
+        mandatory true;
         description
           "Datastore from which to retrieve data.";
       }
@@ -84,6 +88,15 @@ module ietf-netconf-datastores {
           "Subtree or XPath filter to use.";
         nc:get-filter-element-attributes;
       }
+      leaf with-origin {
+        when 'derived-from-or-self(../source, "or:operational")';
+        type boolean;
+        default false;
+        description
+          "If this parameter is 'true', the server will return
+           the 'origin' annotation for the nodes that has one.";
+      }
+      uses ncwd:with-defaults-parameters;
     }
     output {
       anydata data {
@@ -123,7 +136,6 @@ module ietf-netconf-datastores {
         description
           "The default operation to use.";
       }
-      uses ncwd:with-defaults-parameters;
       choice edit-content {
         mandatory true;
         description
