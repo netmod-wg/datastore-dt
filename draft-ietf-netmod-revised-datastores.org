@@ -357,7 +357,7 @@ these datastores.  The set of datastores include:
 Other conventional configuration datastores may be defined in future
 documents.
 
-The flow of data between these datastores is depicted in section
+The flow of data between these datastores is depicted in
 ^datastore-model^.
 
 The specific protocols may define explicit operations to copy between
