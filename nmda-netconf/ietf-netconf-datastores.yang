@@ -64,6 +64,10 @@ module ietf-netconf-datastores {
     reference "RFC XXXX: NETCONF Support for NMDA";
   }
 
+  feature origin {
+    description "Server supports the 'origin' attribute";
+  }
+
   typedef datastore {
     type identityref {
       base ds:datastore;
@@ -83,6 +87,27 @@ module ietf-netconf-datastores {
         description
           "Datastore from which to retrieve data.";
       }
+
+      container where {
+        description "Filter content with specific criteria";
+        leaf origin {
+          if-feature origin;
+          type identityref {
+            base or:origin;
+          }
+          description "Filter based on origin attribute";
+        }
+	leaf config {
+	  type empty;
+          description "Filter for 'config true' nodes";
+        }
+        leaf xpath {
+          if-feature nc:xpath;
+          type string;
+          description "Filter based on an XPath expression";
+        }
+      }
+
       anydata filter {
         description
           "Subtree or XPath filter to use.";
