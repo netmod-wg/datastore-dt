@@ -74,6 +74,8 @@ The "get-data" operation mirrors the "filter" parameter of the
 configuration content, rather than the "get-config"'s use of "type
 anyxml".
 
+An additional filter is defined to retrieve only "config true" nodes.
+
 The "get-data" operation also supports the "with-defaults" parameter
 as defined in ^RFC6243^.  The supported values follow the constraints
 given by the "with-defaults" capability.
