@@ -126,13 +126,63 @@ RPC operations and actions can be defined in YANG modules.  The
 evaluation context for constraints and references in operation and
 actions is <operational>.
 
+** YANG Library Capability
+
+Support for NMDA requires the server to implement the module
+"ietf-yang-library" defined in ^I-D.nmdsdt-netconf-rfc7895bis^.  The
+server MUST advertise the following capability in the <hello> message
+(line breaks and whitespaces are used for formatting reasons only):
+
+  urn:ietf:params:netconf:capability:yang-library:1.1?
+    revision=<date>&checksum=<checksum-value>
+
+The parameter "revision" has the same value as the revision date of
+the "ietf-yang-library" module implemented by the server.  This
+parameter MUST be present.
+
+The parameter "checksum" has the same value as the leaf
+"/yang-library/checksum" from "ietf-yang-library".  This
+parameter MUST be present.
+
+With this mechanism, a client can cache the supported modules for a
+server and only update the cache if the "checksum" value in the
+<hello> message changes.
+
+This document updates ^RFC7950^, section 5.6.4, to allow servers to
+advertise the capability :yang-library:1.1 instead of
+:yang-library:1.0, and to implement the subtree "/yang-library"
+^I-D.nmdsdt-netconf-rfc7895bis^ instead of "/modules-state".
+
 * YANG Model
 
 !! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-06-30.yang"
 
 * IANA Considerations
 
-This document has no actions for IANA.
+This document registers one capability identifier URN from the
+"Network Configuration Protocol (NETCONF) Capability URNs" registry:
+
+  Index           Capability Identifier
+  -------------   ---------------------------------------------------
+  :yang-library   urn:ietf:params:netconf:capability:yang-library:1.1
+
+This document registers a URI in the "IETF XML Registry" [RFC3688].
+Following the format in RFC 3688, the following registration has been
+made.
+
+    URI: urn:ietf:params:xml:ns:yang:ietf-netconf-datastores
+
+    Registrant Contact: The IESG.
+
+    XML: N/A, the requested URI is an XML namespace.
+
+This document registers a YANG module in the "YANG Module Names"
+registry [RFC6020].
+
+  name:         ietf-netconf-datastores
+  namespace:    urn:ietf:params:xml:ns:yang:ietf-netconf-datastores
+  prefix:       ncds
+  reference:    RFC XXXX
 
 * Security Considerations
 
@@ -147,6 +197,7 @@ This document has no security considerations.
     ipr trust200902;
     category std;
     references references.xml;
+    updates rfc7950;
     title "NETCONF Model for NMDA";
     contributor "author:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
     contributor "author:Juergen Schoenwaelder:Jacobs University:j.schoenwaelder@jacobs-university.de";
