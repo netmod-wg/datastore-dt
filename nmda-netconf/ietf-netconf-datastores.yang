@@ -144,8 +144,10 @@ module ietf-netconf-datastores {
           "If this parameter is 'true', the server will return
            the 'origin' annotation for the nodes that has one.";
       }
+
       uses ncwd:with-defaults-parameters;
     }
+
     output {
       anydata data {
         description
