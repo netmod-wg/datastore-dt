@@ -3,6 +3,9 @@ module ietf-netconf-datastores {
   namespace "urn:ietf:params:xml:ns:yang:ietf-netconf-datastores";
   prefix ncds;
 
+  import ietf-yang-types {
+    prefix yang;
+  }
   import ietf-inet-types {
     prefix inet;
   }
@@ -65,7 +68,9 @@ module ietf-netconf-datastores {
   }
 
   feature origin {
-    description "Server supports the 'origin' attribute";
+    description
+      "Indicates that the server supports the 'origin' annotation.";
+    reference "RFC XXXX: Network Management Datastore Architecture";
   }
 
   typedef datastore {
@@ -79,7 +84,7 @@ module ietf-netconf-datastores {
 
   rpc get-data {
     description
-      "Get data from an NMDA datastore";
+      "Retrieve data from an NMDA datastore.";
     input {
       leaf source {
         type ncds:datastore;
@@ -88,32 +93,50 @@ module ietf-netconf-datastores {
           "Datastore from which to retrieve data.";
       }
 
+      choice filter-spec {
+        description
+          "The content filter specification for this request.";
+
+        anydata subtree-filter {
+          description
+            "This parameter identifies the portions of the
+             target datastore to retrieve.";
+          reference "RFC 6241, Section 6.";
+        }
+        leaf xpath-filter {
+          if-feature nc:xpath;
+          type yang:xpath1.0;
+          description
+            "This parameter contains an XPath expression
+             identifying the portions of the target
+             datastore to retrieve.";
+        }
+      }
+
       container where {
-        description "Filter content with specific criteria";
+        description
+          "Filter content with the specified criteria.  All given
+           criteria are logically AND:ed.";
+        leaf config {
+          type boolean;
+          description
+             "Filter for nodes with the given value for their
+              'config' property.";
+        }
         leaf origin {
           if-feature origin;
           type identityref {
             base or:origin;
           }
-          description "Filter based on origin attribute";
-        }
-	leaf config {
-	  type empty;
-          description "Filter for 'config true' nodes";
-        }
-        leaf xpath {
-          if-feature nc:xpath;
-          type string;
-          description "Filter based on an XPath expression";
+          description
+            "Filter based on 'origin' annotation.  A node matches the
+             filter if its 'origin' annotation is derived from or
+             equal to the given filter value.";
         }
       }
 
-      anydata filter {
-        description
-          "Subtree or XPath filter to use.";
-        nc:get-filter-element-attributes;
-      }
       leaf with-origin {
+        if-feature origin;
         when 'derived-from-or-self(../source, "or:operational")';
         type boolean;
         default false;
@@ -133,6 +156,7 @@ module ietf-netconf-datastores {
       }
     }
   }
+
   rpc edit-data {
     description
       "Edit data in an NMDA datastore.";

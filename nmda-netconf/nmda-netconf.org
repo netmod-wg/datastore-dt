@@ -69,12 +69,12 @@ operation, but adds flexibility in naming the target datastore.
 The "source" parameter indicates the datastore which is the source of
 the data to be retrieved.  This is a datastore identity.
 
-The "get-data" operation mirrors the "filter" parameter of the
-"get-config" operation, but it is modified to use "type anydata" for
-configuration content, rather than the "get-config"'s use of "type
-anyxml".
+The <get-data> operation accepts a content filter parameter, similar
+to the "filter" parameter of "get-config", but using explicit nodes
+for subtree filtering and XPath filtering.
 
-An additional filter is defined to retrieve only "config true" nodes.
+Additional filters are defined to retrieve only "config true" nodes or
+nodes matching a given "origin" value.
 
 The "get-data" operation also supports the "with-defaults" parameter
 as defined in ^RFC6243^.  The supported values follow the constraints
@@ -83,7 +83,7 @@ given by the "with-defaults" capability.
 **** Origin Attribute
 
 The "get-data" operation adds a new boolean parameter named
-"with-origin", which requests that the server return the "origin"
+"with-origin", which requests that the server returns the "origin"
 information as detailed in the NMDA.  This parameter is only valid for
 <operational> and any datastores with identities derived from the
 "operational" identity.
