@@ -117,11 +117,12 @@ module ietf-netconf-datastores {
         description
           "Filter content with the specified criteria.  All given
            criteria are logically AND:ed.";
+
         leaf config {
           type boolean;
           description
-             "Filter for nodes with the given value for their
-              'config' property.";
+            "Filter for nodes with the given value for their
+             'config' property.";
         }
         leaf origin {
           if-feature origin;
@@ -136,8 +137,8 @@ module ietf-netconf-datastores {
       }
 
       leaf with-origin {
-        if-feature origin;
         when 'derived-from-or-self(../source, "or:operational")';
+        if-feature origin;
         type boolean;
         default false;
         description
