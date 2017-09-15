@@ -136,8 +136,8 @@ module ietf-netconf-datastores {
       }
 
       leaf with-origin {
-        if-feature origin;
         when 'derived-from-or-self(../source, "or:operational")';
+        if-feature origin;
         type boolean;
         default false;
         description
