@@ -277,75 +277,10 @@ model.
 
 #+END_EXAMPLE
 
-** The Startup Configuration Datastore (<startup>)
-
-The startup configuration datastore (<startup>) is an optional
-configuration datastore holding the configuration loaded by the device
-when it boots.  <startup> is only present on devices that separate the
-startup configuration from the running configuration datastore.
-
-The startup configuration datastore may not be supported by all
-protocols or implementations.
-
-On devices that support non-volatile storage, the contents of
-<startup> will typically persist across reboots via that storage.  At
-boot time, the device loads the saved startup configuration into
-<running>.  To save a new startup configuration, data is copied to
-<startup>, either via implicit or explicit protocol operations.
-
-** The Candidate Configuration Datastore (<candidate>)
-
-The candidate configuration datastore (<candidate>) is an optional
-configuration datastore that can be manipulated without impacting the
-device's current configuration and that can be committed to <running>.
-
-The candidate configuration datastore may not be supported by all
-protocols or implementations.
-
-<candidate> does not typically persist across reboots, even in the
-presence of non-volatile storage.  If <candidate> is stored using
-non-volatile storage, it should be reset at boot time to the contents
-of <running>.
-
-** The Running Configuration Datastore (<running>)
-
-The running configuration datastore (<running>) holds the complete
-current configuration on the device.  It may include inactive
-configuration or template-mechanism-oriented configuration that
-require further expansion.
-
-If a device does not have a distinct <startup> and non-volatile is
-available, the device will typically use that non-volatile storage to
-allow <running> to persist across reboots.
-
-** The Intended Configuration Datastore (<intended>)
-
-The intended configuration datastore (<intended>) is a read-only
-configuration datastore.  It is tightly coupled to <running>.  When
-data is written to <running>, the data that is to be validated is also
-conceptually written to <intended>.  Validation is performed on the
-contents of <intended>.
-
-For simple implementations, <running> and <intended> are identical.
-
-<intended> does not persist across reboots; its relationship
-with <running> makes that unnecessary.
-
-Currently there are no standard mechanisms defined that affect
-<intended> so that it would have different contents than <running>,
-but this architecture allows for such mechanisms to be defined.
-
-One example of such a mechanism is support for marking nodes as
-inactive in <running>.  Inactive nodes are not copied to <intended>,
-and are thus not taken into account when validating the configuration.
-
-Another example is support for templates.  Templates are expanded
-when copied into <intended>, and the expanded result is validated.
-
 ** Conventional Configuration Datastores
 
 The conventional configuration datastores are a set of configuration
-datastores that share a common schema, allowing data to be copied
+datastores that share exactly the same schema, allowing data to be copied
 between them.  The term is meant as a generic umbrella description of
 these datastores.  The set of datastores include:
 
@@ -362,6 +297,81 @@ The flow of data between these datastores is depicted in
 
 The specific protocols may define explicit operations to copy between
 these datastores, e.g., NETCONF's <copy-config> operation.
+
+*** The Startup Configuration Datastore (<startup>)
+
+The startup configuration datastore (<startup>) is an optional
+configuration datastore holding the configuration loaded by the device
+when it boots.  <startup> is only present on devices that separate the
+startup configuration from the running configuration datastore.
+
+The startup configuration datastore may not be supported by all
+protocols or implementations.
+
+On devices that support non-volatile storage, the contents of
+<startup> will typically persist across reboots via that storage.  At
+boot time, the device loads the saved startup configuration into
+<running>.  To save a new startup configuration, data is copied to
+<startup>, either via implicit or explicit protocol operations.
+
+*** The Candidate Configuration Datastore (<candidate>)
+
+The candidate configuration datastore (<candidate>) is an optional
+configuration datastore that can be manipulated without impacting the
+device's current configuration and that can be committed to <running>.
+
+The candidate configuration datastore may not be supported by all
+protocols or implementations.
+
+<candidate> does not typically persist across reboots, even in the
+presence of non-volatile storage.  If <candidate> is stored using
+non-volatile storage, it should be reset at boot time to the contents
+of <running>.
+
+*** The Running Configuration Datastore (<running>)
+
+The running configuration datastore (<running>) holds the complete
+current configuration on the device.  It may include inactive
+configuration or template-mechanism-oriented configuration that
+require further expansion.
+
+If a device does not have a distinct <startup> and non-volatile is
+available, the device will typically use that non-volatile storage to
+allow <running> to persist across reboots.
+
+*** The Intended Configuration Datastore (<intended>)
+
+The intended configuration datastore (<intended>) is a read-only
+configuration datastore.  It represents the configuration after all
+configuration transformations to <running> are performed
+(e.g. template expansion, inactive configuration removal), and is the
+configuration that the system attempts to apply.
+
+It is tightly coupled to <running>.  When data is written to
+<running>, the data that is to be validated is also conceptually
+written to <intended>.  Validation is performed on the contents of
+<intended>.
+
+For simple implementations, <running> and <intended> are identical.
+
+The contents of <intended> is also related to the 'config true' subset
+of <operational>, and hence a client can determine to what extent the
+intended configuration is currently applied by checking whether the
+contents of <intended> also appears in <operational>.
+
+<intended> does not persist across reboots; its relationship
+with <running> makes that unnecessary.
+
+Currently there are no standard mechanisms defined that affect
+<intended> so that it would have different contents than <running>,
+but this architecture allows for such mechanisms to be defined.
+
+One example of such a mechanism is support for marking nodes as
+inactive in <running>.  Inactive nodes are not copied to <intended>,
+and are thus not taken into account when validating the configuration.
+
+Another example is support for templates.  Templates are expanded
+when copied into <intended>, and the expanded result is validated.
 
 ** Dynamic Configuration Datastores
 
