@@ -210,8 +210,8 @@ Some observations:
 - Operational state has not been defined as a datastore although there
   were proposals in the past to introduce an operational state
   datastore.
-- The NETCONF <get/> operation returns the content of the running
-  configuration datastore together with the operational state.  It is
+- The NETCONF <get> operation returns the content of <running>
+  together with the operational state.  It is
   therefore necessary that "config false" data is in a different branch
   than the "config true" data if the operational state can have a
   different lifetime compared to configuration or if
@@ -432,6 +432,7 @@ error.
 <operational> does not persist across reboots.
 
 *** Remnant Configuration @remnant@
+
 Changes to configuration may take time to percolate through to
 <operational>.  During this period, <operational> may contain
 nodes for both the previous and current configuration, as closely as
@@ -719,12 +720,17 @@ This example defines a dynamic configuration datastore called
 "ephemeral", which is loosely modeled after the work done in the I2RS
 working group.
 
-  1. Name            : ephemeral
-  2. YANG modules    : all (default)
-  3. YANG data nodes : all "config true" data nodes
-  4. How applied     : automatic
-  5. Protocols       : NC/RC (default)
-  6. YANG Module     : (see below)
+-- The example "ephemeral" datastore properties
+| Name            | Value                        |
+|-----------------+------------------------------|
+| Name            | ephemeral                    |
+| YANG modules    | all (default)                |
+| YANG data nodes | all "config true" data nodes |
+| How applied     | automatic                    |
+| Protocols       | NC/RC (default)              |
+| YANG Module     | (see below)                  |
+
+# w/o this line, oxtradoc mixes the table with the figure
 
 !! include-figure example-ds-ephemeral.yang
 
