@@ -721,14 +721,14 @@ This example defines a dynamic configuration datastore called
 working group.
 
 -- The example "ephemeral" datastore properties
-| Name            | Value                        |
-|-----------------+------------------------------|
-| Name            | ephemeral                    |
-| YANG modules    | all (default)                |
-| YANG data nodes | all "config true" data nodes |
-| How applied     | automatic                    |
-| Protocols       | NC/RC (default)              |
-| YANG Module     | (see below)                  |
+| Name         | Value                                             |
+|--------------+---------------------------------------------------|
+| Name         | ephemeral                                         |
+| YANG modules | all (default)                                     |
+| YANG nodes   | all "config true" data nodes                      |
+| How applied  | changes automatically propagated to <operational> |
+| Protocols    | NC/RC (default)                                   |
+| YANG Module  | (see below)                                       |
 
 # w/o this line, oxtradoc mixes the table with the figure
 
