@@ -542,6 +542,8 @@ particular configuration data node then it should use the origin
 
 ** XPath Context
 
+This section updates section 6.4.1 of RFC 7950.
+
 If a server implements the architecture defined in this document, the
 accessible trees for some XPath contexts are refined as follows:
 
@@ -1023,6 +1025,7 @@ will appear as follows:
     name ;
     ipr trust200902;
     category std;
+    updates 7950;
     references references.xml;
     title "Network Management Datastore Architecture";
     contributor "author:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
