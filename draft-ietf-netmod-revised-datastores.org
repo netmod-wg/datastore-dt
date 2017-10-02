@@ -43,9 +43,8 @@ when these documents are revised.
 - configuration datastore: A datastore holding configuration.
 - running configuration datastore: A configuration datastore holding
   the current configuration of the device.  It may include
-  inactive configuration or template-mechanism-oriented configuration
-  that require further expansion.  This datastore is referred to as
-  "<running>".
+  configuration that requires further transformations before it can be
+  applied.  This datastore is referred to as "<running>".
 - candidate configuration datastore: A configuration datastore that
   can be manipulated without impacting the device's running
   configuration datastore and that can be committed to the running
@@ -55,13 +54,18 @@ when these documents are revised.
   the configuration loaded by the device into the running
   configuration datastore when it boots.  This datastore is
   referred to as "<startup>".
-- intended configuration: Configuration that is intended to
-  be used by the device.  For example, intended configuration excludes any
-  inactive configuration and it would include configuration
-  produced through the expansion of templates.
+- intended configuration: Configuration that is intended to be
+  used by the device.  It represents the configuration after all
+  configuration transformations to <running> have been performed
+  and is the configuration that the system attempts to apply.
 - intended configuration datastore: A configuration datastore holding
   the complete intended configuration of the device.  This datastore
   is referred to as "<intended>".
+- configuration transformation: The addition, modification or removal
+  of configuration between the <running> and <intended> datastores.
+  Examples of configuration transformations include the removal of
+  inactive configuration and the configuration produced through the
+  expansion of templates.
 - conventional configuration datastore: One of the following set of
   configuration datastores: <running>, <startup>, <candidate>, and
   <intended>.  These datastores share a common schema and protocol
@@ -330,14 +334,21 @@ of <running>.
 
 *** The Running Configuration Datastore (<running>)
 
-The running configuration datastore (<running>) holds the complete
-current configuration on the device.  It may include inactive
-configuration or template-mechanism-oriented configuration that
-require further expansion.
+The running configuration datastore (<running>) is a configuration
+datastore that holds the complete current configuration on the
+device.  It may include configuration that requires further
+transformation before it can be applied, e.g., inactive
+configuration, or template-mechanism-oriented configuration that
+needs further expansion.  However, <running> MUST always be a
+'valid configuration data tree' as defined in Section 8.1 of
+^RFC7950^.
 
-If a device does not have a distinct <startup> and non-volatile is
-available, the device will typically use that non-volatile storage to
-allow <running> to persist across reboots.
+<running> MUST be supported if the device can be configured via
+conventional configuration datastores.
+
+If a device does not have a distinct <startup> and non-volatile
+is available, the device will typically use that non-volatile
+storage to allow <running> to persist across reboots.
 
 *** The Intended Configuration Datastore (<intended>)
 
