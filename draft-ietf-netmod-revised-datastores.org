@@ -342,36 +342,43 @@ allow <running> to persist across reboots.
 *** The Intended Configuration Datastore (<intended>)
 
 The intended configuration datastore (<intended>) is a read-only
-configuration datastore.  It represents the configuration after all
-configuration transformations to <running> are performed
-(e.g. template expansion, inactive configuration removal), and is the
-configuration that the system attempts to apply.
+configuration datastore.  It represents the configuration after
+all configuration transformations to <running> are
+performed (e.g., template expansion, removal of inactive
+configuration), and is the configuration that the system attempts
+to apply.
 
-It is tightly coupled to <running>.  When data is written to
-<running>, the data that is to be validated is also conceptually
-written to <intended>.  Validation is performed on the contents of
-<intended>.
+<intended> is tightly coupled to <running>. Whenever data is
+written to <running>, then <intended> is also immediately updated
+by performing all necessary transformations to the contents of
+<running> and then <intended> is validated.
 
-For simple implementations, <running> and <intended> are identical.
+<intended> may also be updated independently of <running> (e.g.,
+if one of the configuration transformations is changed), but
+<intended> must always be a 'valid configuration data tree' as
+defined in Section 8.1 of ^RFC7950^.
 
-The contents of <intended> is also related to the 'config true' subset
-of <operational>, and hence a client can determine to what extent the
-intended configuration is currently applied by checking whether the
-contents of <intended> also appears in <operational>.
+For simple implementations, <running> and <intended> are
+identical.
 
-<intended> does not persist across reboots; its relationship
-with <running> makes that unnecessary.
+The contents of <intended> is also related to the 'config true'
+subset of <operational>, and hence a client can determine to what
+extent the intended configuration is currently in use by checking
+whether the contents of <intended> also appears in <operational>.
+
+<intended> does not persist across reboots; its relationship with
+<running> makes that unnecessary.
 
 Currently there are no standard mechanisms defined that affect
-<intended> so that it would have different contents than <running>,
-but this architecture allows for such mechanisms to be defined.
+<intended> so that it would have different contents than
+<running>, but this architecture allows for such mechanisms to be
+defined.
 
 One example of such a mechanism is support for marking nodes as
-inactive in <running>.  Inactive nodes are not copied to <intended>,
-and are thus not taken into account when validating the configuration.
-
-Another example is support for templates.  Templates are expanded
-when copied into <intended>, and the expanded result is validated.
+inactive in <running>.  Inactive nodes are not copied to
+<intended>.  A second example is support for templates, which can
+perform transformations on the configuration from <running> to
+the configuration written to <intended>.
 
 ** Dynamic Configuration Datastores
 
