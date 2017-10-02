@@ -304,10 +304,10 @@ these datastores, e.g., NETCONF's <copy-config> operation.
 
 *** The Startup Configuration Datastore (<startup>)
 
-The startup configuration datastore (<startup>) is an optional
-configuration datastore holding the configuration loaded by the device
-when it boots.  <startup> is only present on devices that separate the
-startup configuration from the running configuration datastore.
+The startup configuration datastore (<startup>) is a configuration
+datastore holding the configuration loaded by the device when it
+boots.  <startup> is only present on devices that separate the startup
+configuration from the running configuration datastore.
 
 The startup configuration datastore may not be supported by all
 protocols or implementations.
@@ -320,16 +320,16 @@ boot time, the device loads the saved startup configuration into
 
 *** The Candidate Configuration Datastore (<candidate>)
 
-The candidate configuration datastore (<candidate>) is an optional
-configuration datastore that can be manipulated without impacting the
-device's current configuration and that can be committed to <running>.
+The candidate configuration datastore (<candidate>) is a configuration
+datastore that can be manipulated without impacting the device's
+current configuration and that can be committed to <running>.
 
 The candidate configuration datastore may not be supported by all
 protocols or implementations.
 
 <candidate> does not typically persist across reboots, even in the
 presence of non-volatile storage.  If <candidate> is stored using
-non-volatile storage, it should be reset at boot time to the contents
+non-volatile storage, it is reset at boot time to the contents
 of <running>.
 
 *** The Running Configuration Datastore (<running>)
@@ -366,7 +366,7 @@ by performing all necessary transformations to the contents of
 
 <intended> may also be updated independently of <running> (e.g.,
 if one of the configuration transformations is changed), but
-<intended> must always be a 'valid configuration data tree' as
+<intended> MUST always be a 'valid configuration data tree' as
 defined in Section 8.1 of ^RFC7950^.
 
 For simple implementations, <running> and <intended> are
@@ -426,24 +426,24 @@ is dependent on both the schema definition and the device
 implementation.  Generally, functionality that is enabled and
 operational on the system would be considered as being 'in use'.
 Conversely, functionality that is neither enabled nor operational on
-the system could be considered as not being 'in use', and hence may be
+the system could be considered as not being 'in use', and hence MAY be
 omitted from <operational>.
 
-<operational> should conform to any constraints specified in the data
+<operational> SHOULD conform to any constraints specified in the data
 model, but given the principal aim of returning "in use" values, it is
-possible that constraints may be violated under some circumstances,
+possible that constraints MAY be violated under some circumstances,
 e.g., an abnormal value is "in use", or due to remnant configuration
 (see ^remnant^).  Note, that deviations are still used when it is
 known in advance that a device does not fully conform to the
 <operational> schema.
 
-Only semantic constraints may be violated, these are the YANG "when",
+Only semantic constraints MAY be violated, these are the YANG "when",
 "must", "mandatory", "unique", "min-elements", and "max-elements"
 statements.
 
-Syntactic constraints cannot be violated, including hierarchical
+Syntactic constraints MUST NOT be violated, including hierarchical
 organization, identifiers, and type-based constraints.  If a node in
-<operational> does not meet the syntactic constraints then it cannot
+<operational> does not meet the syntactic constraints then it MUST NOT
 be returned, and some other mechanism should be used to flag the
 error.
 
@@ -452,7 +452,7 @@ error.
 *** Remnant Configuration @remnant@
 
 Changes to configuration may take time to percolate through to
-<operational>.  During this period, <operational> may contain
+<operational>.  During this period, <operational> MAY contain
 nodes for both the previous and current configuration, as closely as
 possible tracking the current operation of the device.  Such remnant
 configuration from the previous configuration persists until the
@@ -531,13 +531,13 @@ These identities can be further refined, e.g., there could be separate
 identities for particular types or instances of dynamic configuration
 datastores derived from "dynamic".
 
-For all configuration data nodes in <operational>, the device should
+For all configuration data nodes in <operational>, the device SHOULD
 report the origin that most accurately reflects the source of the
 configuration that is actively being used by the system.
 
 In cases where it could be ambiguous as to which origin should be
 used, i.e. where the same data node value has originated from multiple
-sources, then the description statement in the YANG module should be
+sources, then the description statement in the YANG module SHOULD be
 used as guidance for choosing the appropriate origin.  For example:
 
 If for a particular configuration node, the associated YANG
@@ -553,7 +553,7 @@ would be reported as "intended" even when a learned value is the same as
 the configured value.
 
 In the case that a device cannot provide an accurate origin for a
-particular configuration data node then it should use the origin
+particular configuration data node then it SHOULD use the origin
 "unknown".
 
 * Implications on YANG
@@ -678,10 +678,10 @@ specified in the sections below.
 
 ** Define which YANG modules can be used in the datastore
 
-Not all YANG modules may be used in all datastores.  Some datastores may
+Not all YANG modules may be used in all datastores.  Some datastores MAY
 constrain which data models can be used in them.  If it is desirable that
 a subset of all modules can be targeted to the datastore,
-then the documentation defining the datastore must indicate this.
+then the documentation defining the datastore MUST indicate this.
 
 ** Define which subset of YANG-modeled data applies
 
@@ -694,11 +694,11 @@ present in the datastore.
 
 ** Define how data is actualized
 
-The new datastore must specify how it interacts with other datastores.
+The new datastore MUST specify how it interacts with other datastores.
 
 For example, the diagram in ^datastore-model^ depicts dynamic
 configuration datastores feeding into <operational>.  How this
-interaction occurs must be defined by the particular dynamic
+interaction occurs has to be defined by the particular dynamic
 configuration datastores.  In some cases, it may occur implicitly, as
 soon as the data is put into the dynamic configuration datastore
 while, in other cases, an explicit action (e.g., an RPC) may be
@@ -715,12 +715,12 @@ filtering).
 
 ** Define YANG identities for the datastore @def-module@
 
-The datastore must be defined with a YANG identity that uses the
+The datastore MUST be defined with a YANG identity that uses the
 "ds:datastore" identity or one of its derived identities as its base.
 This identity is necessary so that the datastore can be referenced in
 protocol operations (e.g., <get-data>).
 
-The datastore may also be defined with an identity that uses the "or:origin"
+The datastore MAY also be defined with an identity that uses the "or:origin"
 identity or one its derived identities as its base.  This identity is
 needed if the datastore interacts with <operational> so that data
 originating from the datastore can be identified as such via the
