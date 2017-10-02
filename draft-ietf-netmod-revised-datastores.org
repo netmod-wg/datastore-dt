@@ -44,16 +44,16 @@ when these documents are revised.
 - running configuration datastore: A configuration datastore holding
   the current configuration of the device.  It may include
   inactive configuration or template-mechanism-oriented configuration
-  that require further expansion.  This datastore is commonly
-  referred to as "<running>".
+  that require further expansion.  This datastore is referred to as
+  "<running>".
 - candidate configuration datastore: A configuration datastore that
   can be manipulated without impacting the device's running
   configuration datastore and that can be committed to the running
-  configuration datastore.  This datastore is commonly referred to as
+  configuration datastore.  This datastore is referred to as
   "<candidate>".
 - startup configuration datastore: A configuration datastore holding
   the configuration loaded by the device into the running
-  configuration datastore when it boots.  This datastore is commonly
+  configuration datastore when it boots.  This datastore is
   referred to as "<startup>".
 - intended configuration: Configuration that is intended to
   be used by the device.  For example, intended configuration excludes any
@@ -61,7 +61,7 @@ when these documents are revised.
   produced through the expansion of templates.
 - intended configuration datastore: A configuration datastore holding
   the complete intended configuration of the device.  This datastore
-  is commonly referred to as "<intended>".
+  is referred to as "<intended>".
 - conventional configuration datastore: One of the following set of
   configuration datastores: <running>, <startup>, <candidate>, and
   <intended>.  These datastores share a common schema and protocol
@@ -95,7 +95,7 @@ when these documents are revised.
   system state.
 - operational state datastore: A datastore holding the
   complete operational state of the device.  This datastore
-  is commonly referred to as "<operational>".
+  is referred to as "<operational>".
 - origin: A metadata annotation indicating the origin of a data item.
 - remnant configuration: Configuration that remains part of the
   applied configuration for a period of time after it has been removed
