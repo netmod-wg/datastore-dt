@@ -22,6 +22,12 @@ protocols expose all these conceptual datastores.  This architecture
 is agnostic with regard to the encoding used by network management
 protocols.
 
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
+"MAY", and "OPTIONAL" in this document are to be interpreted as
+described in BCP 14 ^RFC2119^ ^RFC8174^ when, and only when, they
+appear in all capitals, as shown here.
+
 * Terminology
 
 This document defines the following terminology. Some of the terms are
