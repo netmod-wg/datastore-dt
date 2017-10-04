@@ -220,7 +220,7 @@ Some observations:
 - Operational state has not been defined as a datastore although there
   were proposals in the past to introduce an operational state
   datastore.
-- The NETCONF <get> operation returns the content of <running>
+- The NETCONF <get> operation returns the contents of <running>
   together with the operational state.  It is
   therefore necessary that "config false" data is in a different branch
   than the "config true" data if the operational state can have a
@@ -230,7 +230,7 @@ Some observations:
   clients to store inactive data in <running>; this
   inactive data is only exposed to clients that indicate that they
   support the concept of inactive data; clients not indicating support
-  for inactive data receive the content of <running>
+  for inactive data receive the contents of <running>
   with the inactive data removed.  Inactive data is conceptually
   removed before validation.
 - Some implementations have proprietary mechanisms that allow clients
@@ -342,7 +342,7 @@ of <running>.
 
 The running configuration datastore (<running>) is a configuration
 datastore that holds the complete current configuration on the
-device.  It may include configuration that requires further
+device.  It MAY include configuration that requires further
 transformation before it can be applied, e.g., inactive
 configuration, or template-mechanism-oriented configuration that
 needs further expansion.  However, <running> MUST always be a
@@ -353,7 +353,7 @@ valid configuration data tree, as defined in Section 8.1 of
 conventional configuration datastores.
 
 If a device does not have a distinct <startup> and non-volatile
-is available, the device will typically use that non-volatile
+storage is available, the device will typically use that non-volatile
 storage to allow <running> to persist across reboots.
 
 *** The Intended Configuration Datastore (<intended>)
@@ -365,29 +365,29 @@ performed (e.g., template expansion, removal of inactive
 configuration), and is the configuration that the system attempts
 to apply.
 
-<intended> is tightly coupled to <running>. Whenever data is
-written to <running>, then <intended> is also immediately updated
-by performing all necessary transformations to the contents of
-<running> and then <intended> is validated.
+<intended> is tightly coupled to <running>. Whenever data is written
+to <running>, then <intended> MUST also be immediately updated by
+performing all necessary transformations to the contents of <running>
+and then <intended> is validated.
 
-<intended> may also be updated independently of <running> (e.g.,
-if one of the configuration transformations is changed), but
-<intended> MUST always be a valid configuration data tree, as
-defined in Section 8.1 of ^RFC7950^.
+<intended> MAY also be updated independently of <running> (e.g., if
+one of the configuration transformations is changed), but <intended>
+MUST always be a valid configuration data tree, as defined in Section
+8.1 of ^RFC7950^.
 
 For simple implementations, <running> and <intended> are
 identical.
 
-The contents of <intended> is also related to the "config true"
+The contents of <intended> are also related to the "config true"
 subset of <operational>, and hence a client can determine to what
 extent the intended configuration is currently in use by checking
-whether the contents of <intended> also appears in <operational>.
+whether the contents of <intended> also appear in <operational>.
 
 <intended> does not persist across reboots; its relationship with
 <running> makes that unnecessary.
 
 Currently there are no standard mechanisms defined that affect
-<intended> so that it would have different contents than
+<intended> so that it would have different content than
 <running>, but this architecture allows for such mechanisms to be
 defined.
 
@@ -440,7 +440,7 @@ model, but given the principal aim of returning "in use" values, it is
 possible that constraints MAY be violated under some circumstances,
 e.g., an abnormal value is "in use", the structure of a list is being
 modified, or due to remnant configuration (see ^remnant^).  Note, that
-deviations are still used when it is known in advance that a device
+deviations SHOULD be used when it is known in advance that a device
 does not fully conform to the <operational> schema.
 
 Only semantic constraints MAY be violated, these are the YANG "when",
@@ -465,7 +465,7 @@ configuration from the previous configuration persists until the
 system has released resources used by the newly-deleted configuration
 (e.g., network connections, memory allocations, file handles).
 
-Remant configuration is a common example of where the semantic
+Remnant configuration is a common example of where the semantic
 constraints defined in the data model cannot be relied upon for
 <operational>, since the system may have remnant configuration whose
 constraints were valid with the previous configuration and that are
@@ -486,7 +486,7 @@ interface configuration remains in <intended> but the interface
 configuration will not appear in <operational>.
 
 Note that configuration validity cannot depend on the current state of
-such resources, since that would imply the removing a resource might
+such resources, since that would imply that removing a resource might
 render the configuration invalid.  This is unacceptable, especially
 given that rebooting such a device would fail to boot due to an
 invalid configuration.  Instead we allow configuration for missing
@@ -722,9 +722,9 @@ filtering).
 ** Define YANG identities for the datastore @def-module@
 
 The datastore MUST be defined with a YANG identity that uses the
-"ds:datastore" identity or one of its derived identities as its base.
-This identity is necessary so that the datastore can be referenced in
-protocol operations (e.g., <get-data>).
+"ds:datastore" identity, or one of its derived identities, as its
+base.  This identity is necessary so that the datastore can be
+referenced in protocol operations (e.g., <get-data>).
 
 The datastore MAY also be defined with an identity that uses the "or:origin"
 identity or one its derived identities as its base.  This identity is
@@ -774,7 +774,7 @@ In this example, the following fictional module is used:
 !! include-figure example-system.yang
 
 The operator has configured the host name and two interfaces, so the
-contents of <intended> is:
+contents of <intended> are:
 
 !! include-figure ex-intended.load
 
