@@ -458,7 +458,7 @@ error.
 *** Remnant Configuration @remnant@
 
 Changes to configuration may take time to percolate through to
-<operational>.  During this period, <operational> MAY contain
+<operational>.  During this period, <operational> may contain
 nodes for both the previous and current configuration, as closely as
 possible tracking the current operation of the device.  Such remnant
 configuration from the previous configuration persists until the
