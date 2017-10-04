@@ -438,14 +438,14 @@ omitted from <operational>.
 <operational> SHOULD conform to any constraints specified in the data
 model, but given the principal aim of returning "in use" values, it is
 possible that constraints MAY be violated under some circumstances,
-e.g., an abnormal value is "in use", or due to remnant configuration
-(see ^remnant^).  Note, that deviations are still used when it is
-known in advance that a device does not fully conform to the
-<operational> schema.
+e.g., an abnormal value is "in use", the structure of a list is being
+modified, or due to remnant configuration (see ^remnant^).  Note, that
+deviations are still used when it is known in advance that a device
+does not fully conform to the <operational> schema.
 
 Only semantic constraints MAY be violated, these are the YANG "when",
 "must", "mandatory", "unique", "min-elements", and "max-elements"
-statements.
+statements; and the uniqueness of key values.
 
 Syntactic constraints MUST NOT be violated, including hierarchical
 organization, identifiers, and type-based constraints.  If a node in
