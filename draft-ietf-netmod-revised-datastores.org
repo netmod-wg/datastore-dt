@@ -74,7 +74,7 @@ when these documents are revised.
   expansion of templates.
 - conventional configuration datastore: One of the following set of
   configuration datastores: <running>, <startup>, <candidate>, and
-  <intended>.  These datastores share a common schema and protocol
+  <intended>.  These datastores share a common schema, and protocol
   operations allow copying data between these datastores.  The term
   "conventional" is chosen as a generic umbrella term for these
   datastores.
@@ -684,10 +684,10 @@ specified in the sections below.
 
 ** Define which YANG modules can be used in the datastore
 
-Not all YANG modules may be used in all datastores.  Some datastores MAY
+Not all YANG modules may be used in all datastores.  Some datastores may
 constrain which data models can be used in them.  If it is desirable that
 a subset of all modules can be targeted to the datastore,
-then the documentation defining the datastore MUST indicate this.
+then the documentation defining the datastore must indicate this.
 
 ** Define which subset of YANG-modeled data applies
 
@@ -700,7 +700,7 @@ present in the datastore.
 
 ** Define how data is actualized
 
-The new datastore MUST specify how it interacts with other datastores.
+The new datastore must specify how it interacts with other datastores.
 
 For example, the diagram in ^datastore-model^ depicts dynamic
 configuration datastores feeding into <operational>.  How this
@@ -721,12 +721,12 @@ filtering).
 
 ** Define YANG identities for the datastore @def-module@
 
-The datastore MUST be defined with a YANG identity that uses the
+The datastore must be defined with a YANG identity that uses the
 "ds:datastore" identity, or one of its derived identities, as its
 base.  This identity is necessary so that the datastore can be
 referenced in protocol operations (e.g., <get-data>).
 
-The datastore MAY also be defined with an identity that uses the "or:origin"
+The datastore may also be defined with an identity that uses the "or:origin"
 identity or one its derived identities as its base.  This identity is
 needed if the datastore interacts with <operational> so that data
 originating from the datastore can be identified as such via the
