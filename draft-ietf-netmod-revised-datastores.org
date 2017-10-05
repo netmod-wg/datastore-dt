@@ -488,7 +488,7 @@ configuration will not appear in <operational>.
 Note that configuration validity cannot depend on the current state of
 such resources, since that would imply that removing a resource might
 render the configuration invalid.  This is unacceptable, especially
-given that rebooting such a device would fail to boot due to an
+given that rebooting such a device would cause it to restart with an
 invalid configuration.  Instead we allow configuration for missing
 resources to exist in <running> and <intended>, but it will not appear
 in <operational>.
@@ -496,7 +496,7 @@ in <operational>.
 *** System-controlled Resources
 
 Sometimes resources are controlled by the device and the corresponding
-system controlled data appear in (and disappear from) <operational>
+system controlled data appears in (and disappears from) <operational>
 dynamically.  If a system controlled resource has matching
 configuration in <intended> when it appears, the system will try to
 apply the configuration, which causes the configuration to appear in
@@ -539,7 +539,7 @@ datastores derived from "dynamic".
 
 For all configuration data nodes in <operational>, the device SHOULD
 report the origin that most accurately reflects the source of the
-configuration that is actively being used by the system.
+configuration that is in use by the system.
 
 In cases where it could be ambiguous as to which origin should be
 used, i.e. where the same data node value has originated from multiple
