@@ -227,12 +227,8 @@ Some observations:
   different lifetime compared to configuration or if
   configuration is not immediately or successfully applied.
 - Several implementations have proprietary mechanisms that allow
-  clients to store inactive data in <running>; this
-  inactive data is only exposed to clients that indicate that they
-  support the concept of inactive data; clients not indicating support
-  for inactive data receive the contents of <running>
-  with the inactive data removed.  Inactive data is conceptually
-  removed before validation.
+  clients to store inactive data in <running>.  Inactive data is
+  conceptually removed before validation.
 - Some implementations have proprietary mechanisms that allow clients
   to define configuration templates in <running>.  These
   templates are expanded automatically by the system, and the
@@ -359,11 +355,10 @@ storage to allow <running> to persist across reboots.
 *** The Intended Configuration Datastore (<intended>)
 
 The intended configuration datastore (<intended>) is a read-only
-configuration datastore.  It represents the configuration after
-all configuration transformations to <running> are
-performed (e.g., template expansion, removal of inactive
-configuration), and is the configuration that the system attempts
-to apply.
+configuration datastore.  It represents the configuration after all
+configuration transformations to <running> are performed (e.g.,
+template expansion, removal of inactive configuration), and is the
+configuration that the system attempts to apply.
 
 <intended> is tightly coupled to <running>. Whenever data is written
 to <running>, then <intended> MUST also be immediately updated by
@@ -432,7 +427,7 @@ is dependent on both the schema definition and the device
 implementation.  Generally, functionality that is enabled and
 operational on the system would be considered as being "in use".
 Conversely, functionality that is neither enabled nor operational on
-the system could be considered as not being "in use", and hence MAY be
+the system is considered as not being "in use", and hence SHOULD be
 omitted from <operational>.
 
 <operational> SHOULD conform to any constraints specified in the data
@@ -694,9 +689,9 @@ then the documentation defining the datastore must indicate this.
 By default, the data in a datastore is modeled by all YANG statements
 in the available YANG modules.  However, it is possible to specify
 criteria that YANG statements must satisfy in order to be present in a
-datastore.  For instance, maybe only "config true" nodes are present,
-or "config false" nodes that also have a specific YANG extension are
-present in the datastore.
+datastore.  For instance, maybe only "config true" nodes, or "config
+false" nodes that also have a specific YANG extension, are present in
+the datastore.
 
 ** Define how data is actualized
 
