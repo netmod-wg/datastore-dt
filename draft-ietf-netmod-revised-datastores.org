@@ -22,6 +22,12 @@ protocols expose all these conceptual datastores.  This architecture
 is agnostic with regard to the encoding used by network management
 protocols.
 
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
+"MAY", and "OPTIONAL" in this document are to be interpreted as
+described in BCP 14 ^RFC2119^ ^RFC8174^ when, and only when, they
+appear in all capitals, as shown here.
+
 * Terminology
 
 This document defines the following terminology. Some of the terms are
@@ -43,28 +49,32 @@ when these documents are revised.
 - configuration datastore: A datastore holding configuration.
 - running configuration datastore: A configuration datastore holding
   the current configuration of the device.  It may include
-  inactive configuration or template-mechanism-oriented configuration
-  that require further expansion.  This datastore is commonly
-  referred to as "<running>".
+  configuration that requires further transformations before it can be
+  applied.  This datastore is referred to as "<running>".
 - candidate configuration datastore: A configuration datastore that
   can be manipulated without impacting the device's running
   configuration datastore and that can be committed to the running
-  configuration datastore.  This datastore is commonly referred to as
+  configuration datastore.  This datastore is referred to as
   "<candidate>".
 - startup configuration datastore: A configuration datastore holding
   the configuration loaded by the device into the running
-  configuration datastore when it boots.  This datastore is commonly
+  configuration datastore when it boots.  This datastore is
   referred to as "<startup>".
-- intended configuration: Configuration that is intended to
-  be used by the device.  For example, intended configuration excludes any
-  inactive configuration and it would include configuration
-  produced through the expansion of templates.
+- intended configuration: Configuration that is intended to be
+  used by the device.  It represents the configuration after all
+  configuration transformations to <running> have been performed
+  and is the configuration that the system attempts to apply.
 - intended configuration datastore: A configuration datastore holding
   the complete intended configuration of the device.  This datastore
-  is commonly referred to as "<intended>".
+  is referred to as "<intended>".
+- configuration transformation: The addition, modification or removal
+  of configuration between the <running> and <intended> datastores.
+  Examples of configuration transformations include the removal of
+  inactive configuration and the configuration produced through the
+  expansion of templates.
 - conventional configuration datastore: One of the following set of
   configuration datastores: <running>, <startup>, <candidate>, and
-  <intended>.  These datastores share a common schema and protocol
+  <intended>.  These datastores share a common schema, and protocol
   operations allow copying data between these datastores.  The term
   "conventional" is chosen as a generic umbrella term for these
   datastores.
@@ -95,7 +105,7 @@ when these documents are revised.
   system state.
 - operational state datastore: A datastore holding the
   complete operational state of the device.  This datastore
-  is commonly referred to as "<operational>".
+  is referred to as "<operational>".
 - origin: A metadata annotation indicating the origin of a data item.
 - remnant configuration: Configuration that remains part of the
   applied configuration for a period of time after it has been removed
@@ -210,19 +220,15 @@ Some observations:
 - Operational state has not been defined as a datastore although there
   were proposals in the past to introduce an operational state
   datastore.
-- The NETCONF <get/> operation returns the content of the running
-  configuration datastore together with the operational state.  It is
+- The NETCONF <get> operation returns the contents of <running>
+  together with the operational state.  It is
   therefore necessary that "config false" data is in a different branch
   than the "config true" data if the operational state can have a
   different lifetime compared to configuration or if
   configuration is not immediately or successfully applied.
 - Several implementations have proprietary mechanisms that allow
-  clients to store inactive data in <running>; this
-  inactive data is only exposed to clients that indicate that they
-  support the concept of inactive data; clients not indicating support
-  for inactive data receive the content of <running>
-  with the inactive data removed.  Inactive data is conceptually
-  removed before validation.
+  clients to store inactive data in <running>.  Inactive data is
+  conceptually removed before validation.
 - Some implementations have proprietary mechanisms that allow clients
   to define configuration templates in <running>.  These
   templates are expanded automatically by the system, and the
@@ -277,75 +283,10 @@ model.
 
 #+END_EXAMPLE
 
-** The Startup Configuration Datastore (<startup>)
-
-The startup configuration datastore (<startup>) is an optional
-configuration datastore holding the configuration loaded by the device
-when it boots.  <startup> is only present on devices that separate the
-startup configuration from the running configuration datastore.
-
-The startup configuration datastore may not be supported by all
-protocols or implementations.
-
-On devices that support non-volatile storage, the contents of
-<startup> will typically persist across reboots via that storage.  At
-boot time, the device loads the saved startup configuration into
-<running>.  To save a new startup configuration, data is copied to
-<startup>, either via implicit or explicit protocol operations.
-
-** The Candidate Configuration Datastore (<candidate>)
-
-The candidate configuration datastore (<candidate>) is an optional
-configuration datastore that can be manipulated without impacting the
-device's current configuration and that can be committed to <running>.
-
-The candidate configuration datastore may not be supported by all
-protocols or implementations.
-
-<candidate> does not typically persist across reboots, even in the
-presence of non-volatile storage.  If <candidate> is stored using
-non-volatile storage, it should be reset at boot time to the contents
-of <running>.
-
-** The Running Configuration Datastore (<running>)
-
-The running configuration datastore (<running>) holds the complete
-current configuration on the device.  It may include inactive
-configuration or template-mechanism-oriented configuration that
-require further expansion.
-
-If a device does not have a distinct <startup> and non-volatile is
-available, the device will typically use that non-volatile storage to
-allow <running> to persist across reboots.
-
-** The Intended Configuration Datastore (<intended>)
-
-The intended configuration datastore (<intended>) is a read-only
-configuration datastore.  It is tightly coupled to <running>.  When
-data is written to <running>, the data that is to be validated is also
-conceptually written to <intended>.  Validation is performed on the
-contents of <intended>.
-
-For simple implementations, <running> and <intended> are identical.
-
-<intended> does not persist across reboots; its relationship
-with <running> makes that unnecessary.
-
-Currently there are no standard mechanisms defined that affect
-<intended> so that it would have different contents than <running>,
-but this architecture allows for such mechanisms to be defined.
-
-One example of such a mechanism is support for marking nodes as
-inactive in <running>.  Inactive nodes are not copied to <intended>,
-and are thus not taken into account when validating the configuration.
-
-Another example is support for templates.  Templates are expanded
-when copied into <intended>, and the expanded result is validated.
-
 ** Conventional Configuration Datastores
 
 The conventional configuration datastores are a set of configuration
-datastores that share a common schema, allowing data to be copied
+datastores that share exactly the same schema, allowing data to be copied
 between them.  The term is meant as a generic umbrella description of
 these datastores.  The set of datastores include:
 
@@ -361,7 +302,95 @@ The flow of data between these datastores is depicted in
 ^datastore-model^.
 
 The specific protocols may define explicit operations to copy between
-these datastores, e.g., NETCONF's <copy-config> operation.
+these datastores, e.g., NETCONF defines the <copy-config> operation.
+
+*** The Startup Configuration Datastore (<startup>)
+
+The startup configuration datastore (<startup>) is a configuration
+datastore holding the configuration loaded by the device when it
+boots.  <startup> is only present on devices that separate the startup
+configuration from the running configuration datastore.
+
+The startup configuration datastore may not be supported by all
+protocols or implementations.
+
+On devices that support non-volatile storage, the contents of
+<startup> will typically persist across reboots via that storage.  At
+boot time, the device loads the saved startup configuration into
+<running>.  To save a new startup configuration, data is copied to
+<startup>, either via implicit or explicit protocol operations.
+
+*** The Candidate Configuration Datastore (<candidate>)
+
+The candidate configuration datastore (<candidate>) is a configuration
+datastore that can be manipulated without impacting the device's
+current configuration and that can be committed to <running>.
+
+The candidate configuration datastore may not be supported by all
+protocols or implementations.
+
+<candidate> does not typically persist across reboots, even in the
+presence of non-volatile storage.  If <candidate> is stored using
+non-volatile storage, it is reset at boot time to the contents
+of <running>.
+
+*** The Running Configuration Datastore (<running>)
+
+The running configuration datastore (<running>) is a configuration
+datastore that holds the complete current configuration on the
+device.  It MAY include configuration that requires further
+transformation before it can be applied, e.g., inactive
+configuration, or template-mechanism-oriented configuration that
+needs further expansion.  However, <running> MUST always be a
+valid configuration data tree, as defined in Section 8.1 of
+^RFC7950^.
+
+<running> MUST be supported if the device can be configured via
+conventional configuration datastores.
+
+If a device does not have a distinct <startup> and non-volatile
+storage is available, the device will typically use that non-volatile
+storage to allow <running> to persist across reboots.
+
+*** The Intended Configuration Datastore (<intended>)
+
+The intended configuration datastore (<intended>) is a read-only
+configuration datastore.  It represents the configuration after all
+configuration transformations to <running> are performed (e.g.,
+template expansion, removal of inactive configuration), and is the
+configuration that the system attempts to apply.
+
+<intended> is tightly coupled to <running>. Whenever data is written
+to <running>, then <intended> MUST also be immediately updated by
+performing all necessary transformations to the contents of <running>
+and then <intended> is validated.
+
+<intended> MAY also be updated independently of <running> (e.g., if
+one of the configuration transformations is changed), but <intended>
+MUST always be a valid configuration data tree, as defined in Section
+8.1 of ^RFC7950^.
+
+For simple implementations, <running> and <intended> are
+identical.
+
+The contents of <intended> are also related to the "config true"
+subset of <operational>, and hence a client can determine to what
+extent the intended configuration is currently in use by checking
+whether the contents of <intended> also appear in <operational>.
+
+<intended> does not persist across reboots; its relationship with
+<running> makes that unnecessary.
+
+Currently there are no standard mechanisms defined that affect
+<intended> so that it would have different content than
+<running>, but this architecture allows for such mechanisms to be
+defined.
+
+One example of such a mechanism is support for marking nodes as
+inactive in <running>.  Inactive nodes are not copied to
+<intended>.  A second example is support for templates, which can
+perform transformations on the configuration from <running> to
+the configuration written to <intended>.
 
 ** Dynamic Configuration Datastores
 
@@ -396,32 +425,33 @@ this implies that the node is not used by the device.
 The interpretation of what constitutes as being "in use" by the system
 is dependent on both the schema definition and the device
 implementation.  Generally, functionality that is enabled and
-operational on the system would be considered as being 'in use'.
+operational on the system would be considered as being "in use".
 Conversely, functionality that is neither enabled nor operational on
-the system could be considered as not being 'in use', and hence may be
+the system is considered as not being "in use", and hence SHOULD be
 omitted from <operational>.
 
-<operational> should conform to any constraints specified in the data
+<operational> SHOULD conform to any constraints specified in the data
 model, but given the principal aim of returning "in use" values, it is
-possible that constraints may be violated under some circumstances,
-e.g., an abnormal value is "in use", or due to remnant configuration
-(see ^remnant^).  Note, that deviations are still used when it is
-known in advance that a device does not fully conform to the
-<operational> schema.
+possible that constraints MAY be violated under some circumstances,
+e.g., an abnormal value is "in use", the structure of a list is being
+modified, or due to remnant configuration (see ^remnant^).  Note, that
+deviations SHOULD be used when it is known in advance that a device
+does not fully conform to the <operational> schema.
 
-Only semantic constraints may be violated, these are the YANG "when",
+Only semantic constraints MAY be violated, these are the YANG "when",
 "must", "mandatory", "unique", "min-elements", and "max-elements"
-statements.
+statements; and the uniqueness of key values.
 
-Syntactic constraints cannot be violated, including hierarchical
+Syntactic constraints MUST NOT be violated, including hierarchical
 organization, identifiers, and type-based constraints.  If a node in
-<operational> does not meet the syntactic constraints then it cannot
+<operational> does not meet the syntactic constraints then it MUST NOT
 be returned, and some other mechanism should be used to flag the
 error.
 
 <operational> does not persist across reboots.
 
 *** Remnant Configuration @remnant@
+
 Changes to configuration may take time to percolate through to
 <operational>.  During this period, <operational> may contain
 nodes for both the previous and current configuration, as closely as
@@ -430,7 +460,7 @@ configuration from the previous configuration persists until the
 system has released resources used by the newly-deleted configuration
 (e.g., network connections, memory allocations, file handles).
 
-Remant configuration is a common example of where the semantic
+Remnant configuration is a common example of where the semantic
 constraints defined in the data model cannot be relied upon for
 <operational>, since the system may have remnant configuration whose
 constraints were valid with the previous configuration and that are
@@ -451,9 +481,9 @@ interface configuration remains in <intended> but the interface
 configuration will not appear in <operational>.
 
 Note that configuration validity cannot depend on the current state of
-such resources, since that would imply the removing a resource might
+such resources, since that would imply that removing a resource might
 render the configuration invalid.  This is unacceptable, especially
-given that rebooting such a device would fail to boot due to an
+given that rebooting such a device would cause it to restart with an
 invalid configuration.  Instead we allow configuration for missing
 resources to exist in <running> and <intended>, but it will not appear
 in <operational>.
@@ -461,7 +491,7 @@ in <operational>.
 *** System-controlled Resources
 
 Sometimes resources are controlled by the device and the corresponding
-system controlled data appear in (and disappear from) <operational>
+system controlled data appears in (and disappears from) <operational>
 dynamically.  If a system controlled resource has matching
 configuration in <intended> when it appears, the system will try to
 apply the configuration, which causes the configuration to appear in
@@ -502,13 +532,13 @@ These identities can be further refined, e.g., there could be separate
 identities for particular types or instances of dynamic configuration
 datastores derived from "dynamic".
 
-For all configuration data nodes in <operational>, the device should
+For all configuration data nodes in <operational>, the device SHOULD
 report the origin that most accurately reflects the source of the
-configuration that is actively being used by the system.
+configuration that is in use by the system.
 
 In cases where it could be ambiguous as to which origin should be
 used, i.e. where the same data node value has originated from multiple
-sources, then the description statement in the YANG module should be
+sources, then the description statement in the YANG module SHOULD be
 used as guidance for choosing the appropriate origin.  For example:
 
 If for a particular configuration node, the associated YANG
@@ -524,12 +554,14 @@ would be reported as "intended" even when a learned value is the same as
 the configured value.
 
 In the case that a device cannot provide an accurate origin for a
-particular configuration data node then it should use the origin
+particular configuration data node then it SHOULD use the origin
 "unknown".
 
 * Implications on YANG
 
 ** XPath Context
+
+This section updates section 6.4.1 of RFC 7950.
 
 If a server implements the architecture defined in this document, the
 accessible trees for some XPath contexts are refined as follows:
@@ -657,9 +689,9 @@ then the documentation defining the datastore must indicate this.
 By default, the data in a datastore is modeled by all YANG statements
 in the available YANG modules.  However, it is possible to specify
 criteria that YANG statements must satisfy in order to be present in a
-datastore.  For instance, maybe only "config true" nodes are present,
-or "config false" nodes that also have a specific YANG extension are
-present in the datastore.
+datastore.  For instance, maybe only "config true" nodes, or "config
+false" nodes that also have a specific YANG extension, are present in
+the datastore.
 
 ** Define how data is actualized
 
@@ -667,7 +699,7 @@ The new datastore must specify how it interacts with other datastores.
 
 For example, the diagram in ^datastore-model^ depicts dynamic
 configuration datastores feeding into <operational>.  How this
-interaction occurs must be defined by the particular dynamic
+interaction occurs has to be defined by the particular dynamic
 configuration datastores.  In some cases, it may occur implicitly, as
 soon as the data is put into the dynamic configuration datastore
 while, in other cases, an explicit action (e.g., an RPC) may be
@@ -685,9 +717,9 @@ filtering).
 ** Define YANG identities for the datastore @def-module@
 
 The datastore must be defined with a YANG identity that uses the
-"ds:datastore" identity or one of its derived identities as its base.
-This identity is necessary so that the datastore can be referenced in
-protocol operations (e.g., <get-data>).
+"ds:datastore" identity, or one of its derived identities, as its
+base.  This identity is necessary so that the datastore can be
+referenced in protocol operations (e.g., <get-data>).
 
 The datastore may also be defined with an identity that uses the "or:origin"
 identity or one its derived identities as its base.  This identity is
@@ -709,12 +741,17 @@ This example defines a dynamic configuration datastore called
 "ephemeral", which is loosely modeled after the work done in the I2RS
 working group.
 
-  1. Name            : ephemeral
-  2. YANG modules    : all (default)
-  3. YANG data nodes : all "config true" data nodes
-  4. How applied     : automatic
-  5. Protocols       : NC/RC (default)
-  6. YANG Module     : (see below)
+-- The example "ephemeral" datastore properties
+| Name         | Value                                             |
+|--------------+---------------------------------------------------|
+| Name         | ephemeral                                         |
+| YANG modules | all (default)                                     |
+| YANG nodes   | all "config true" data nodes                      |
+| How applied  | changes automatically propagated to <operational> |
+| Protocols    | NC/RC (default)                                   |
+| YANG Module  | (see below)                                       |
+
+# w/o this line, oxtradoc mixes the table with the figure
 
 !! include-figure example-ds-ephemeral.yang
 
@@ -732,7 +769,7 @@ In this example, the following fictional module is used:
 !! include-figure example-system.yang
 
 The operator has configured the host name and two interfaces, so the
-contents of <intended> is:
+contents of <intended> are:
 
 !! include-figure ex-intended.load
 
@@ -1007,6 +1044,7 @@ will appear as follows:
     name ;
     ipr trust200902;
     category std;
+    updates 7950;
     references references.xml;
     title "Network Management Datastore Architecture";
     contributor "author:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";

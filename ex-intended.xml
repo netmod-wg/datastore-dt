@@ -10,7 +10,7 @@
     </auto-negotiation>
     <address>
       <ip>2001:db8::10</ip>
-      <prefix-length>32</prefix-length>
+      <prefix-length>64</prefix-length>
     </address>
   </interface>
 
@@ -18,7 +18,7 @@
     <name>eth1</name>
     <address>
       <ip>2001:db8::20</ip>
-      <prefix-length>32</prefix-length>
+      <prefix-length>64</prefix-length>
     </address>
   </interface>
 
