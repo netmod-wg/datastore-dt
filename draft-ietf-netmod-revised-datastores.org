@@ -396,13 +396,13 @@ configuration that the system attempts to apply.
 
 <intended> is tightly coupled to <running>. Whenever data is written
 to <running>, then <intended> MUST also be immediately updated by
-performing all necessary transformations to the contents of <running>
-and then <intended> is validated.
+performing all necessary configuration transformations to the contents
+of <running> and then <intended> is validated.
 
-<intended> MAY also be updated independently of <running> (e.g., if
-one of the configuration transformations is changed), but <intended>
-MUST always be a valid configuration data tree, as defined in Section
-8.1 of ^RFC7950^.
+<intended> MAY also be updated independently of <running> if the
+effect of a configuration transformation changes, but <intended> MUST
+always be a valid configuration data tree, as defined in Section 8.1
+of ^RFC7950^.
 
 For simple implementations, <running> and <intended> are
 identical.
