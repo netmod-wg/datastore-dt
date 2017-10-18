@@ -28,6 +28,48 @@ NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
 described in BCP 14 ^RFC2119^ ^RFC8174^ when, and only when, they
 appear in all capitals, as shown here.
 
+* Objectives
+
+Network management data objects can often take two different values,
+the value configured by the user or an application (configuration) and
+the value that the device is actually using (operational state). These
+two values may be different for a number of reasons, e.g., system
+internal interactions with hardware, interaction with protocols or
+other devices, or simply the time it takes to propagate a
+configuration change to the software and hardware components of a
+system. Furthermore, configuration and operational state data objects
+may have different lifetimes.
+
+The original model of datastores required these data objects to be
+modeled twice in the YANG schema, as "config true" objects and as
+"config false" objects. The convention adopted by the interfaces data
+model (^RFC7223^) and the IP data model (^RFC7277^) was using two
+separate branches rooted at the root of the data tree, one branch for
+configuration data objects and one branch for operational state data
+objects.
+
+The duplication of definitions and the ad-hoc separation of
+operational state data from configuration data leads to a number of
+problems. Having configuration and operational state data in separate
+branches in the data model is operationally complicated and impacts
+the readability of module definitions. Furthermore, the relationship
+between the branches is not machine readable and filter expressions
+operating on configuration and on related operational state are
+different.
+
+With the revised architectural model of datastores defined in this
+document, the data objects are defined only once in the YANG schema
+but independent instantiations can appear in two different datastores,
+one for configured values and one for operational state values. This
+provides a more elegant and simpler solution to the problem.
+
+The revised architectural model of datastores supports additional
+datastores for systems that support more advanced processing chains
+converting configuration to operational state. For example, some
+systems support configuration that is not currently used (so called
+inactive configuration) or they support configuration templates that
+are used to expand configuration data via a common template.
+
 * Terminology
 
 This document defines the following terminology. Some of the terms are
@@ -166,14 +208,6 @@ Implementation experience and requests from operators
 indicate that the datastore model initially designed for NETCONF and
 refined by YANG needs to be extended.  In particular, the notion of
 intended configuration and applied configuration has developed.
-
-Furthermore, separating operational state from configuration
-in a separate branch in the data model has been found operationally
-complicated, and typically impacts the readability of module
-definitions due to overuse of groupings.  The relationship between the
-branches is not machine readable and filter expressions operating on
-configuration and on related operational state are
-different.
 
 ** Original Model of Datastores
 
@@ -656,11 +690,14 @@ document:
 - Andy Bierman, YumaWorks, <andy@yumaworks.com>
 - Marcus Hines, Google, <hines@google.com>
 - Christian Hopps, Deutsche Telekom, <chopps@chopps.org>
+- Balazs Lengyel, Ericsson, <balazs.lengyel@ericsson.com>
 - Acee Lindem, Cisco Systems, <acee@cisco.com>
 - Ladislav Lhotka, CZ.NIC, <lhotka@nic.cz>
 - Thomas Nadeau, Brocade Networks, <tnadeau@lucidvision.com>
+- Tom Petch, Engineering Networks Ltd, <ietfc@btconnect.com>
 - Anees Shaikh, Google, <aashaikh@google.com>
 - Rob Shakir, Google, <robjs@google.com>
+- Jason Sterne, Nokia, <jason.sterne@nokia.co>
 
 Juergen Schoenwaelder was partly funded by Flamingo, a Network of
 Excellence project (ICT-318488) supported by the European Commission
