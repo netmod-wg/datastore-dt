@@ -13,6 +13,8 @@
   ietf-ref RFC3688;
   ietf-ref RFC6020;
   ietf-ref RFC6244;
+  ietf-ref RFC7223;
+  ietf-ref RFC7277;
   ietf-ref I-D.ietf-netmod-opstate-reqs;
   ietf-ref I-D.bjorklund-netmod-operational;
   ietf-ref I-D.kwatsen-netmod-opstate;
