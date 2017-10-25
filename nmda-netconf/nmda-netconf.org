@@ -80,21 +80,31 @@ The <get-data> operation also supports the "with-defaults" parameter
 as defined in ^RFC6243^.  The supported values follow the constraints
 given by the "with-defaults" capability.
 
-**** Origin Attribute
+**** Origin Metadata Attribute
 
 The <get-data> operation adds a new boolean parameter named
-"with-origin", which requests that the server returns the "origin"
-information as detailed in the NMDA.  This parameter is only valid for
-<operational> and any datastores with identities derived from the
-"operational" identity.
+"with-origin", which if present and set to true, requests that the
+server includes "origin" metadata anotations in its response, as
+detailed in the NMDA.  This parameter is only valid for <operational>
+and any datastores with identities derived from the "operational"
+identity.  "origin" metadata annotations are not included unless a
+client explicitly requesteds them.
 
 Data from <operational> can come from multiple sources.  The server
-should return the most accurate value for the "origin" attribute as
-possible, indicating the source of the operational value.
+should return the most accurate value for the "origin" metadata
+annotation as possible, indicating the source of the operational
+value, as specified in section 5.3.4 of the NMDA.
 
-When encoding the origin attribute for a hierarchy of returned nodes,
-the origin attribute may be omitted when the value matches that of the
-parent node.
+When encoding the origin metadata annotation for a hierarchy of
+returned nodes, the annotation may be omitted for a child node when
+the value matches that of the parent node (as described in
+ietf-origin@2017-08-17). [RFC Editor, please check published revision
+date.]
+
+The "with-origin" parameter is optional to support.  It is identified
+with the URI:
+
+  urn:ietf:params:netconf:capability:with-origin:1.0
 
 *** The <edit-data> Operation
 
@@ -126,7 +136,7 @@ Only writable datastores can be locked.
 
 RPC operations and actions can be defined in YANG modules.  The
 evaluation context for constraints and references in RPC operations
-and actions is <operational>.
+and actions is <operational>, as specified in the NMDA.
 
 ** YANG Library Capability
 
