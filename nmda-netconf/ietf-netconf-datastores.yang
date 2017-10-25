@@ -86,7 +86,7 @@ module ietf-netconf-datastores {
     description
       "Retrieve data from an NMDA datastore.";
     input {
-      leaf source {
+      leaf datastore {
         type ncds:datastore;
         mandatory true;
         description
@@ -164,7 +164,7 @@ module ietf-netconf-datastores {
     description
       "Edit data in an NMDA datastore.";
     input {
-      leaf target {
+      leaf datastore {
         type ncds:datastore;
         description
           "Datastore which data affects.";
