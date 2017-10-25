@@ -64,7 +64,7 @@ document.
 
 The <get-data> operation retrieves data from a specific NMDA
 datastore.  This operation is similar to NETCONF's <get-config>
-operation, but adds flexibility in naming the target datastore.
+operation, but adds flexibility in naming the source datastore.
 
 The "source" parameter indicates the datastore which is the source of
 the data to be retrieved.  This is a datastore identity.
@@ -102,7 +102,7 @@ The <edit-data> operation changes the contents of a specific
 datastore, similar to the <edit-config> operation, but with additional
 flexibility in naming the target datastore.
 
-The "target" parameter is a datastore identity that indicates the
+The "datastore" parameter is a datastore identity that indicates the
 desired target datastore where changes should be made.
 
 The "edit-content" parameter from "edit-config" it is modified to
