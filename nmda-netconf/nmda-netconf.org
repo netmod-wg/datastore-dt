@@ -82,13 +82,14 @@ given by the "with-defaults" capability.
 
 **** Origin Metadata Attribute
 
-The <get-data> operation adds a new boolean parameter named
-"with-origin", which if present and set to true, requests that the
-server includes "origin" metadata anotations in its response, as
-detailed in the NMDA.  This parameter is only valid for <operational>
-and any datastores with identities derived from the "operational"
-identity.  "origin" metadata annotations are not included unless a
-client explicitly requesteds them.
+The <get-data> operation adds a new parameter named "with-origin",
+which if present, requests that the server includes "origin" metadata
+anotations in its response, as detailed in the NMDA.  This parameter
+is only valid for <operational> and any datastores with identities
+derived from the "operational" identity.  Otherwise, if an invalid
+datastore is specified then an <rpc-error> element is returned with an
+<error-tag> value of "invalid-value".  "origin" metadata annotations
+are not included unless a client explicitly requesteds them.
 
 Data from <operational> can come from multiple sources.  The server
 should return the most accurate value for the "origin" metadata
