@@ -84,6 +84,11 @@ when these documents are revised.
   datastore might be implemented, for example, using files, a
   database, flash memory locations, or combinations thereof.
   A datastore maps to an instantiated YANG data tree.
+- schema node: A node in the schema tree.  The formal definition is
+  in RFC 7950.
+- datastore schema: The combined set of schema nodes for all modules
+  supported by a particular datastore, taking into consideration any
+  deviations and enabled features for that datastore. 
 - configuration: Data that is required to get a device from its
   initial default state into a desired operational state.
   This data is modeled in YANG using "config true" nodes.
@@ -116,9 +121,9 @@ when these documents are revised.
   expansion of templates.
 - conventional configuration datastore: One of the following set of
   configuration datastores: <running>, <startup>, <candidate>, and
-  <intended>.  These datastores share a common schema, and protocol
-  operations allow copying data between these datastores.  The term
-  "conventional" is chosen as a generic umbrella term for these
+  <intended>.  These datastores share a common datastore schema, and
+  protocol operations allow copying data between these datastores.  The
+  term "conventional" is chosen as a generic umbrella term for these
   datastores.
 - conventional configuration: Configuration that is stored
   in any of the conventional configuration datastores.
@@ -320,9 +325,9 @@ model.
 ** Conventional Configuration Datastores
 
 The conventional configuration datastores are a set of configuration
-datastores that share exactly the same schema, allowing data to be copied
-between them.  The term is meant as a generic umbrella description of
-these datastores.  The set of datastores include:
+datastores that share exactly the same datastore schema, allowing data
+to be copied between them.  The term is meant as a generic umbrella
+description of these datastores.  The set of datastores include:
 
 - <running>
 - <candidate>
@@ -439,10 +444,11 @@ through <operational>.
 
 The operational state datastore (<operational>) is a read-only
 datastore that consists of all "config true" and "config false" nodes
-defined in the schema.  In the original NETCONF model the operational
-state only had "config false" nodes.  The reason for incorporating
-"config true" nodes here is to be able to expose all operational
-settings without having to replicate definitions in the data models.
+defined in the datastore's schema.  In the original NETCONF model the
+operational state only had "config false" nodes.  The reason for
+incorporating "config true" nodes here is to be able to expose all
+operational settings without having to replicate definitions in the
+data models.
 
 <operational> contains system state and all configuration actually
 used by the system.  This includes all applied configuration from
@@ -450,6 +456,11 @@ used by the system.  This includes all applied configuration from
 default values defined by any supported data models.  In addition,
 <operational> also contains applied configuration from dynamic
 configuration datastores.
+
+The datastore schema for <operational> MUST be a superset of the
+combined datastore schema used in all configuration datastores except
+that YANG nodes supported in a configuration datastore MAY be omitted
+from <operational> if a server is not able to accurately report them.
 
 Requests to retrieve nodes from <operational> always return the value
 in use if the node exists, regardless of any default value specified
