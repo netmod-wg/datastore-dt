@@ -139,6 +139,10 @@ RPC operations and actions can be defined in YANG modules.  The
 evaluation context for constraints and references in RPC operations
 and actions is <operational>, as specified in the NMDA.
 
+Thus, this document updates ^RFC7950^, section 7.15.2, so that the
+<action> element contains a hierarchy of nodes that identifies
+the node in the operational state datastore.
+
 ** YANG Library Capability
 
 RFC Ed.: Update 201X-XX-XX below with correct date.

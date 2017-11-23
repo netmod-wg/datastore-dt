@@ -639,6 +639,14 @@ accessible trees for some XPath contexts are refined as follows:
   node representing the operation being defined has the operation's
   output parameters as children.
 
+** Invocation of Actions
+
+This section updates section 7.15 of RFC 7950.
+
+Actions are always invoked in the context of the operational state
+datastore.  The node for which the action is invoked MUST exist in
+the operational state datastore.
+
 * YANG Modules @yang-module@
 
 !! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-08-17.yang"
