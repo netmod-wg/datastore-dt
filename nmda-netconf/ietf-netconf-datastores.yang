@@ -109,7 +109,27 @@ module ietf-netconf-datastores {
           description
             "This parameter contains an XPath expression
              identifying the portions of the target
-             datastore to retrieve.";
+             datastore to retrieve.
+
+             If the expression returns a node-set, all nodes in the
+             node-set are selected by the filter.  Otherwise, if the
+             expression does not return a node-set, the filter doesn't
+             select any nodes.
+
+             The expression is evaluated in the following XPath
+             context:
+
+               o  The set of namespace declarations are those in scope
+                  on the 'xpath-filter' leaf element.
+
+               o  The set of variable bindings is empty.
+
+               o  The function library is the core function library,
+                  and the XPath functions defined in section 10 in RFC
+                  7950.
+
+               o  The context node is the root node of the target
+                  datastore.";
         }
       }
 
