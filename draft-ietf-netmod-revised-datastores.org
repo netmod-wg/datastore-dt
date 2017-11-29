@@ -88,7 +88,7 @@ when these documents are revised.
   in RFC 7950.
 - datastore schema: The combined set of schema nodes for all modules
   supported by a particular datastore, taking into consideration any
-  deviations and enabled features for that datastore. 
+  deviations and enabled features for that datastore.
 - configuration: Data that is required to get a device from its
   initial default state into a desired operational state.
   This data is modeled in YANG using "config true" nodes.
@@ -858,7 +858,7 @@ Consider the following fragment of a fictional BGP module:
       list peer {
         key name;
         leaf name {
-          type ipaddress;
+          type inet:ip-address;
         }
         leaf local-as {
           type uint32;
