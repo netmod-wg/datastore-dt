@@ -32,7 +32,7 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
 "OPTIONAL" in this document are to be interpreted as described in BCP
 14, ^RFC2119^ ^RFC8174^ when, and only when, they appear in all capitals,
-as shown here..
+as shown here.
 
 * NETCONF Support for NMDA Datastores
 
@@ -96,7 +96,7 @@ value, as specified in section 5.3.4 of
 When encoding the origin metadata annotation for a hierarchy of
 returned nodes, the annotation may be omitted for a child node when
 the value matches that of the parent node, as described in the
-ietf-origin YANG module ^I-D.ietf-netmod-revised-datastores^.
+"ietf-origin" YANG module ^I-D.ietf-netmod-revised-datastores^.
 
 The "with-origin" parameter is optional to support.  It is identified
 with the URI:
@@ -213,10 +213,10 @@ of the NETCONF ^RFC6241^ protocol. The lowest NETCONF layer is the
 secure transport layer and the mandatory-to-implement secure transport
 is Secure Shell (SSH) ^RFC6242^.
 
-The NETCONF access control model ^RFC6536^ provides the means to
-restrict access for particular NETCONF or RESTCONF users to a
-preconfigured subset of all available NETCONF or RESTCONF protocol
-operations and content.
+The network configuration access control model
+^I-D.ietf-netconf-rfc6536bis^ provides the means to restrict access
+for particular NETCONF users to a preconfigured subset of all
+available NETCONF protocol operations and content.
 
 The security considerations for the base NETCONF protocol operations
 (see Section 9 of ^RFC6241^) apply to the new NETCONF <get-data> and
