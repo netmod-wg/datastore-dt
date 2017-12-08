@@ -2,35 +2,31 @@
 # NMDA Changes for NETCONF
 #
 
-The "Network Management Datastore Architecture" (NMDA) improves on
-NETCONF by adding new features to give more accurate handling of
-configuration and operational data.  These include ability to inspect
-the current operational values of configuration data, allowing clients
-to use identical paths for retrieving the configured values and the
-operational values.  These new features require additional operations
-in network management applications such as NETCONF.  This document
-details those new operations.
+The Network Management Datastore Architecture defines datastores are a
+fundamental concept binding the data models written in the YANG data
+modeling language to network management protocols.  This document
+updates the NETCONF protocol in order to support the Network
+Management Datastore Architecture.
 
 * Introduction
 
-This document provides a YANG model that adds NETCONF (^RFC6241^)
-support for the "Network Management Datastore Architecture"
-(NMDA) ^I-D.ietf-netmod-revised-datastores^.  NMDA defines a framework
-for datastores, a fundamental concept binding network management data
-models to network management protocols, enabling data models to be
-written in a network management protocol agnostic way.  NETCONF
-operations currently refer to the datastores defined in the original
-model, so new operations are required to allow references to the new
-datastores.
+This document updates the NETCONF protocol defined in ^RFC6241^ in
+order to support the Network Management Datastore Architecture (NMDA)
+defined in ^I-D.ietf-netmod-revised-datastores^.
 
-Operations like <copy-config>, <lock> and <unlock> are augmented to
+NETCONF operations defined in ^RFC6241^ refer to the datastores
+defined in the original datstore model. Several new NETCONF operations
+are required to allow references to the new datastores defined in
+^I-D.ietf-netmod-revised-datastores^. Other existing NETCONF
+operations like <copy-config>, <lock> and <unlock> are augmented to
 allow them to target additional datastores.
 
 In addition the original <get> operation is deprecated, since the
-information it returns is no longer needed.  <get>'s deficiencies were
-a major motivation for the NMDA.
+information it returns is no longer needed.  The deficiencies of the
+<get> operation were one of the motivations for developing the NMDA.
 
-** Keywords
+This document uses the terminology defined by the NMDA
+^I-D.ietf-netmod-revised-datastores^.
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
@@ -38,27 +34,24 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 14, ^RFC2119^ ^RFC8174^ when, and only when, they appear in all capitals,
 as shown here..
 
-** Terminology
+* NETCONF Support for NMDA Datastores
 
-This document uses the terminology defined by the NMDA
-^I-D.ietf-netmod-revised-datastores^.
-
-* The NMDA Model for NETCONF
-
-This section describes the changes needed for NMDA support.  These
-changes are contained in a new YANG (^RFC7950^) model
+This section describes the NETCONF changes needed to support NMDA.
+These changes are defined in a new YANG (^RFC7950^) module
 "ietf-netconf-datastores".
 
 These changes include the use of source and target parameters based on
-the "datastore" identity defined in the "ietf-datastores" from
+the "datastore" identity defined in the "ietf-datastores" module
 ^I-D.ietf-netmod-revised-datastores^.  The use of identities allows
 future expansion in a way that the choice-based strategy from the
 original operations (e.g., <get-config>, <edit-config>) do not.
 
-** Operations
+** New NETCONF Operations
 
-Support for the NMDA includes two new operations defined in this
-document.
+Two new operations <get-data> and <edit-data> are defined in this
+document in order to support NMDA. These operations are similar
+to the <get-config> and <edit-config> operations but they can work
+on an extensible set of datastores.
 
 *** The <get-data> Operation
 
@@ -89,18 +82,18 @@ is only valid for <operational> and any datastores with identities
 derived from the "operational" identity.  Otherwise, if an invalid
 datastore is specified then an <rpc-error> element is returned with an
 <error-tag> value of "invalid-value".  "origin" metadata annotations
-are not included unless a client explicitly requesteds them.
+are not included unless a client explicitly requests them.
 
 Data from <operational> can come from multiple sources.  The server
 should return the most accurate value for the "origin" metadata
 annotation as possible, indicating the source of the operational
-value, as specified in section 5.3.4 of the NMDA.
+value, as specified in section 5.3.4 of
+^I-D.ietf-netmod-revised-datastores^.
 
 When encoding the origin metadata annotation for a hierarchy of
 returned nodes, the annotation may be omitted for a child node when
-the value matches that of the parent node (as described in
-ietf-origin@2017-08-17). [RFC Editor, please check published revision
-date.]
+the value matches that of the parent node, as described in the
+ietf-origin YANG module ^I-D.ietf-netmod-revised-datastores^.
 
 The "with-origin" parameter is optional to support.  It is identified
 with the URI:
@@ -123,13 +116,12 @@ allow use "type anydata" for configuration content, rather than the
 The "default-operation" parameter mirrors the parameter of the
 <edit-config> operation.
 
-** Augmentations to the Base NETCONF Model
+** Augmentations to NETCONF Operations
 
-Several of the operations defined in the base NETCONF data model
-(ietf-netconf@2011-06-01.yang) will continue to be used under the
-NMDA.  The <lock>, <unlock>, and <validate> operations are
-augmented with a new "datastore" leaf can indicate a desired
-NMDA datastore.
+Several of the operations defined in the base NETCONF YANG module
+^RFC6241^ will continue to be used under the NMDA.  The <lock>,
+<unlock>, and <validate> operations are augmented with a new
+"datastore" leaf can indicate a desired NMDA datastore.
 
 Only writable datastores can be locked.
 
@@ -173,20 +165,27 @@ advertise the capability :yang-library:1.1 instead of
 :yang-library:1.0, and to implement the subtree "/yang-library"
 ^I-D.nmdsdt-netconf-rfc7895bis^ instead of "/modules-state".
 
-* YANG Model
+* NETCONF Datastores YANG Module
+
+This module imports definitions from ^RFC6991^, ^RFC6241^, ^RFC6243',
+and ^I-D.ietf-netmod-revised-datastores^.
+
+RFC Ed.: update the date below with the date of RFC publication and
+remove this note.
 
 !! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-08-24.yang"
 
 * IANA Considerations
 
-This document registers one capability identifier URN from the
-"Network Configuration Protocol (NETCONF) Capability URNs" registry:
+This document registers two capability identifier URNs in the "Network
+Configuration Protocol (NETCONF) Capability URNs" registry:
 
   Index           Capability Identifier
   -------------   ---------------------------------------------------
   :yang-library   urn:ietf:params:netconf:capability:yang-library:1.1
+  :with-origin    urn:ietf:params:netconf:capability:with-origin:1.0
 
-This document registers a URI in the "IETF XML Registry" [RFC3688].
+This document registers a URI in the "IETF XML Registry" ^RFC3688^.
 Following the format in RFC 3688, the following registration has been
 made.
 
@@ -197,7 +196,7 @@ made.
     XML: N/A, the requested URI is an XML namespace.
 
 This document registers a YANG module in the "YANG Module Names"
-registry [RFC6020].
+registry ^RFC6020^.
 
   name:         ietf-netconf-datastores
   namespace:    urn:ietf:params:xml:ns:yang:ietf-netconf-datastores
@@ -206,7 +205,19 @@ registry [RFC6020].
 
 * Security Considerations
 
-This document has no security considerations.
+The YANG module defined in this document extends the base operations
+of the NETCONF ^RFC6241^ protocol. The lowest NETCONF layer is the
+secure transport layer and the mandatory-to-implement secure transport
+is Secure Shell (SSH) ^RFC6242^.
+
+The NETCONF access control model ^RFC6536^ provides the means to
+restrict access for particular NETCONF or RESTCONF users to a
+preconfigured subset of all available NETCONF or RESTCONF protocol
+operations and content.
+
+The security considerations for the base NETCONF protocol operations
+(see Section 9 of ^RFC6241^) apply to the new NETCONF <get-data> and
+<edit-data> operations defined in this document.
 
 # *! start-appendix
 #
@@ -218,7 +229,7 @@ This document has no security considerations.
     category std;
     references references.xml;
     updates 7950;
-    title "NETCONF Model for NMDA";
+    title "NETCONF Update to Support the Network Management Datastore Architecture";
     contributor "author:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
     contributor "author:Juergen Schoenwaelder:Jacobs University:j.schoenwaelder@jacobs-university.de";
     contributor "author:Phil Shafer:Juniper Networks:phil@juniper.net";
