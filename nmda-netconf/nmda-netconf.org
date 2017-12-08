@@ -69,6 +69,9 @@ for subtree filtering and XPath filtering.
 Additional filters are defined to retrieve only "config true" nodes or
 nodes matching a given "origin" value.
 
+The parameter "depth" can be used by the client to limit the number
+of sub-tree levels that are returned in the reply.
+
 The <get-data> operation also supports the "with-defaults" parameter
 as defined in ^RFC6243^.  The supported values follow the constraints
 given by the "with-defaults" capability.
@@ -173,7 +176,7 @@ and ^I-D.ietf-netmod-revised-datastores^.
 RFC Ed.: update the date below with the date of RFC publication and
 remove this note.
 
-!! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-08-24.yang"
+!! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-12-08.yang"
 
 * IANA Considerations
 

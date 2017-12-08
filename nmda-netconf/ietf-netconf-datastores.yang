@@ -150,6 +150,24 @@ module ietf-netconf-datastores {
         }
       }
 
+      leaf depth {
+        type union {
+          type uint16 {
+            range "1..65535";
+          }
+          type enumeration {
+            enum "unbounded";
+          }
+        }
+        default "unbounded";
+        description
+          "For each node selected by the filter, this parameter
+           selects how many conceptual sub-tree levels should be
+           returned in the reply.  If the depth is 1, the reply
+           includes just the selected nodes but no children.  If the
+           depth is 'unbounded', all descendant nodes are included.";
+      }
+
       leaf with-origin {
         when 'derived-from-or-self(../datastore, "or:operational")';
         if-feature origin;
@@ -160,6 +178,7 @@ module ietf-netconf-datastores {
       }
 
       uses ncwd:with-defaults-parameters;
+
     }
 
     output {
