@@ -113,14 +113,14 @@ module ietf-netconf-datastores {
              The expression is evaluated in the following XPath
              context:
 
-               o  The set of namespace declarations are those in scope
-                  on the 'xpath-filter' leaf element.
+               o  The set of namespace declarations are those in
+                  scope on the 'xpath-filter' leaf element.
 
                o  The set of variable bindings is empty.
 
                o  The function library is the core function library,
-                  and the XPath functions defined in section 10 in RFC
-                  7950.
+                  and the XPath functions defined in section 10 in
+                  RFC 7950.
 
                o  The context node is the root node of the target
                   datastore.";
