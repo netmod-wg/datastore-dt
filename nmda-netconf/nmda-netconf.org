@@ -5,8 +5,9 @@
 The Network Management Datastore Architecture defines datastores are a
 fundamental concept binding the data models written in the YANG data
 modeling language to network management protocols.  This document
-updates the NETCONF protocol defined in RFC 7950 in order to support
-the Network Management Datastore Architecture.
+extends the NETCONF protocol in order to support the Network
+Management Datastore Architecture. This document updates RFC 7950
+to allow the usage of ^I-D.ietf-netconf-rfc7895bis^ with NETCONF.
 
 * Introduction
 
@@ -60,11 +61,11 @@ datastore.  This operation is similar to NETCONF's <get-config>
 operation defined in ^RFC6241^, but it adds the flexibility to
 select the source datastore.
 
-The <source> parameter indicates the datastore which is the source of
+The "source" parameter indicates the datastore which is the source of
 the data to be retrieved.  This is a datastore identity.
 
 The <get-data> operation accepts a content filter parameter, similar
-to the <filter> parameter of <get-config>, but using explicit nodes
+to the "filter" parameter of <get-config>, but using explicit nodes
 for subtree filtering and XPath filtering. The behaviour of <get-data>
 differs from the behaviour of <get-config> in case the XPath filter
 does not return a node set: The <get-config> operation fails in this
@@ -73,10 +74,10 @@ situation while the <get-data> operation returns an empty result.
 Additional filters are defined to retrieve only "config true" nodes or
 nodes matching a given "origin" value.
 
-The parameter <depth> can be used by the client to limit the number of
+The parameter "depth" can be used by the client to limit the number of
 sub-tree levels that are returned in the reply.
 
-The <get-data> operation also supports the <with-defaults> parameter
+The <get-data> operation also supports the "with-defaults" parameter
 as defined in ^RFC6243^.  The supported values follow the constraints
 given by the "with-defaults" capability.
 
@@ -85,16 +86,17 @@ given by the "with-defaults" capability.
 The <get-data> operation adds a new parameter named "with-origin",
 which if present, requests that the server includes "origin" metadata
 anotations in its response, as detailed in the NMDA.  This parameter
-is only valid for <operational> and any datastores with identities
-derived from the "operational" identity.  Otherwise, if an invalid
-datastore is specified then an <rpc-error> element is returned with an
-<error-tag> value of "invalid-value".  "origin" metadata annotations
-are not included unless a client explicitly requests them.
+is only valid for the operational state datastore and any datastores
+with identities derived from the "operational" identity.  Otherwise,
+if an invalid datastore is specified then an <rpc-error> element is
+returned with an <error-tag> value of "invalid-value".  "origin"
+metadata annotations are not included unless a client explicitly
+requests them.
 
-Data from <operational> can come from multiple sources.  The server
-should return the most accurate value for the "origin" metadata
-annotation as possible, indicating the source of the operational
-value, as specified in section 5.3.4 of
+Data in the operational state datastore can come from multiple
+sources.  The server should return the most accurate value for the
+"origin" metadata annotation as possible, indicating the source of the
+operational value, as specified in section 5.3.4 of
 ^I-D.ietf-netmod-revised-datastores^.
 
 When encoding the origin metadata annotation for a hierarchy of
@@ -114,20 +116,20 @@ datastore, similar to the <edit-config> operation defined in
 ^RFC6241^, but with additional flexibility in naming the target
 datastore.
 
-The <datastore> parameter is a datastore identity that indicates the
+The "datastore" parameter is a datastore identity that indicates the
 desired target datastore where changes should be made.
 
-The <default-operation> parameter is a copy of the <default-operation>
+The "default-operation" parameter is a copy of the "default-operation"
 parameter of the <edit-config> operation.
 
-The <edit-content> choice mirrors the <edit-content> choice of the
-<edit-config> operation. Note, however, that the <config> element in
+The "edit-content" choice mirrors the "edit-content" choice of the
+<edit-config> operation. Note, however, that the "config" element in
 the "edit-content" choice of <edit-data> uses "anydata" (introduced in
-YANG 1.1) while the <config> element in the "edit-content" choice of
+YANG 1.1) while the "config" element in the "edit-content" choice of
 <edit-config> used "anyxml".
 
-The <edit-data> operation does not support the <error-option> and the
-<test-option> parameters that were part of the <edit-config>
+The <edit-data> operation does not support the "error-option" and the
+"test-option" parameters that were part of the <edit-config>
 operation.
 
 ** Augmentations to NETCONF Operations
@@ -145,7 +147,7 @@ RFC Ed.: Update 201X-XX-XX below with correct date.
 
 Support for NMDA requires the server to implement at least revision
 201X-XX-XX of the "ietf-yang-library" module defined in
-^I-D.nmdsdt-netconf-rfc7895bis^.  The server MUST advertise the
+^I-D.ietf-netconf-rfc7895bis^.  The server MUST advertise the
 following capability in the <hello> message (line breaks and
 whitespaces are used for formatting reasons only):
 
@@ -167,7 +169,7 @@ server and only update the cache if the "checksum" value in the
 This document updates ^RFC7950^, section 5.6.4, to allow servers to
 advertise the capability :yang-library:1.1 instead of
 :yang-library:1.0, and to implement the subtree "/yang-library"
-^I-D.nmdsdt-netconf-rfc7895bis^ instead of "/modules-state".
+^I-D.ietf-netconf-rfc7895bis^ instead of "/modules-state".
 
 * NETCONF Datastores YANG Module
 
