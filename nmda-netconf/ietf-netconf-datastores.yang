@@ -61,7 +61,7 @@ module ietf-netconf-datastores {
      (http://www.rfc-editor.org/info/rfcxxxx); see the RFC itself
      for full legal notices.";
 
-  revision 2017-12-08 {
+  revision 2017-12-14 {
     description
       "Initial revision.";
     reference
