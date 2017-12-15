@@ -6,8 +6,9 @@ The Network Management Datastore Architecture defines datastores are a
 fundamental concept binding the data models written in the YANG data
 modeling language to network management protocols.  This document
 extends the NETCONF protocol in order to support the Network
-Management Datastore Architecture. This document updates RFC 7950
-to allow the usage of ^I-D.ietf-netconf-rfc7895bis^ with NETCONF.
+Management Datastore Architecture. This document updates RFC 7950 by
+requiring the usage of ^I-D.ietf-netconf-rfc7895bis^ by NETCONF
+servers implementing the Network Management Datastore Architecture.
 
 * Introduction
 
@@ -25,6 +26,8 @@ allow them to target additional datastores.
 In addition the original <get> operation is deprecated, since the
 information it returns is no longer needed.  The deficiencies of the
 <get> operation were one of the motivations for developing the NMDA.
+
+* Terminology
 
 This document uses the terminology defined by the NMDA
 ^I-D.ietf-netmod-revised-datastores^.
