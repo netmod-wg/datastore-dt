@@ -2,7 +2,7 @@
 # NMDA Changes for NETCONF
 #
 
-The Network Management Datastore Architecture defines datastores are a
+The Network Management Datastore Architecture defines datastores as a
 fundamental concept binding the data models written in the YANG data
 modeling language to network management protocols.  This document
 extends the NETCONF protocol in order to support the Network
@@ -12,7 +12,7 @@ servers implementing the Network Management Datastore Architecture.
 
 * Introduction
 
-This document updates the NETCONF protocol defined in ^RFC6241^ in
+This document extends the NETCONF protocol defined in ^RFC6241^ in
 order to support the Network Management Datastore Architecture (NMDA)
 defined in ^I-D.ietf-netmod-revised-datastores^.
 
