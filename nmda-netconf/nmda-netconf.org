@@ -6,9 +6,13 @@ The Network Management Datastore Architecture defines datastores as a
 fundamental concept binding the data models written in the YANG data
 modeling language to network management protocols.  This document
 extends the NETCONF protocol in order to support the Network
-Management Datastore Architecture. This document updates RFC 7950 by
-requiring the usage of ^I-D.ietf-netconf-rfc7895bis^ by NETCONF
-servers implementing the Network Management Datastore Architecture.
+Management Datastore Architecture. This document updates RFC 6241 by
+defining the new operations <get-data> and <edit-data> that replace
+the <get>, <get-config> and <edit-config> operations on systems
+implementing the Network Management Datastore Architecture.  This
+document also updates RFC 7950 by requiring the usage of
+^I-D.ietf-netconf-rfc7895bis^ by NETCONF servers implementing the
+Network Management Datastore Architecture.
 
 * Introduction
 
@@ -17,15 +21,16 @@ order to support the Network Management Datastore Architecture (NMDA)
 defined in ^I-D.ietf-netmod-revised-datastores^.
 
 NETCONF operations defined in ^RFC6241^ refer to the datastores
-defined in the original datstore model. Several new NETCONF operations
-are required to allow references to the new datastores defined in
-^I-D.ietf-netmod-revised-datastores^. Other existing NETCONF
-operations like <copy-config>, <lock> and <unlock> are augmented to
-allow them to target additional datastores.
+defined in the original datstore model. Two new NETCONF operations
+<get-data> and <edit-data> are introduced to allow references to the
+new datastores defined in ^I-D.ietf-netmod-revised-datastores^. Other
+existing NETCONF operations like <copy-config>, <lock> and <unlock>
+are augmented to allow them to target additional datastores.
 
-In addition the original <get> operation is deprecated, since the
-information it returns is no longer needed.  The deficiencies of the
-<get> operation were one of the motivations for developing the NMDA.
+For systems implementing the Network Management Datastore
+Architecture, the new <get-data> operation replaces the <get> and
+<get-config> operations and the new <edit-data> operation replaces the
+<edit-config> operation.
 
 * Terminology
 
@@ -64,8 +69,8 @@ datastore.  This operation is similar to NETCONF's <get-config>
 operation defined in ^RFC6241^, but it adds the flexibility to
 select the source datastore.
 
-The "source" parameter indicates the datastore which is the source of
-the data to be retrieved.  This is a datastore identity.
+The "datastore" parameter indicates the datastore which is the source
+of the data to be retrieved.  This is a datastore identity.
 
 The <get-data> operation accepts a content filter parameter, similar
 to the "filter" parameter of <get-config>, but using explicit nodes
@@ -114,7 +119,7 @@ with the URI:
 
 *** The <edit-data> Operation
 
-The <edit-data> operation changes the contents of a specific
+The <edit-data> operation changes the contents of a writable
 datastore, similar to the <edit-config> operation defined in
 ^RFC6241^, but with additional flexibility in naming the target
 datastore.
@@ -237,8 +242,8 @@ The security considerations for the base NETCONF protocol operations
     ipr trust200902;
     category std;
     references references.xml;
-    updates 7950;
-    title "NETCONF Update to Support the Network Management Datastore Architecture";
+    updates 6241, 7950;
+    title "NETCONF Extensions to Support the Network Management Datastore Architecture";
     contributor "author:Martin Bjorklund:Tail-f Systems:mbj@tail-f.com";
     contributor "author:Juergen Schoenwaelder:Jacobs University:j.schoenwaelder@jacobs-university.de";
     contributor "author:Phil Shafer:Juniper Networks:phil@juniper.net";
