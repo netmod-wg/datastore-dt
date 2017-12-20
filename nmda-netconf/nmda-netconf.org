@@ -143,11 +143,12 @@ operation.
 ** Augmentations to NETCONF Operations
 
 Several of the operations defined in the base NETCONF YANG module
-^RFC6241^ will continue to be used under the NMDA.  The <lock>,
+^RFC6241^ may to be used for new datastores.  Hence, the <lock>,
 <unlock>, and <validate> operations are augmented with a new
-"datastore" leaf can indicate a desired NMDA datastore.
+"datastore" leaf that can indicate a desired NMDA datastore.  If an
+operation is not supported on a particular datastore then an error is
+returned, as specified in "ietf-netconf-datastores" (see ^yangmod^).
 
-Only writable datastores can be locked.
 
 ** YANG Library Capability
 
@@ -179,8 +180,7 @@ advertise the capability :yang-library:1.1 instead of
 :yang-library:1.0, and to implement the subtree "/yang-library"
 ^I-D.ietf-netconf-rfc7895bis^ instead of "/modules-state".
 
-* NETCONF Datastores YANG Module
-
+* NETCONF Datastores YANG Module @yangmod@
 This module imports definitions from ^RFC6991^, ^RFC6241^, ^RFC6243',
 and ^I-D.ietf-netmod-revised-datastores^.
 
