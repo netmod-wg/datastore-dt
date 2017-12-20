@@ -86,8 +86,8 @@ validate-ex-yang:
 
 validate-ex-xml: ietf-origin.yang example-system.yang \
 	example-system.oper.yang
-	yang2dsdl -j -t data -v ex-intended.xml $< example-system.yang
-	yang2dsdl -j -t data -v ex-oper.xml $< example-system.oper.yang
+	yang2dsdl -j -x -t data -v ex-intended.xml $< example-system.yang
+	yang2dsdl -j -x -t data -v ex-oper.xml $< example-system.oper.yang
 
 ${references_xml}: ${references_src}
 	$(oxtradoc) -m mkback $< > $@

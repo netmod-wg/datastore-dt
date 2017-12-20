@@ -219,24 +219,27 @@ intended configuration and applied configuration has developed.
 The following drawing shows the original model of datastores as it is
 currently used by NETCONF ^RFC6241^:
 
+# use @ to bypass oxtradoc in order to get numbered figures
 #+BEGIN_EXAMPLE
-  +-------------+                 +-----------+
-  | <candidate> |                 | <startup> |
-  |  (ct, rw)   |<---+       +--->| (ct, rw)  |
-  +-------------+    |       |    +-----------+
-         |           |       |           |
-         |         +-----------+         |
-         +-------->| <running> |<--------+
-                   | (ct, rw)  |
-                   +-----------+
-                         |
-                         v
-                  operational state  <--- control plane
-                      (cf, ro)
-
-  ct = config true; cf = config false
-  rw = read-write; ro = read-only
-  boxes denote datastores
+@<figure anchor="oldarch"><artwork><![CDATA[
+@  +-------------+                 +-----------+
+@  | <candidate> |                 | <startup> |
+@  |  (ct, rw)   |<---+       +--->| (ct, rw)  |
+@  +-------------+    |       |    +-----------+
+@         |           |       |           |
+@         |         +-----------+         |
+@         +-------->| <running> |<--------+
+@                   | (ct, rw)  |
+@                   +-----------+
+@                         |
+@                         v
+@                  operational state  <--- control plane
+@                      (cf, ro)
+@
+@  ct = config true; cf = config false
+@  rw = read-write; ro = read-only
+@  boxes denote datastores
+@]]></artwork></figure>
 
 #+END_EXAMPLE
 
@@ -283,42 +286,46 @@ Below is a new conceptual model of datastores extending the original
 model in order to reflect the experience gained with the original
 model.
 
+# use @ to bypass oxtradoc in order to get numbered figures
 #+BEGIN_EXAMPLE
-  +-------------+                 +-----------+
-  | <candidate> |                 | <startup> |
-  |  (ct, rw)   |<---+       +--->| (ct, rw)  |
-  +-------------+    |       |    +-----------+
-         |           |       |           |
-         |         +-----------+         |
-         +-------->| <running> |<--------+
-                   | (ct, rw)  |
-                   +-----------+
-                         |
-                         |        // configuration transformations,
-                         |        // e.g., removal of "inactive"
-                         |        // nodes, expansion of templates
-                         v
-                   +------------+
-                   | <intended> | // subject to validation
-                   | (ct, ro)   |
-                   +------------+
-                         |        // changes applied, subject to
-                         |        // local factors, e.g., missing
-                         |        // resources, delays
-                         |
-    dynamic              |   +-------- learned configuration
-    configuration        |   +-------- system configuration
-    datastores -----+    |   +-------- default configuration
-                    |    |   |
-                    v    v   v
-                 +---------------+
-                 | <operational> | <-- system state
-                 | (ct + cf, ro) |
-                 +---------------+
-
-  ct = config true; cf = config false
-  rw = read-write; ro = read-only
-  boxes denote named datastores
+@<figure anchor="newarch"><artwork><![CDATA[
+@  +-------------+                 +-----------+
+@  | <candidate> |                 | <startup> |
+@  |  (ct, rw)   |<---+       +--->| (ct, rw)  |
+@  +-------------+    |       |    +-----------+
+@         |           |       |           |
+@         |         +-----------+         |
+@         +-------->| <running> |<--------+
+@                   | (ct, rw)  |
+@                   +-----------+
+@                         |
+@                         |        // configuration transformations,
+@                         |        // e.g., removal of nodes marked as
+@                         |        // "inactive", expansion of
+@                         |        // templates
+@                         v
+@                   +------------+
+@                   | <intended> | // subject to validation
+@                   | (ct, ro)   |
+@                   +------------+
+@                         |        // changes applied, subject to
+@                         |        // local factors, e.g., missing
+@                         |        // resources, delays
+@                         |
+@    dynamic              |   +-------- learned configuration
+@    configuration        |   +-------- system configuration
+@    datastores -----+    |   +-------- default configuration
+@                    |    |   |
+@                    v    v   v
+@                 +---------------+
+@                 | <operational> | <-- system state
+@                 | (ct + cf, ro) |
+@                 +---------------+
+@
+@  ct = config true; cf = config false
+@  rw = read-write; ro = read-only
+@  boxes denote named datastores
+@]]></artwork></figure>
 
 #+END_EXAMPLE
 
@@ -663,9 +670,9 @@ modify the contents of some datastore.
 
 * YANG Modules @yang-module@
 
-!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-08-17.yang"
+!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-12-20.yang"
 
-!! include-figure ietf-origin.yang extract-to="ietf-origin@2017-08-17.yang"
+!! include-figure ietf-origin.yang extract-to="ietf-origin@2017-12-20.yang"
 
 * IANA Considerations @iana-con@
 
@@ -685,7 +692,7 @@ the format in ^RFC3688^, the following registrations are requested:
 ** Updates to the YANG Module Names Registry
 
 This document registers two YANG modules in the YANG Module Names registry
-^RFC6020^.  Following the format in ^RFC6020^, the the following registrations
+^RFC6020^.  Following the format in ^RFC6020^, the following registrations
 are requested:
 
    name:         ietf-datastores

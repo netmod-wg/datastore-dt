@@ -48,7 +48,7 @@ module ietf-origin {
      (http://www.rfc-editor.org/info/rfcxxxx); see the RFC itself
      for full legal notices.";
 
-  revision 2017-08-17 {
+  revision 2017-12-20 {
     description
       "Initial revision.";
     reference
@@ -138,8 +138,8 @@ module ietf-origin {
     type origin-ref;
     description
       "The 'origin' annotation can be present on any configuration
-       data node in the operational datastore.  It specifies from
-       where the node originated.  If not specified for a given
+       data node in the operational state datastore.  It specifies
+       from where the node originated.  If not specified for a given
        configuration data node then the origin is the same as the
        origin of its parent node in the data tree.  The origin for
        any top level configuration data nodes must be specified.";
