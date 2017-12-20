@@ -250,7 +250,12 @@ module ietf-netconf-datastores {
     leaf datastore {
       type ds:datastore-ref;
       description
-        "Datastore to lock.";
+        "Datastore to lock.
+
+         If the lock operation is not supported by the server on the
+         specified target datastore, then the server MUST return an
+         <rpc-error> element with an <error-tag> value of
+         'invalid-value'";
     }
   }
   augment "/nc:unlock/nc:input/nc:target/nc:config-target" {
@@ -259,7 +264,12 @@ module ietf-netconf-datastores {
     leaf datastore {
       type ds:datastore-ref;
       description
-        "Datastore to unlock.";
+        "Datastore to unlock.
+
+         If the unlock operation is not supported by the server on the
+         specified target datastore, then the server MUST return an
+         <rpc-error> element with an <error-tag> value of
+         'invalid-value'";
     }
   }
 
@@ -274,7 +284,13 @@ module ietf-netconf-datastores {
     leaf datastore {
       type ds:datastore-ref;
       description
-        "Datastore to validate.";
+        "Datastore to validate.
+
+         If the validate operation is not supported by the server on
+         the specified target datastore, then the server MUST return
+         an <rpc-error> element with an <error-tag> value of
+         'invalid-value'";
+
     }
   }
 }
