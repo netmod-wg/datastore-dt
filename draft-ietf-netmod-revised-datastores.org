@@ -5,7 +5,7 @@ in the YANG data modeling language to network management protocols
 such as NETCONF and RESTCONF.  This document defines an architectural
 framework for datastores based on the experience gained with the
 initial simpler model, addressing requirements that were not well
-supported in the initial model.
+supported in the initial model.  This document updates RFC 7950.
 
 * Introduction
 
@@ -327,7 +327,10 @@ model.
 The conventional configuration datastores are a set of configuration
 datastores that share exactly the same datastore schema, allowing data
 to be copied between them.  The term is meant as a generic umbrella
-description of these datastores.  The set of datastores include:
+description of these datastores.  If a module does not contain any
+configuration data nodes and it is not needed to satisfy any imports,
+then it MAY be omitted from the datastore schema for the conventional
+configuration datastores.  The set of datastores include:
 
 - <running>
 - <candidate>
@@ -440,6 +443,12 @@ since the information is ephemeral, i.e., lost upon reboot.  The
 dynamic configuration datastores interact with the rest of the system
 through <operational>.
 
+The datastore schema for a dynamic configuration datastore MAY differ
+from the datastore schema used for conventional configuration
+datastores.  If a module does not contain any configuration data nodes
+and it is not needed to satisfy any imports, then it MAY be omitted
+from the datastore schema for the dynamic configuration datastore.
+
 ** The Operational State Datastore (<operational>)
 
 The operational state datastore (<operational>) is a read-only
@@ -459,8 +468,9 @@ configuration datastores.
 
 The datastore schema for <operational> MUST be a superset of the
 combined datastore schema used in all configuration datastores except
-that YANG nodes supported in a configuration datastore MAY be omitted
-from <operational> if a server is not able to accurately report them.
+that configuration data nodes supported in a configuration datastore
+MAY be omitted from <operational> if a server is not able to
+accurately report them.
 
 Requests to retrieve nodes from <operational> always return the value
 in use if the node exists, regardless of any default value specified
