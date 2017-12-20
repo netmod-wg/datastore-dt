@@ -13,3 +13,8 @@
     ietf-ref I-D.ietf-netconf-rfc7895bis;
     ietf-ref I-D.ietf-netconf-rfc6536bis;
 }}
+
+{{references:
+    title "Informative References";
+    ietf-ref I-D.ietf-netmod-yang-tree-diagrams;
+}}
