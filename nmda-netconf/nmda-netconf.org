@@ -80,16 +80,15 @@ of the data to be retrieved.  This is a datastore identity.
 
 The <get-data> operation accepts a content filter parameter, similar
 to the "filter" parameter of <get-config>, but using explicit nodes
-for subtree filtering and XPath filtering. The behaviour of <get-data>
-differs from the behaviour of <get-config> in case the XPath filter
-does not return a node set: The <get-config> operation fails in this
-situation while the <get-data> operation returns an empty result.
+for subtree filtering ("subtree-filter") and XPath filtering
+("xpath-filter").
 
-Additional filters are defined to retrieve only "config true" nodes or
-nodes matching a given "origin" value.
+The "config-filter" parameter can be used to retrieve only "config
+true" or "config false" nodes. The "origin-filter" can be used to
+select nodes matching a given "origin" value.
 
-The parameter "depth" can be used by the client to limit the number of
-sub-tree levels that are returned in the reply.
+The "max-depth" parameter can be used by the client to limit the
+number of sub-tree levels that are returned in the reply.
 
 The <get-data> operation also supports the "with-defaults" parameter
 as defined in ^RFC6243^.  The supported values follow the constraints
@@ -123,12 +122,22 @@ with the URI:
 
   urn:ietf:params:netconf:capability:with-origin:1.0
 
+The "with-defaults" parameter does not apply when interacting with an
+operational datastore. This means that all values are always returned
+from the operational state datastore, even if a node happens to have a
+default statement in the YANG module, and this default value is being
+used by the server. If the "with-defaults" parameter is present in a
+request to such a datastore, then the server MUST return an
+<rpc-error> element with an <error-tag> value of "invalid-value".
+
 *** The <edit-data> Operation
 
 The <edit-data> operation changes the contents of a writable
 datastore, similar to the <edit-config> operation defined in
 ^RFC6241^, but with additional flexibility in naming the target
-datastore.
+datastore. If an <edit-data> operation is invoked on a non-writable
+datastore, then an error is returned, as specified in
+"ietf-netconf-datastores" (see ^yangmod^).
 
 !! include-figure edit-data.tree
 
@@ -153,9 +162,10 @@ operation.
 Several of the operations defined in the base NETCONF YANG module
 ^RFC6241^ may to be used for new datastores.  Hence, the <lock>,
 <unlock>, and <validate> operations are augmented with a new
-"datastore" leaf that can indicate a desired NMDA datastore.  If an
-operation is not supported on a particular datastore then an error is
-returned, as specified in "ietf-netconf-datastores" (see ^yangmod^).
+"datastore" leaf that can select the desired datastore.  If a <lock>,
+<unlock>, or <validate> operation is not supported on a particular
+datastore then an error is returned, as specified in
+"ietf-netconf-datastores" (see ^yangmod^).
 
 
 ** YANG Library Capability
@@ -195,7 +205,7 @@ and ^I-D.ietf-netmod-revised-datastores^.
 RFC Ed.: update the date below with the date of RFC publication and
 remove this note.
 
-!! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-12-14.yang"
+!! include-figure ietf-netconf-datastores.yang extract-to="ietf-netconf-datastores@2017-12-22.yang"
 
 * IANA Considerations
 

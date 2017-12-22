@@ -61,7 +61,7 @@ module ietf-netconf-datastores {
      (http://www.rfc-editor.org/info/rfcxxxx); see the RFC itself
      for full legal notices.";
 
-  revision 2017-12-14 {
+  revision 2017-12-22 {
     description
       "Initial revision.";
     reference
@@ -77,7 +77,9 @@ module ietf-netconf-datastores {
 
   rpc get-data {
     description
-      "Retrieve data from an NMDA datastore.";
+      "Retrieve data from an NMDA datastore. The content returned
+       by get-data must satisfy all filters, i.e., the filter
+       criteria are logically ANDed.";
     input {
       leaf datastore {
         type ds:datastore-ref;
@@ -101,14 +103,13 @@ module ietf-netconf-datastores {
           if-feature nc:xpath;
           type yang:xpath1.0;
           description
-            "This parameter contains an XPath expression
-             identifying the portions of the target
-             datastore to retrieve.
+            "This parameter contains an XPath expression identifying
+             the portions of the target datastore to retrieve.
 
              If the expression returns a node-set, all nodes in the
              node-set are selected by the filter.  Otherwise, if the
-             expression does not return a node-set, the filter does
-             not select any nodes.
+             expression does not return a node-set, then the get-data
+             operation fails.
 
              The expression is evaluated in the following XPath
              context:
@@ -127,30 +128,25 @@ module ietf-netconf-datastores {
         }
       }
 
-      container where {
+      leaf config-filter {
+        type boolean;
         description
-          "Filter content with the specified criteria.  All given
-           criteria are logically AND:ed.";
-
-        leaf config {
-          type boolean;
-          description
-            "Filter for nodes with the given value for their
-             'config' property.";
+          "Filter for nodes with the given value for their
+           'config' property.";
+      }
+      leaf origin-filter {
+        when 'derived-from-or-self(../datastore, "or:operational")';
+        if-feature origin;
+        type identityref {
+          base or:origin;
         }
-        leaf origin {
-          if-feature origin;
-          type identityref {
-            base or:origin;
-          }
-          description
-            "Filter based on 'origin' annotation.  A node matches the
-             filter if its 'origin' annotation is derived from or
-             equal to the given filter value.";
-        }
+        description
+          "Filter based on 'origin' annotation.  A node matches the
+           filter if its 'origin' annotation is derived from or
+           equal to the given filter value.";
       }
 
-      leaf depth {
+      leaf max-depth {
         type union {
           type uint16 {
             range "1..65535";
@@ -199,7 +195,11 @@ module ietf-netconf-datastores {
       leaf datastore {
         type ds:datastore-ref;
         description
-          "Datastore which data affects.";
+          "Datastore which is the target of the edit-data operation.
+
+           If the target datastore is not writable, then the server
+           MUST return an <rpc-error> element with an <error-tag>
+           value of 'invalid-value'";
       }
       leaf default-operation {
         type enumeration {
