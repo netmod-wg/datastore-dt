@@ -47,7 +47,7 @@ module ietf-netconf-datastores {
     "This YANG module defines a set of NETCONF operations to support
      the Network Management Datastore Architecture (NMDA).
 
-     Copyright (c) 2017 IETF Trust and the persons identified as
+     Copyright (c) 2018 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
 
      Redistribution and use in source and binary forms, with or
@@ -61,11 +61,12 @@ module ietf-netconf-datastores {
      (http://www.rfc-editor.org/info/rfcxxxx); see the RFC itself
      for full legal notices.";
 
-  revision 2017-12-22 {
+  revision 2018-01-10 {
     description
       "Initial revision.";
     reference
-      "RFC XXXX: NETCONF Support for NMDA";
+      "RFC XXXX: NETCONF Extensions to Support the Network Management
+                 Datastore Architecture";
   }
 
   feature origin {
