@@ -22,6 +22,10 @@ protocols expose all these conceptual datastores.  This architecture
 is agnostic with regard to the encoding used by network management
 protocols.
 
+This document updates RFC 7950 by refining the definition of the
+accessible tree for some XPath context (see ^xpath^) and the
+invocation context of operations (see ^invocation^).
+
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
 NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
 "MAY", and "OPTIONAL" in this document are to be interpreted as
@@ -204,7 +208,7 @@ but note that NETCONF was defined before YANG existed):
 
 Section 4.3.3 of ^RFC6244^ discusses operational state and among other
 things mentions the option to consider operational state as being
-stored in another datastore.  Section 4.4 of this document then
+stored in another datastore.  Section 4.4 of ^RFC6244^ then
 concludes that at the time of the writing, modeling state as distinct
 leafs and distinct branches is the recommended approach.
 
@@ -621,7 +625,7 @@ particular configuration data node then it SHOULD use the origin
 
 * Implications on YANG
 
-** XPath Context
+** XPath Context @xpath@
 
 This section updates section 6.4.1 of RFC 7950.
 
@@ -656,7 +660,7 @@ accessible trees for some XPath contexts are refined as follows:
   node representing the operation being defined has the operation's
   output parameters as children.
 
-** Invocation of Actions and RPCs
+** Invocation of Actions and RPCs @invocation@
 
 This section updates section 7.15 of RFC 7950.
 
