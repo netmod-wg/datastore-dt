@@ -386,7 +386,7 @@ of <running>.
 *** The Running Configuration Datastore (<running>)
 
 The running configuration datastore (<running>) is a configuration
-datastore that holds the complete current configuration on the
+datastore that holds the current configuration of the
 device.  It MAY include configuration that requires further
 transformation before it can be applied, e.g., inactive
 configuration, or template-mechanism-oriented configuration that

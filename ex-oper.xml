@@ -3,7 +3,7 @@
     xmlns="urn:example:system"
     xmlns:or="urn:ietf:params:xml:ns:yang:ietf-origin">
 
-  <hostname or:origin="or:learned">bar</hostname>
+  <hostname or:origin="or:learned">bar.example.com</hostname>
 
   <interface or:origin="or:intended">
     <name>eth0</name>

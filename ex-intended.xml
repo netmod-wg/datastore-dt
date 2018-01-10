@@ -1,7 +1,7 @@
 <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
 <system xmlns="urn:example:system">
 
-  <hostname>foo</hostname>
+  <hostname>foo.example.com</hostname>
 
   <interface>
     <name>eth0</name>
