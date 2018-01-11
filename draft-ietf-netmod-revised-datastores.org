@@ -63,9 +63,10 @@ different.
 
 With the revised architectural model of datastores defined in this
 document, the data objects are defined only once in the YANG schema
-but independent instantiations can appear in two different datastores,
-one for configured values and one for operational state values. This
-provides a more elegant and simpler solution to the problem.
+but independent instantiations can appear in different datastores,
+e.g., one for a configured value and another for an operationally used
+value. This provides a more elegant and simpler solution to the
+problem.
 
 The revised architectural model of datastores supports additional
 datastores for systems that support more advanced processing chains
