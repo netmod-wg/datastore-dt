@@ -674,9 +674,9 @@ modify the contents of some datastore.
 
 * YANG Modules @yang-module@
 
-!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2017-12-20.yang"
+!! include-figure ietf-datastores.yang extract-to="ietf-datastores@2018-01-11.yang"
 
-!! include-figure ietf-origin.yang extract-to="ietf-origin@2017-12-20.yang"
+!! include-figure ietf-origin.yang extract-to="ietf-origin@2018-01-11.yang"
 
 * IANA Considerations @iana-con@
 
