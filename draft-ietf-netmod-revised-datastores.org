@@ -945,7 +945,7 @@ In this scenario, we've added the following to <running>:
     <local-as>64501</local-as>
     <peer-as>64502</peer-as>
     <peer>
-      <name>10.1.2.3</name>
+      <name>2001:db8::2:3</name>
     </peer>
   </bgp>
 
@@ -978,7 +978,7 @@ have their values.
     <local-as>64501</local-as>
     <peer-as>64502</peer-as>
     <peer>
-      <name>10.1.2.3</name>
+      <name>2001:db8::2:3</name>
       <local-as or:origin="or:default">64501</local-as>
       <peer-as or:origin="or:default">64502</peer-as>
       <local-port or:origin="or:system">60794</local-port>
@@ -1008,7 +1008,7 @@ origin of the original data.
     <local-as>64501</local-as>
     <peer-as>64502</peer-as>
     <peer>
-      <name>10.1.2.3</name>
+      <name>2001:db8::2:3</name>
       <local-as or:origin="or:default">64501</local-as>
       <peer-as or:origin="or:default">64502</peer-as>
       <local-port or:origin="or:system">60794</local-port>
