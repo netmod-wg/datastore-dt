@@ -717,8 +717,16 @@ management using NETCONF/RESTCONF and YANG.  It has no security impact
 on the Internet.
 
 Although this document specifies several YANG modules, these modules
-only define identities and meta-data, hence the "YANG module security
-guidelines" do not apply.
+only define identities and a metadata annotation, hence the "YANG
+module security guidelines" do not apply.
+
+The origin metadata annotation exposes the origin of values in the
+applied configuration. Origin information may provide hints that
+certain control plane protocols are active on a device. Since origin
+information is tied to applied configuration values, it is only
+accessible to clients that have the permissions to read the applied
+configuration values. Security administrators should consider the
+sensitivity of origin information while defining access control rules.
 
 * Acknowledgments
 
